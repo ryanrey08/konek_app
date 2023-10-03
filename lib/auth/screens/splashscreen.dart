@@ -68,24 +68,25 @@ class _SplashScreenState extends State<SplashScreen> {
         body: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/eaggro-bg.jpg'),
-              fit: BoxFit.cover,
-              // colorFilter: ColorFilter.mode(
-              //   Colors.black.withOpacity(0.2),
-              //   BlendMode.dstATop,
-              // ),
-            ),
-            // gradient: LinearGradient(
-            //   begin: Alignment.topCenter,
-            //   end: Alignment.bottomCenter,
-            //   stops: [0.1, 0.8],
-            //   colors: [
-            //    Colors.white, Colors.green[300]
-            //   ],
-            // ),
-          ),
+          color: Color.fromARGB(255, 55, 57, 175),
+          // decoration: BoxDecoration(
+          //   image: DecorationImage(
+          //     image: AssetImage('images/connections-clipart-md.png'),
+          //     fit: BoxFit.cover,
+          //     // colorFilter: ColorFilter.mode(
+          //     //   Colors.black.withOpacity(0.2),
+          //     //   BlendMode.dstATop,
+          //     // ),
+          //   ),
+          //   // gradient: LinearGradient(
+          //   //   begin: Alignment.topCenter,
+          //   //   end: Alignment.bottomCenter,
+          //   //   stops: [0.1, 0.8],
+          //   //   colors: [
+          //   //    Colors.white, Colors.green[300]
+          //   //   ],
+          //   // ),
+          // ),
           // decoration: BoxDecoration(
           //                   gradient: LinearGradient(
           //                       begin: Alignment.topLeft,
@@ -114,7 +115,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       // ),
                       //  SizedBox(height: 10),
                       Image.asset(
-                        'assets/images/eaggro-1.png',
+                        'images/novulutions.png',
                         width: widget.useMobileLayout ? 300 : 350,
                         height: widget.useMobileLayout ? 300 : 350,
                       ),

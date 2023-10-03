@@ -1,0 +1,233 @@
+[
+    {
+        "id":  1,
+        "location": "Baclaran",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 2,
+        "location": "Banay-Banay",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 3,
+        "location": "Banlic",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 4,
+        "location": "Bigaa",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 5,
+        "location": "Butong",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 6,
+        "location": "Casile",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 7,
+        "location": "Diezmo",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 8,
+        "location": "Gulod",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 9,
+        "location": "Mamatid",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 10,
+        "location": "Marinig",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 11,
+        "location": "Niugan",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 12,
+        "location": "Pittland",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 13,
+        "location": "Pulo",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 14,
+        "location": "Sala",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 15,
+        "location": "San Isidro",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 16,
+        "location": "Poblacion I",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 17,
+        "location": "Poblacion II",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 18,
+        "location": "Poblacion III",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 19,
+        "location": "Cabuyao",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 20,
+        "location": "Laguna",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    },
+    {
+        "id": 21,
+        "location": "Philippines",
+        "confirmed": 1,
+        "recovered": 2,
+        "deceased": 3,
+        "suspect": 4,
+        "probable": 5,
+        "source": "https://covid19stats.ph/stats/by-location/cabuyao-laguna",
+        "last_update": "19 August 2020 10:45pm"
+    }
+]
