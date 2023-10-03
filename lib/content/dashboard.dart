@@ -3,6 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:konek_app/auth/screens/login.dart';
 import 'package:konek_app/features/widgets.dart';
 
+import './home.dart';
+import '../profile/screens/profile.dart';
+import './transaction.dart';
+
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
   static const routeName = '/dashboard';
@@ -12,6 +16,27 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  int? _currentIndex;
+  String? _pageTitle;
+
+  final tabs = [
+    HomePage(),
+    const Transaction(),
+    // ReportPage(),
+    // MiscPage(),
+    // ComponentsPage()
+  ];
+
+  var pageTitle = ["Home", "Transactions"];
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = 0;
+    _pageTitle = pageTitle[0];
+    // startTime();
+  }
+
   @override
   Widget build(BuildContext context) {
     double appBarHeight = AppBar().preferredSize.height;
@@ -25,7 +50,7 @@ class _DashboardState extends State<Dashboard> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text(
-            "Dashboard",
+            _pageTitle!,
             style: GoogleFonts.poppins(
               textStyle: TextStyle(
                 fontSize: useMobileLayout ? 16 : 18,
@@ -49,56 +74,58 @@ class _DashboardState extends State<Dashboard> {
           ],
         ),
         // body: pages[_currentIndex],
-        body: Container(),
+        body: tabs[_currentIndex!],
         bottomNavigationBar: BottomAppBar(
           child: BottomNavigationBar(
+            // selectedItemColor: Colors.white,
+            // unselectedItemColor: Colors.black,
             type: BottomNavigationBarType.fixed,
             onTap: (index) {
               setState(() {
-                // _currentIndex = index;
-                // _pageTitle = pageTitle[index];
-                // print(index.toString());
+                _currentIndex = index;
+                _pageTitle = pageTitle[index];
+                print(index.toString());
               });
             },
             backgroundColor: Color.fromARGB(255, 55, 57, 175),
             currentIndex: 0,
             items: [
               BottomNavigationBarItem(
-                icon: new Icon(
-                  Icons.home,
-                  size: 20,
-                  color: Colors.white,
-                ),
-                label: "Home"
-                // title: Text(
-                //   'Home',
-                //   style: GoogleFonts.poppins(
-                //     textStyle: TextStyle(
-                //       fontSize: 10,
-                //       color: Colors.white,
-                //     ),
-                //   ),
-                // ),
-                // backgroundColor: Colors.green[50],
-              ),
+                  icon: new Icon(
+                    Icons.home,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  label: ""
+                  // title: Text(
+                  //   'Home',
+                  //   style: GoogleFonts.poppins(
+                  //     textStyle: TextStyle(
+                  //       fontSize: 10,
+                  //       color: Colors.white,
+                  //     ),
+                  //   ),
+                  // ),
+                  // backgroundColor: Colors.green[50],
+                  ),
               BottomNavigationBarItem(
-                icon: new Icon(
-                  Icons.list,
-                  size: 20,
-                  color: Colors.white,
-                ),
-                label: "Application"
-                // title: Text(
-                //   'Application',
-                //   style: GoogleFonts.poppins(
-                //     textStyle: TextStyle(
-                //       fontSize: 13,
-                //       color: Colors.white,
-                //     ),
-                //   ),
-                // ),
-                // backgroundColor: Colors.green[50],
-              ),
+                  icon: new Icon(
+                    Icons.list,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  label: ""
+                  // title: Text(
+                  //   'Application',
+                  //   style: GoogleFonts.poppins(
+                  //     textStyle: TextStyle(
+                  //       fontSize: 13,
+                  //       color: Colors.white,
+                  //     ),
+                  //   ),
+                  // ),
+                  // backgroundColor: Colors.green[50],
+                  ),
               // BottomNavigationBarItem(
               //   icon: new Icon(
               //     Icons.report,
@@ -174,7 +201,8 @@ class _DashboardState extends State<Dashboard> {
                           child: Theme(
                             data: ThemeData(dividerColor: Colors.transparent),
                             child: DrawerHeader(
-                              decoration: BoxDecoration(color: Color.fromARGB(255, 55, 57, 175)),
+                              decoration: BoxDecoration(
+                                  color: Color.fromARGB(255, 55, 57, 175)),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -185,14 +213,14 @@ class _DashboardState extends State<Dashboard> {
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
                                         image: AssetImage(
-                                            'images/novulutions.png'),
+                                            'assets/images/novulutions.png'),
                                       ),
                                       // border: Border.all(color: Colors.grey),
                                       // borderRadius: BorderRadius.circular(50),
                                     ),
                                   ),
                                   // isLoading
-                                  //     ? 
+                                  //     ?
                                   //     Text(
                                   //    '',
                                   //         style: GoogleFonts.poppins(
@@ -237,9 +265,10 @@ class _DashboardState extends State<Dashboard> {
                                 useMobileLayout: useMobileLayout,
                                 iconData: Icons.account_box,
                                 onTapFunc: () {
-                                  // Navigator.of(context).pushReplacementNamed(
-                                  //     MyProfile.routeName);
-                                }, color: Colors.white,
+                                  Navigator.of(context).pushReplacementNamed(
+                                      MyProfile.routeName);
+                                },
+                                color: Colors.white,
                               ),
 
                               // DrawerOptions(
@@ -306,7 +335,8 @@ class _DashboardState extends State<Dashboard> {
 
                                     Navigator.of(context)
                                         .pushReplacementNamed(Login.routeName);
-                                  }, color: Colors.white,
+                                  },
+                                  color: Colors.white,
                                   dense: false,
                                 ),
                               ),

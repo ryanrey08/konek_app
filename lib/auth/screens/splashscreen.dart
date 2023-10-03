@@ -115,7 +115,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       // ),
                       //  SizedBox(height: 10),
                       Image.asset(
-                        'images/novulutions.png',
+                        'assets/images/novulutions.png',
                         width: widget.useMobileLayout ? 300 : 350,
                         height: widget.useMobileLayout ? 300 : 350,
                       ),

@@ -64,7 +64,7 @@ class _LoginState extends State<Login> {
                     height: useMobileLayout ? 280 : 400,
                     decoration: const BoxDecoration(
                       image: DecorationImage(
-                          image: AssetImage('images/connection.png'),
+                          image: AssetImage('assets/images/connection.png'),
                           fit: BoxFit.cover),
                     ),
                   ),
@@ -114,13 +114,14 @@ class _LoginState extends State<Login> {
                                       ),
                                     ),
                                     Container(
-                                      width: 100,
-                                      height: 100,
-                                      child: const Image(
-                                        image: NetworkImage(
-                                            'assets/images/novulutions.png'),
-                                      ),
-                                    ),
+                                        width: 100,
+                                        height: 100,
+                                        child: const Image(
+                                          // image: NetworkImage(
+                                          //     'assets/images/novulutions.png'),
+                                          image: AssetImage(
+                                              'assets/images/novulutions.png'),
+                                        )),
                                     SizedBox(
                                       height: 15,
                                     ),

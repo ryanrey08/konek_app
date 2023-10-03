@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:konek_app/profile/screens/profile.dart';
 import 'package:provider/provider.dart';
 import 'package:konek_app/auth/screens/login.dart';
 import 'package:konek_app/auth/screens/register.dart';
@@ -60,6 +61,7 @@ class _MyAppPageState extends State<MyApp> {
               Login.routeName: (context) => Login(),
               // ignore: equal_keys_in_map
               AccountRegister.routeName: (context) => AccountRegister(),
+              MyProfile.routeName: (context) => MyProfile(),
             },
           ),
         ),

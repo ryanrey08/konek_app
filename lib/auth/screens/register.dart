@@ -269,15 +269,20 @@ class _AccountRegisterState extends State<AccountRegister> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
+                          SizedBox(
+                            height: 20,
+                          ),
                           Container(
                             width: useMobileLayout ? 100 : 220,
                             height: useMobileLayout ? 100 : 220,
                             alignment: Alignment.topRight,
                             // width: 250,
                             // height: 250,
+
                             decoration: BoxDecoration(
                               image: const DecorationImage(
-                                image: AssetImage('images/novulutions.png'),
+                                image:
+                                    AssetImage('assets/images/novulutions.png'),
                               ),
                             ),
                           ),
@@ -323,20 +328,25 @@ class _AccountRegisterState extends State<AccountRegister> {
                           confirmpassword("Confirm Password", Icons.password,
                               txtConfirmPassword, useMobileLayout),
                           Container(
-                            child: Row(children: [
+                              child: Row(
+                            children: [
                               Checkbox(
-                              checkColor: Colors.black,
-                              //fillColor: MaterialStateProperty.resolveWith(getColor),
-                              value: isChecked,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                   isChecked = value!;
-                                });
-                              },
-                            ),
-                            Expanded(child: Text("I agree the Terms and Conditions and Privacy Policy", style: GoogleFonts.poppins(color: Colors.white),))
-                            ],)
-                          ),
+                                checkColor: Colors.black,
+                                //fillColor: MaterialStateProperty.resolveWith(getColor),
+                                value: isChecked,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    isChecked = value!;
+                                  });
+                                },
+                              ),
+                              Expanded(
+                                  child: Text(
+                                "I agree the Terms and Conditions and Privacy Policy",
+                                style: GoogleFonts.poppins(color: Colors.white),
+                              ))
+                            ],
+                          )),
 
                           SizedBox(
                             height: 10,

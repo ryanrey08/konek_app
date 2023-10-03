@@ -138,7 +138,7 @@ class CustomFormField extends StatelessWidget {
         ),
         controller: controller,
         onFieldSubmitted: onFieldSubmitted,
-        validator: validator(),
+        validator: (_) => validator(),
       ),
     );
   }
@@ -203,7 +203,7 @@ class DrawerOptions extends StatelessWidget {
           ),
           // style: SettingsStyle.listTileText(),
         ),
-        leading: Icon(iconData, color: Colors.green[900], size: 20),
+        leading: Icon(iconData, color: Color.fromARGB(255, 55, 57, 175), size: 20),
         trailing: Icon(Icons.keyboard_arrow_right, size: 15),
         onTap: onTapFunc,
       ),
