@@ -13,6 +13,11 @@ import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
 import 'package:datetime_picker_formfield_new/datetime_picker_formfield.dart';
 import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:grecaptcha/grecaptcha.dart';
+import 'package:grecaptcha/grecaptcha_platform_interface.dart';
+import 'package:flutter_gcaptcha_v3/constants.dart';
+import 'package:flutter_gcaptcha_v3/recaptca_config.dart';
+import 'package:flutter_gcaptcha_v3/web_view.dart';
 // import 'package:loader_overlay/loader_overlay.dart';
 
 import 'dart:convert';
@@ -195,6 +200,31 @@ class _AccountRegisterState extends State<AccountRegister> {
     // print(errorMessage);
   }
 
+  String _token = 'Click the below button to generate token';
+  bool badgeVisible = true;
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> getToken() async {
+    String token = await GRecaptchaV3.execute('6LdPSX0oAAAAAGZuVcMRzKh5abcPyLVrs4qMgDKS') ?? 'null returned';
+    setState(() {
+      _token = token;
+       print(token);
+    });
+  }
+  
+    _openReCaptcha() async {
+      bool ready = await GRecaptchaV3.ready(CAPTCHA_SITE_KEY);
+      print(ready);
+    String? tokenResult = await GRecaptchaV3.execute(CAPTCHA_SITE_KEY);
+    print('tokenResult: $tokenResult');
+    if (tokenResult != null) {
+      setState(() {
+        isNotARobot = true;
+      });
+    }
+
+    // setState
+  }
+
   @override
   Widget build(BuildContext context) {
     // ScreenUtil.init(context, width: 750, height: 1334, allowFontScaling: false);
@@ -207,6 +237,8 @@ class _AccountRegisterState extends State<AccountRegister> {
     bool _hideConfirmPassword = true;
 
     final format = DateFormat("MM/dd/yyyy");
+
+      //getToken();
 
     return SafeArea(
       child: Scaffold(
@@ -347,6 +379,31 @@ class _AccountRegisterState extends State<AccountRegister> {
                               ))
                             ],
                           )),
+                               SelectableText('Token: $_token\n'),
+              ElevatedButton(
+                onPressed: _openReCaptcha,
+                child: const Text('Get new token'),
+              ),
+              OutlinedButton.icon(
+                onPressed: () {
+                  if (badgeVisible) {
+                    GRecaptchaV3.hideBadge();
+                  } else {
+                    GRecaptchaV3.showBadge();
+                  }
+                  badgeVisible = !badgeVisible;
+                },
+                icon: const Icon(Icons.legend_toggle),
+                label: const Text("Toggle Badge Visibilty"),
+              ),
+              TextButton.icon(
+                  label: const Icon(Icons.copy),
+                  onPressed: () {
+                    Clipboard.setData(const ClipboardData(
+                        text: "https://pub.dev/packages/g_recaptcha_v3"));
+                  },
+                  icon: const SelectableText(
+                      "https://pub.dev/packages/g_recaptcha_v3")),
 
                           SizedBox(
                             height: 10,
@@ -382,7 +439,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                                     textStyle: TextStyle(
                                       fontSize: useMobileLayout ? 16 : 18,
                                       fontWeight: FontWeight.w600,
-                                      color: Colors.red,
+                                      color: Colors.amberAccent
                                     ),
                                   ),
                                 ),

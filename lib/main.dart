@@ -8,6 +8,7 @@ import 'auth/screens/app_retain_widget.dart';
 import 'auth/providers/auth.dart';
 import './content/dashboard.dart';
 import 'auth/screens/splashscreen.dart';
+import 'content/pos.dart';
 
 void main() {
   runApp(MyApp());
@@ -62,6 +63,7 @@ class _MyAppPageState extends State<MyApp> {
               // ignore: equal_keys_in_map
               AccountRegister.routeName: (context) => AccountRegister(),
               MyProfile.routeName: (context) => MyProfile(),
+              POS.routeName: (context) => POS(),
             },
           ),
         ),

@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="konek_app"
+        android:label="1KoneK"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/novulutions_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"

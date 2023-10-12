@@ -121,7 +121,6 @@ class _MyProfileState extends State<MyProfile> {
       // txtAccountName.text = farmer['farmer_bank_information_account_name'];
       // txtAccountNumber.text = farmer['farmer_bank_information_account_number'];
 
-
       // txtAccountName.text = farmer['first_name'] + ' ' + farmer['last_name'];
       isLoading = true;
     });
@@ -253,7 +252,6 @@ class _MyProfileState extends State<MyProfile> {
     var encodedSignature;
     var encodedGov;
 
-
     var farmerInfo = {
       'token': token,
       'farmer_id': farmer['farmer_id'].toString(),
@@ -315,7 +313,6 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -327,8 +324,6 @@ class _MyProfileState extends State<MyProfile> {
   void dispose() {
     super.dispose();
   }
-
-
 
   // File? _imageGov;
   // final imagePickerGov = ImagePicker();
@@ -368,157 +363,159 @@ class _MyProfileState extends State<MyProfile> {
           key: _formKey1,
           child: Column(
             children: <Widget>[
-      
-                 Expanded(
-                      child: SingleChildScrollView(
-                          child: Container(
-                        color: Colors.white,
-                        padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                        child: Column(
-                          children: <Widget>[
-                            // CustomFormField(
-                            //   // initialValue: user['farmer']['rsbsa_no'],
-                            //   status: editStatus,
-                            //   label: 'RSBSA Number',
-                            //   controller: txtRSBSANumber,
-                            //   onFieldSubmitted: (_) {
-                            //     FocusScope.of(context).requestFocus(fNameFocus);
-                            //   },
-                            //   validator: (value) {
-                            //     if (value.isEmpty) {
-                            //       return 'Please enter your first name';
-                            //     }
-                            //     return null;
-                            //   },
-                            //   initialValue: '',
-                            // ),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'First Name',
-                              controller: txtFirstName,
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context).requestFocus(mNameFocus);
-                              },
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter your first name';
-                                }
-                                return null;
-                              },
-                              initialValue: '',
-                            ),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'Middlename (optional)',
-                              controller: txtMiddleName,
-                              validator: (value) {
-                                return null;
-                              },
-                              initialValue: '',
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context).requestFocus(lNameFocus);
-                              },
-                            ),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'Lastname',
-                              controller: txtLastName,
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context)
-                                    .requestFocus(addressFocus);
-                              },
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter your lasst name';
-                                }
-                                return null;
-                              },
-                              initialValue: '',
-                            ),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'Complete Address',
-                              controller: txtCompleteAddress,
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context).requestFocus(phoneFocus);
-                              },
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter your complete address';
-                                }
-                                return null;
-                              },
-                              initialValue: '',
-                            ),
-
-                            SizedBox(height: 4),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'TIN Number',
-                              controller: txtTINnumber,
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context).requestFocus(phoneFocus);
-                              },
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter your TIN No.';
-                                }
-                                return null;
-                              },
-                              initialValue: '',
-                            ),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'Mobile Number',
-                              controller: txtPhoneNumber,
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context)
-                                    .requestFocus(educationalFocus);
-                              },
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter your mobile number';
-                                }
-                                return null;
-                              },
-                              initialValue: '',
-                            ),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'Educational Attainment',
-                              controller: txtEducational,
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context)
-                                    .requestFocus(degreeFocus);
-                              },
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter your education attainment.';
-                                }
-                                return null;
-                              }, initialValue: '',
-                            ),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'Degree/Course',
-                              controller: txtDegree,
-                              onFieldSubmitted: (_) {
-                                // FocusScope.of(context)
-                                //     .requestFocus(
-                                //         entityFocus);
-                              },
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter your degree/course.';
-                                }
-                                return null;
-                              }, initialValue: '',
-                            ),
-                          ],
-                        ),
-                      )),
-                    )
+              Expanded(
+                child: SingleChildScrollView(
+                    child: Container(
+                  color: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  child: Column(
+                    children: <Widget>[
+                      // CustomFormField(
+                      //   // initialValue: user['farmer']['rsbsa_no'],
+                      //   status: editStatus,
+                      //   label: 'RSBSA Number',
+                      //   controller: txtRSBSANumber,
+                      //   onFieldSubmitted: (_) {
+                      //     FocusScope.of(context).requestFocus(fNameFocus);
+                      //   },
+                      //   validator: (value) {
+                      //     if (value.isEmpty) {
+                      //       return 'Please enter your first name';
+                      //     }
+                      //     return null;
+                      //   },
+                      //   initialValue: '',
+                      // ),
+                      CustomFormField(
+                        status: editStatus,
+                        label: 'First Name',
+                        controller: txtFirstName,
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context).requestFocus(mNameFocus);
+                        },
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter your first name';
+                          }
+                          return null;
+                        },
+                        initialValue: '',
+                      ),
+                      SizedBox(height: 4),
+                      CustomFormField(
+                        status: editStatus,
+                        label: 'Middlename (optional)',
+                        controller: txtMiddleName,
+                        validator: (value) {
+                          return null;
+                        },
+                        initialValue: '',
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context).requestFocus(lNameFocus);
+                        },
+                      ),
+                      SizedBox(height: 4),
+                      CustomFormField(
+                        status: editStatus,
+                        label: 'Lastname',
+                        controller: txtLastName,
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context).requestFocus(addressFocus);
+                        },
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter your lasst name';
+                          }
+                          return null;
+                        },
+                        initialValue: '',
+                      ),
+                      SizedBox(height: 4),
+                      CustomFormField(
+                        status: editStatus,
+                        label: 'Email Address',
+                        controller: txtTINnumber,
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context).requestFocus(phoneFocus);
+                        },
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter your TIN No.';
+                          }
+                          return null;
+                        },
+                        initialValue: '',
+                      ),
+                      SizedBox(height: 4),
+                      CustomFormField(
+                        status: editStatus,
+                        label: 'Mobile Number',
+                        controller: txtPhoneNumber,
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context).requestFocus(educationalFocus);
+                        },
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter your mobile number';
+                          }
+                          return null;
+                        },
+                        initialValue: '',
+                      ),
+                      SizedBox(height: 4),
+                      CustomFormField(
+                        status: editStatus,
+                        label: 'Address',
+                        controller: txtCompleteAddress,
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context).requestFocus(phoneFocus);
+                        },
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter your complete address';
+                          }
+                          return null;
+                        },
+                        initialValue: '',
+                      ),
+                      SizedBox(height: 4),
+                      CustomFormField(
+                        status: editStatus,
+                        label: 'City',
+                        controller: txtEducational,
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context).requestFocus(degreeFocus);
+                        },
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter your education attainment.';
+                          }
+                          return null;
+                        },
+                        initialValue: '',
+                      ),
+                      SizedBox(height: 4),
+                      CustomFormField(
+                        status: editStatus,
+                        label: 'Province',
+                        controller: txtDegree,
+                        onFieldSubmitted: (_) {
+                          // FocusScope.of(context)
+                          //     .requestFocus(
+                          //         entityFocus);
+                        },
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter your degree/course.';
+                          }
+                          return null;
+                        },
+                        initialValue: '',
+                      ),
+                    ],
+                  ),
+                )),
+              )
             ],
           ),
         ),
@@ -544,7 +541,7 @@ class _MyProfileState extends State<MyProfile> {
                     _formKey1.currentState!.validate();
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.red, // background
+                    primary: Color.fromARGB(255, 55, 57, 175), // background
                     onPrimary: Colors.white, // foreground
                     //                color: Colors.yellow,
                     // textColor: Colors.black,
@@ -578,7 +575,7 @@ class _MyProfileState extends State<MyProfile> {
                           // _formKey1.currentState.validate();
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.red, // background
+                          primary: Color.fromARGB(255, 55, 57, 175), // background
                           onPrimary: Colors.white, // foreground
                           //                color: Colors.yellow,
                           // textColor: Colors.black,
@@ -606,7 +603,7 @@ class _MyProfileState extends State<MyProfile> {
                           proceed();
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.red, // background
+                          primary: Color.fromARGB(255, 55, 57, 175), // background
                           onPrimary: Colors.white, // foreground
                           //                color: Colors.yellow,
                           // textColor: Colors.black,

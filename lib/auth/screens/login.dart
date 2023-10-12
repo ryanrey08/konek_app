@@ -174,13 +174,15 @@ class _LoginState extends State<Login> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: <Widget>[
-                                        Text(
-                                          'Don\'t have any account?',
-                                          style: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              fontSize:
-                                                  useMobileLayout ? 13 : 18,
-                                              color: Colors.black,
+                                        Expanded(
+                                          child: Text(
+                                            'Don\'t have any account?',
+                                            style: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                fontSize:
+                                                    useMobileLayout ? 13 : 18,
+                                                color: Colors.black,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -190,14 +192,16 @@ class _LoginState extends State<Login> {
                                                 .pushReplacementNamed(
                                                     AccountRegister.routeName);
                                           },
-                                          child: Text(
-                                            'Register Here',
-                                            style: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize:
-                                                    useMobileLayout ? 13 : 18,
-                                                fontWeight: FontWeight.w600,
-                                                color: Colors.red,
+                                          child: Expanded(
+                                            child: Text(
+                                              'Register Here',
+                                              style: GoogleFonts.poppins(
+                                                textStyle: TextStyle(
+                                                  fontSize:
+                                                      useMobileLayout ? 13 : 18,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.amberAccent,
+                                                ),
                                               ),
                                             ),
                                           ),

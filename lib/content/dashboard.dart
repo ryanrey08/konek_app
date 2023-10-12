@@ -219,6 +219,16 @@ class _DashboardState extends State<Dashboard> {
                                       // borderRadius: BorderRadius.circular(50),
                                     ),
                                   ),
+                                  Text(
+                                     'John Doe',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        )
                                   // isLoading
                                   //     ?
                                   //     Text(

@@ -66,7 +66,7 @@ class CustomFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
-    final bool useMobileLayout = shortestSide < 600.0;
+    final bool useMobileLayout = shortestSide < 900.0;
     return Container(
       padding: EdgeInsets.symmetric(vertical: useMobileLayout ? 3:10),
       child: TextFormField(
@@ -188,7 +188,7 @@ class DrawerOptions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
         final double shortestSide = MediaQuery.of(context).size.shortestSide;
-    final bool useMobileLayout = shortestSide < 600.0;
+    final bool useMobileLayout = shortestSide < 900.0;
     return Container(
       child: ListTile(
         dense: dense,
@@ -221,7 +221,7 @@ class DragContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
-    final bool useMobileLayout = shortestSide < 600.0;
+    final bool useMobileLayout = shortestSide < 900.0;
     return Card(
           child: Container(
             height: 150,
@@ -790,7 +790,7 @@ class ProductionCostList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
-        final bool useMobileLayout = shortestSide < 600.0;
+        final bool useMobileLayout = shortestSide < 900.0;
     return Card(
       child: Container(
         decoration: BoxDecoration(
@@ -906,7 +906,7 @@ class ParticularDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
-    final bool useMobileLayout = shortestSide < 600.0;
+    final bool useMobileLayout = shortestSide < 900.0;
 
     var _selectedUnit;
     var _unitPrice = [400, 500, 600];

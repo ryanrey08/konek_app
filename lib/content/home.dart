@@ -11,6 +11,8 @@ import 'dashboard.dart';
 import '../features/Widgets.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 
+import 'pos.dart';
+
 class HomePage extends StatefulWidget {
   static const routeName = "/home";
   @override
@@ -52,9 +54,66 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void enterVoucherCode() {
+    late AwesomeDialog dialog;
+    dialog = AwesomeDialog(
+      context: context,
+      animType: AnimType.scale,
+      dialogType: DialogType.noHeader,
+      keyboardAware: true,
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
+            Text(
+              'Enter Voucher Code',
+              // style: Theme.of(context).textTheme.titleLarge,
+              style: GoogleFonts.poppins(
+                  color: Color.fromARGB(255, 55, 57, 175),
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Material(
+              elevation: 0,
+              color: Colors.blueGrey.withAlpha(40),
+              child: TextFormField(
+                autofocus: true,
+                minLines: 1,
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.all(10),
+                  border: InputBorder.none,
+                  labelText: 'Voucher Code',
+                  //prefixIcon: Icon(Icons.code),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            AnimatedButton(
+              isFixedHeight: false,
+              text: 'OK',
+              color: Color.fromARGB(255, 55, 57, 175),
+              pressEvent: () {
+                dialog.dismiss();
+              },
+            )
+          ],
+        ),
+      ),
+    );
+
+    dialog.show();
+  }
+
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
-    final bool useMobileLayout = shortestSide < 600.0;
+    final bool useMobileLayout = shortestSide < 900.0;
     final Orientation orientation = MediaQuery.of(context).orientation;
     var height = MediaQuery.of(context).size.height;
 
@@ -263,7 +322,10 @@ class _HomePageState extends State<HomePage> {
                                             onPrimary:
                                                 Colors.white, // foreground
                                           ),
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            Navigator.pushReplacementNamed(
+                                                context, POS.routeName);
+                                          },
                                           // color: Colors.white,
                                           // textColor: Colors.black,
                                           // splashColor: Colors.yellowAccent[800],
@@ -330,7 +392,10 @@ class _HomePageState extends State<HomePage> {
                                             onPrimary:
                                                 Colors.white, // foreground
                                           ),
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            Navigator.pushReplacementNamed(
+                                                context, POS.routeName);
+                                          },
                                           // color: Colors.white,
                                           // textColor: Colors.black,
                                           // splashColor: Colors.yellowAccent[800],
@@ -397,7 +462,10 @@ class _HomePageState extends State<HomePage> {
                                             onPrimary:
                                                 Colors.white, // foreground
                                           ),
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            Navigator.pushReplacementNamed(
+                                                context, POS.routeName);
+                                          },
                                           // color: Colors.white,
                                           // textColor: Colors.black,
                                           // splashColor: Colors.yellowAccent[800],
@@ -408,7 +476,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       Expanded(
                                         child: Text(
-                                          "15 Day Unlimited All Surf Data for P550",
+                                          "15 Days Unlimited All Surf Data for P550",
                                           textAlign: TextAlign.center,
                                           style: GoogleFonts.poppins(
                                             textStyle: TextStyle(
@@ -464,7 +532,10 @@ class _HomePageState extends State<HomePage> {
                                             onPrimary:
                                                 Colors.white, // foreground
                                           ),
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            Navigator.pushReplacementNamed(
+                                                context, POS.routeName);
+                                          },
                                           // color: Colors.white,
                                           // textColor: Colors.black,
                                           // splashColor: Colors.yellowAccent[800],
@@ -475,7 +546,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       Expanded(
                                         child: Text(
-                                          "30 Day Unlimited All Surf Data for P100",
+                                          "30 Days Unlimited All Surf Data for P1000",
                                           textAlign: TextAlign.center,
                                           style: GoogleFonts.poppins(
                                             textStyle: TextStyle(
@@ -493,6 +564,59 @@ class _HomePageState extends State<HomePage> {
                               ],
                             )
                           ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Card(
+                    elevation: 4,
+                    color: Colors.white.withOpacity(0.8),
+                    margin: EdgeInsets.all(8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Container(
+                      // height:  150,
+                      width: double.infinity,
+
+                      //height: useMobileLayout ? 90 : 150,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white,
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                      child: Container(
+                        child: SizedBox(
+                          width: useMobileLayout ? 130 : 180,
+                          height: 50,
+                          child: ElevatedButton(
+                            child: Text(
+                              //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
+                              "VOUCHER CODE",
+                              style: GoogleFonts.poppins(
+                                textStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: useMobileLayout ? 14 : 25,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50.0),
+                              ),
+                              primary: Color.fromARGB(
+                                  255, 55, 57, 175), // background
+                              onPrimary: Colors.white, // foreground
+                            ),
+                            onPressed: () {
+                              enterVoucherCode();
+                            },
+                            // color: Colors.white,
+                            // textColor: Colors.black,
+                            // splashColor: Colors.yellowAccent[800],
+                          ),
                         ),
                       ),
                     ),
