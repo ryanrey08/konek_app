@@ -51,8 +51,8 @@ dependencies:
   dotted_border: ^2.1.0
   shimmer: ^3.0.0
   grecaptcha: ^0.0.6
-  flutter_gcaptcha_v3: ^2.0.4
   slider_captcha: ^1.0.0
+  hcaptcha: ^0.0.2
 
 dev_dependencies:
   flutter_test:

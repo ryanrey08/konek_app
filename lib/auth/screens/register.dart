@@ -15,9 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:grecaptcha/grecaptcha.dart';
 import 'package:grecaptcha/grecaptcha_platform_interface.dart';
-import 'package:flutter_gcaptcha_v3/constants.dart';
-import 'package:flutter_gcaptcha_v3/recaptca_config.dart';
-import 'package:flutter_gcaptcha_v3/web_view.dart';
+import 'package:hcaptcha/hcaptcha.dart';
 // import 'package:loader_overlay/loader_overlay.dart';
 
 import 'dart:convert';
@@ -203,26 +201,29 @@ class _AccountRegisterState extends State<AccountRegister> {
   String _token = 'Click the below button to generate token';
   bool badgeVisible = true;
   // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> getToken() async {
-    String token = await GRecaptchaV3.execute('6LdPSX0oAAAAAGZuVcMRzKh5abcPyLVrs4qMgDKS') ?? 'null returned';
-    setState(() {
-      _token = token;
-       print(token);
+  Future<void> _openReCaptcha() async {
+    Grecaptcha()
+        .verifyWithRecaptcha('6LcSiSQdAAAAAOyoKM6G5CeLAPE-P5ApqwNMUQaV')
+        .then((result) {
+      print(result);
+      if (result != '') {
+        setState(() {
+          isNotARobot = true;
+        });
+      }
+      // You can send the result token, along with some form fields, to your
+      // server, which can verify the token using an endpoint proved by the
+      // reCAPTCHA API for servers, see https://developers.google.com/recaptcha/docs/verify
+    }, onError: (e, s) {
+      // An error doesn't have to mean that the user is not a human. Errors
+      // can also occur when the sitekey is invalid or does not match your
+      // application, when the device is not supported or when a network
+      // error occurs.
+      // You should inform the user of errors, explaining why they can't
+      // proceed. As the plugin is not available for iOS, you might consider
+      // skipping the reCAPTCHA step when FGrecaptcha.isAvailable is false.
+      print("Could not verify:\n $e at $s");
     });
-  }
-  
-    _openReCaptcha() async {
-      bool ready = await GRecaptchaV3.ready(CAPTCHA_SITE_KEY);
-      print(ready);
-    String? tokenResult = await GRecaptchaV3.execute(CAPTCHA_SITE_KEY);
-    print('tokenResult: $tokenResult');
-    if (tokenResult != null) {
-      setState(() {
-        isNotARobot = true;
-      });
-    }
-
-    // setState
   }
 
   @override
@@ -237,8 +238,9 @@ class _AccountRegisterState extends State<AccountRegister> {
     bool _hideConfirmPassword = true;
 
     final format = DateFormat("MM/dd/yyyy");
+    HCaptcha.init(siteKey: '6LcSiSQdAAAAAOyoKM6G5CeLAPE-P5ApqwNMUQaV');
 
-      //getToken();
+    //getToken();
 
     return SafeArea(
       child: Scaffold(
@@ -337,24 +339,88 @@ class _AccountRegisterState extends State<AccountRegister> {
                           SizedBox(
                             height: 15,
                           ),
-                          customTextField('First Name', txtFirstName,
-                              useMobileLayout, 'Please enter your First Name'),
-                          customTextField('Middle Name', txtMiddleName,
-                              useMobileLayout, 'Please enter your Middle Name'),
+                          customTextField(
+                            TextInputType.text,
+                            'First Name',
+                            txtFirstName,
+                            useMobileLayout,
+                            'Please enter your First Name',
+                            (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter your First Name';
+                              }
+
+                              if (!RegExp(r"^[a-zA-Z0-9]+$").hasMatch(value)) {
+                                return 'Invalid Input';
+                              }
+                              return null;
+                            },
+                          ),
+                          customTextField(
+                              TextInputType.text,
+                              'Middle Name',
+                              txtMiddleName,
+                              useMobileLayout,
+                              'Please enter your Middle Name', (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter your Middle Name';
+                            }
+
+                            if (!RegExp(r"^[a-zA-Z0-9]+$").hasMatch(value)) {
+                              return 'Invalid Input';
+                            }
+                            return null;
+                          }),
 //                           customTextField('Middle Name', txtMiddleName,
 //                               useMobileLayout, 'Please enter your Middle Name'),
-                          customTextField('Last Name', txtLastName,
-                              useMobileLayout, 'Please enter your Last Name'),
+                          customTextField(
+                              TextInputType.text,
+                              'Last Name',
+                              txtLastName,
+                              useMobileLayout,
+                              'Please enter your Last Name', (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter your Last Name';
+                            }
+
+                            if (!RegExp(r"^[a-zA-Z0-9]+$").hasMatch(value)) {
+                              return 'Invalid Input';
+                            }
+                            return null;
+                          }),
                           // SizedBox(
                           //   height: 15,
                           // ),
-                          customTextField('Email', txtEmail, useMobileLayout,
-                              'Please enter your Email'),
                           customTextField(
+                              TextInputType.emailAddress,
+                              'Email',
+                              txtEmail,
+                              useMobileLayout,
+                              'Please enter your Email', (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter your First Name';
+                            }
+
+                            if (!RegExp(r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$').hasMatch(value)) {
+                              return 'Invalid Input';
+                            }
+                            return null;
+                          }),
+                          customTextField(
+                              TextInputType.number,
                               'Mobile Number (09XXXXXXXXX)',
                               txtContactNumber,
                               useMobileLayout,
-                              'Please enter your contact number'),
+                              'Please enter your contact number', (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter your First Name';
+                            }
+
+                            if (txtContactNumber.toString().length != 11) {
+                              return 'Invalid Number';
+                            }
+                            return null;
+                          }),
                           mypassword('Password', Icons.password, txtPassword,
                               useMobileLayout),
                           confirmpassword("Confirm Password", Icons.password,
@@ -379,32 +445,36 @@ class _AccountRegisterState extends State<AccountRegister> {
                               ))
                             ],
                           )),
-                               SelectableText('Token: $_token\n'),
-              ElevatedButton(
-                onPressed: _openReCaptcha,
-                child: const Text('Get new token'),
-              ),
-              OutlinedButton.icon(
-                onPressed: () {
-                  if (badgeVisible) {
-                    GRecaptchaV3.hideBadge();
-                  } else {
-                    GRecaptchaV3.showBadge();
-                  }
-                  badgeVisible = !badgeVisible;
-                },
-                icon: const Icon(Icons.legend_toggle),
-                label: const Text("Toggle Badge Visibilty"),
-              ),
-              TextButton.icon(
-                  label: const Icon(Icons.copy),
-                  onPressed: () {
-                    Clipboard.setData(const ClipboardData(
-                        text: "https://pub.dev/packages/g_recaptcha_v3"));
-                  },
-                  icon: const SelectableText(
-                      "https://pub.dev/packages/g_recaptcha_v3")),
 
+                          Card(
+                            elevation: 5,
+                            child: Container(
+                              height: 100,
+                              child: Row(
+                                children: <Widget>[
+                                  Checkbox(
+                                      value: isNotARobot,
+                                      onChanged: (bool? value) {
+                                        _openReCaptcha();
+                                      }),
+                                  Expanded(
+                                    child: Text("I'm not a robot"),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Container(
+                                    alignment: Alignment.centerRight,
+                                    child: Image.asset(
+                                      'assets/images/captcha.jpg',
+                                      width: 80,
+                                      height: 80,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                           SizedBox(
                             height: 10,
                           ),
@@ -437,10 +507,9 @@ class _AccountRegisterState extends State<AccountRegister> {
                                   'Login',
                                   style: GoogleFonts.poppins(
                                     textStyle: TextStyle(
-                                      fontSize: useMobileLayout ? 16 : 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.amberAccent
-                                    ),
+                                        fontSize: useMobileLayout ? 16 : 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.amberAccent),
                                   ),
                                 ),
                               ),
@@ -471,8 +540,13 @@ class _AccountRegisterState extends State<AccountRegister> {
     );
   }
 
-  Container customTextField(String hintTextP, TextEditingController control,
-      bool useMobileLayout, String validator) {
+  Container customTextField(
+      TextInputType inputType,
+      String hintTextP,
+      TextEditingController control,
+      bool useMobileLayout,
+      String validator,
+      String? Function(String?)? validate) {
     return Container(
       margin: EdgeInsets.only(bottom: 15),
       child: Row(
@@ -482,6 +556,7 @@ class _AccountRegisterState extends State<AccountRegister> {
           Expanded(
             child: TextFormField(
               controller: control,
+              keyboardType: inputType,
               obscureText: hintTextP != "" ? false : _hidePassword,
               style: GoogleFonts.poppins(
                 textStyle: TextStyle(
@@ -538,7 +613,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                 errorStyle: GoogleFonts.poppins(
                   textStyle: TextStyle(
                     fontSize: 12,
-                    color: Colors.redAccent[700],
+                    color: Colors.redAccent[200],
                   ),
                 ),
                 fillColor: Colors.white,
@@ -562,12 +637,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                       )
                     : null,
               ),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return validator;
-                }
-                return null;
-              },
+              validator: validate,
               onChanged: (value) {
                 // if (hintTextP.contains("RSBSA Number")) {
                 //   validateRSBA(value, useMobileLayout);
@@ -648,7 +718,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                 errorStyle: GoogleFonts.poppins(
                   textStyle: TextStyle(
                     fontSize: 12,
-                    color: Colors.redAccent[700],
+                    color: Colors.redAccent[200],
                   ),
                 ),
                 //         labelText: widget.controller.text != "" ? widget.title : null,
@@ -762,7 +832,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                 errorStyle: GoogleFonts.poppins(
                   textStyle: TextStyle(
                     fontSize: 12,
-                    color: Colors.redAccent[700],
+                    color: Colors.redAccent[200],
                   ),
                 ),
                 //         labelText: widget.controller.text != "" ? widget.title : null,
