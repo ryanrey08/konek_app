@@ -12,7 +12,8 @@ import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 // final String img_url = "http://159.223.37.192/storage/";
 
 //my local
-final String pre_url = "http://192.168.42.88:8000";
+//final String pre_url = "http://192.168.42.88:8000";
+final String pre_url = "http://157.230.37.42/api/v1/auth";
 final String img_url = "http://192.168.42.88:8000/storage/";
 
 //staging

@@ -68,11 +68,11 @@ class CustomFormField extends StatelessWidget {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
     final bool useMobileLayout = shortestSide < 900.0;
     return Container(
-      padding: EdgeInsets.symmetric(vertical: useMobileLayout ? 3:10),
+      padding: EdgeInsets.symmetric(vertical: useMobileLayout ? 3 : 10),
       child: TextFormField(
         enabled: status,
 
-        style: GoogleFonts.poppins(fontSize: useMobileLayout ?16:18),
+        style: GoogleFonts.poppins(fontSize: useMobileLayout ? 16 : 18),
         // decoration: InputDecoration(
         //   border: OutlineInputBorder(),
         //   labelText: label,
@@ -125,7 +125,7 @@ class CustomFormField extends StatelessWidget {
           labelText: label != "" ? label : null,
           labelStyle: GoogleFonts.poppins(
             textStyle: TextStyle(
-              fontSize: useMobileLayout ? 16:18,
+              fontSize: useMobileLayout ? 16 : 18,
               color: Colors.grey[400],
             ),
           ),
@@ -171,12 +171,12 @@ class StatementAccountListItem extends StatelessWidget {
 
 class DrawerOptions extends StatelessWidget {
   DrawerOptions(
-      {
-        required this.dense,
+      {required this.dense,
       required this.title,
       required this.useMobileLayout,
       required this.iconData,
-      required this.onTapFunc, required this.color});
+      required this.onTapFunc,
+      required this.color});
 
   final bool dense;
   final String title;
@@ -187,7 +187,7 @@ class DrawerOptions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        final double shortestSide = MediaQuery.of(context).size.shortestSide;
+    final double shortestSide = MediaQuery.of(context).size.shortestSide;
     final bool useMobileLayout = shortestSide < 900.0;
     return Container(
       child: ListTile(
@@ -203,7 +203,8 @@ class DrawerOptions extends StatelessWidget {
           ),
           // style: SettingsStyle.listTileText(),
         ),
-        leading: Icon(iconData, color: Color.fromARGB(255, 55, 57, 175), size: 20),
+        leading:
+            Icon(iconData, color: Color.fromARGB(255, 55, 57, 175), size: 20),
         trailing: Icon(Icons.keyboard_arrow_right, size: 15),
         onTap: onTapFunc,
       ),
@@ -216,16 +217,17 @@ class DragContainer extends StatelessWidget {
   final String label2;
   final String location;
 
-  DragContainer({required this.label1, required this.label2, required this.location});
+  DragContainer(
+      {required this.label1, required this.label2, required this.location});
 
   @override
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
     final bool useMobileLayout = shortestSide < 900.0;
     return Card(
-          child: Container(
-            height: 150,
-          color: Colors.green[50],
+      child: Container(
+        height: 150,
+        color: Colors.green[50],
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -233,7 +235,7 @@ class DragContainer extends StatelessWidget {
             Center(
               child: Container(
                 width: double.infinity,
-                height:  useMobileLayout ? 65 : 100,
+                height: useMobileLayout ? 65 : 100,
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage(location),
@@ -243,8 +245,11 @@ class DragContainer extends StatelessWidget {
             ),
             Text(label2,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(fontSize: useMobileLayout ? 10 : 18, color: Colors.black)),
-                SizedBox(height: 10,),
+                style: GoogleFonts.poppins(
+                    fontSize: useMobileLayout ? 10 : 18, color: Colors.black)),
+            SizedBox(
+              height: 10,
+            ),
           ],
         ),
       ),
@@ -342,11 +347,12 @@ class ShimmerList extends StatelessWidget {
 }
 
 class CustomDropDown extends StatefulWidget {
-  final dynamic value;
+  final String? value;
   final List<dynamic> items;
   final String title;
-  final Function onChanged;
-  final Function validator;
+  final String? Function(Object?) onChanged;
+  final String? Function(Object?) validator;
+  final bool status;
 
   const CustomDropDown(
       {Key? key,
@@ -354,7 +360,8 @@ class CustomDropDown extends StatefulWidget {
       required this.items,
       required this.title,
       required this.onChanged,
-      required this.validator})
+      required this.validator,
+      required this.status})
       : super(key: key);
 
   @override
@@ -445,8 +452,8 @@ class _CustomDropDownState extends State<CustomDropDown> {
                 )
               : null,
         ),
-        onChanged: widget.onChanged(),
-        validator: widget.validator(),
+        onChanged: widget.status ? widget.onChanged : null,
+        validator: widget.validator,
       ),
     );
   }
@@ -468,7 +475,8 @@ class CustomDateTime extends StatefulWidget {
       required this.focusNode,
       required this.onFieldSubmitted,
       required this.onSaved,
-      required this.validator, required this.labeltxtTitle})
+      required this.validator,
+      required this.labeltxtTitle})
       : super(key: key);
 
   @override
@@ -504,8 +512,8 @@ class _CustomDateTimeState extends State<CustomDateTime> {
               initialDate: currentValue ?? DateTime.now(),
               // lastDate: DateTime.now(),
 
-            lastDate: DateTime(2050),
-            // initialDatePickerMode: DatePickerMode.year
+              lastDate: DateTime(2050),
+              // initialDatePickerMode: DatePickerMode.year
             ).then((pickedDate) {
               if (pickedDate == null) {
                 return null;
@@ -720,7 +728,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
   }
 }
 
-
 class DropDownCustom extends StatelessWidget {
   final String points;
   final String title;
@@ -790,15 +797,17 @@ class ProductionCostList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
-        final bool useMobileLayout = shortestSide < 900.0;
+    final bool useMobileLayout = shortestSide < 900.0;
     return Card(
       child: Container(
         decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
-                      ),
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+        ),
         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        width: useMobileLayout ? MediaQuery.of(context).size.width : MediaQuery.of(context).size.width / 2 - 25 ,
+        width: useMobileLayout
+            ? MediaQuery.of(context).size.width
+            : MediaQuery.of(context).size.width / 2 - 25,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -817,7 +826,7 @@ class ProductionCostList extends StatelessWidget {
             RichText(
               text: TextSpan(
                 text: 'Product: ',
-              style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.black),
                 children: <TextSpan>[
                   TextSpan(
                       text: text2,
@@ -828,7 +837,7 @@ class ProductionCostList extends StatelessWidget {
             RichText(
               text: TextSpan(
                 text: 'Area (Hectare): ',
-                 style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.black),
                 children: <TextSpan>[
                   TextSpan(
                       text: text2,
@@ -839,7 +848,7 @@ class ProductionCostList extends StatelessWidget {
             RichText(
               text: TextSpan(
                 text: 'Total Loan: ',
-                 style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.black),
                 children: <TextSpan>[
                   TextSpan(
                       text: text2,
@@ -861,7 +870,7 @@ class ProductionCostList extends StatelessWidget {
             RichText(
               text: TextSpan(
                 text: 'Request Status: ',
-                 style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.black),
                 children: <TextSpan>[
                   TextSpan(
                       text: text2,
@@ -876,17 +885,17 @@ class ProductionCostList extends StatelessWidget {
   }
 }
 
-  void showError(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Color(0xff404747),
-      textColor: Colors.white,
-      fontSize: 13.0,
-    );
-  }
+void showError(String message) {
+  Fluttertoast.showToast(
+    msg: message,
+    toastLength: Toast.LENGTH_SHORT,
+    gravity: ToastGravity.BOTTOM,
+    timeInSecForIosWeb: 1,
+    backgroundColor: Color(0xff404747),
+    textColor: Colors.white,
+    fontSize: 13.0,
+  );
+}
 
 class ParticularDetails extends StatelessWidget {
   final String particularName;
@@ -901,7 +910,8 @@ class ParticularDetails extends StatelessWidget {
       required this.measurement,
       required this.quantity,
       required this.unit,
-      required this.amount, required this.color});
+      required this.amount,
+      required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -921,7 +931,8 @@ class ParticularDetails extends StatelessWidget {
           child: Text(
             particularName,
             textAlign: TextAlign.start,
-            style: TextStyle(color: Colors.black,fontSize: useMobileLayout ? 16 : 18),
+            style: TextStyle(
+                color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
           ),
         ),
         Container(
@@ -929,7 +940,8 @@ class ParticularDetails extends StatelessWidget {
           child: Center(
               child: Text(
             measurement,
-            style: TextStyle(color: Colors.black,fontSize: useMobileLayout ? 16 : 18),
+            style: TextStyle(
+                color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
           )),
         ),
         Container(
@@ -937,7 +949,8 @@ class ParticularDetails extends StatelessWidget {
           child: Center(
               child: Text(
             quantity,
-            style: TextStyle(color: Colors.black,fontSize: useMobileLayout ? 16 : 18),
+            style: TextStyle(
+                color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
           )),
         ),
         Container(
@@ -945,7 +958,8 @@ class ParticularDetails extends StatelessWidget {
           child: Center(
               child: Text(
             unit,
-            style: TextStyle(color: Colors.black,fontSize: useMobileLayout ? 16 : 18),
+            style: TextStyle(
+                color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
           )),
         ),
         Container(
@@ -953,13 +967,15 @@ class ParticularDetails extends StatelessWidget {
           child: Center(
               child: Text(
             amount,
-            style: TextStyle(color: Colors.black,fontSize: useMobileLayout ? 16 : 18),
+            style: TextStyle(
+                color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
           )),
         ),
       ],
     );
   }
 }
+
 class Production extends StatefulWidget {
   // final String title;
   // final String helperText;
@@ -1009,7 +1025,8 @@ class _ProductionState extends State<Production> {
             child: Text(
               widget.title,
               textAlign: TextAlign.start,
-              style: TextStyle(color: Colors.black,fontSize: useMobileLayout ? 16 : 18),
+              style: TextStyle(
+                  color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
             ),
           ),
           Container(
@@ -1018,7 +1035,8 @@ class _ProductionState extends State<Production> {
             child: Center(
                 child: Text(
               widget.measurement,
-              style: TextStyle(color: Colors.black,fontSize: useMobileLayout ? 16 : 18),
+              style: TextStyle(
+                  color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
             )),
           ),
           // Production(controller: quantityTextA),
@@ -1028,7 +1046,8 @@ class _ProductionState extends State<Production> {
             child: Center(
                 child: Text(
               widget.quantity,
-              style: TextStyle(color: Colors.black,fontSize: useMobileLayout ? 16 : 18),
+              style: TextStyle(
+                  color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
             )),
           ),
           Expanded(
@@ -1069,7 +1088,8 @@ class _ProductionState extends State<Production> {
             child: Center(
                 child: Text(
               widget.amount,
-              style: TextStyle(color: Colors.black,fontSize: useMobileLayout ? 16 : 18),
+              style: TextStyle(
+                  color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
             )),
           ),
         ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:konek_app/profile/screens/profile.dart';
 import 'package:provider/provider.dart';
 import 'package:konek_app/auth/screens/login.dart';
@@ -11,11 +12,15 @@ import 'auth/screens/splashscreen.dart';
 import 'content/pos.dart';
 
 void main() {
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
+    runApp(MyApp());
+  });
+  // runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
-
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
   // how it looks.
@@ -30,15 +35,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppPageState extends State<MyApp> {
-
   final navigatorKey = GlobalKey<NavigatorState>();
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-     return MultiProvider(
+    return MultiProvider(
       providers: [
-                ChangeNotifierProvider.value(
+        ChangeNotifierProvider.value(
           value: Auth(),
         ),
       ],
@@ -50,12 +54,15 @@ class _MyAppPageState extends State<MyApp> {
             //home: MySplashScreen(Login()),
             debugShowCheckedModeBanner: false,
             home: auth.isAuth
-                ? Dashboard()
+                ? MySplashScreen(Dashboard())
                 // ? MySplashScreen(CovidDashboard())
                 : FutureBuilder(
                     future: auth.tryAutoLogin(),
                     builder: (ctx, authResultSnapshot) =>
-                        authResultSnapshot.connectionState == ConnectionState.waiting ? CircularProgressIndicator() : MySplashScreen(Login()),
+                        authResultSnapshot.connectionState ==
+                                ConnectionState.waiting
+                            ? CircularProgressIndicator()
+                            : MySplashScreen(Login()),
                   ),
             routes: {
               Dashboard.routeName: (context) => Dashboard(),

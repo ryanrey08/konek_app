@@ -41,8 +41,6 @@ class Auth with ChangeNotifier {
 
   //      print(extracteduserData['system_access_id']);
 
-  
-        
   //     } else {
   //       print(jsonResponse['message']);
   //       throw HttpException(jsonResponse['message']);
@@ -54,27 +52,54 @@ class Auth with ChangeNotifier {
   //   }
   // }
 
-    Future<bool> tryAutoLogin() async {
+  Future<void> login(String contact_number, String password) async {
+    Map data = {'mobile_number': contact_number, 'password': password};
+    Map<String, dynamic> jsonResponse;
+    var responseCode;
+    try {
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+      var response =
+          await http.post(Uri.parse(config.pre_url + "/login"), body: data);
+      var jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      if (jsonResponse['success'] == true) {
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        sharedPreferences.setString('userData', json.encode(jsonResponse));
+      } else {
+        print(jsonResponse['message']);
+        throw HttpException('Something went wrong');
+      }
+    } catch (error) {
+      print(error);
+      // print(responseCode);
+      throw (error);
+    }
+  }
+
+  Future<bool> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey('userData')) {
       return false;
     }
-    final extractedUserData = json.decode(prefs.getString('userData')!) as String;
+    final extractedUserData =
+        json.decode(prefs.getString('userData')!) as Map;
     // print(expiryDate);
 
-    _token = extractedUserData;
+    _token = extractedUserData['data']['token'];
     notifyListeners();
     return true;
   }
 
-    Future<void> register(Map<String, dynamic> userInfo) async {
+  Future<void> register(userInfo) async {
+    print(userInfo);
     Map<String, dynamic> jsonResponse;
 
-        Map<String, dynamic> jsonResponseRSBSA;
 
     try {
       final response = await http.post(
-        (config.pre_url + config.auth_route + "/register") as Uri,
+       Uri.parse(config.pre_url + "/register"),
         body: userInfo,
       );
 
@@ -92,41 +117,24 @@ class Auth with ChangeNotifier {
       if (jsonResponse['success']) {
         final userData = json.encode(jsonResponse);
         print(userData);
-        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
         sharedPreferences.setString('userData', userData);
         notifyListeners();
       } else {
-        
-     if(jsonResponse['data']['rsbsa_no'][0] == 'The rsbsa no has already been taken.' && jsonResponse['type_error'] == 'contact')
-        {
-            var error = jsonResponse['data']['rsbsa_no']; 
-              throw HttpException(error[0]);
-        }
-        else if(jsonResponse['type_error'] == 'contact')
-        {
-             var error = jsonResponse['data']['contact_number']; 
-              throw HttpException(error[0]);
-            // var errorRSBSA = jsonResponse['data']['rsbsa_bo']; 
-            //  throw HttpException(errorRSBSA[0]);
-              
-        }
-        else if (jsonResponse['type_error'] == 'rsbsa')
-        {
-            var error = jsonResponse['message']; 
-              throw HttpException(error);
-        }
-        else
-        {
-          throw HttpException('Something went wrong. Please check your RSBSA and contact number again.');
-        }
-        
+        throw HttpException('Something went wrong.');
       }
 
       print(jsonResponse['message']);
     } catch (error) {
-        throw (error);
+      throw (error);
     }
 
     notifyListeners();
+  }
+
+    Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove('userData');
   }
 }

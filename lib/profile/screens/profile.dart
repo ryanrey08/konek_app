@@ -5,6 +5,8 @@ import 'dart:convert';
 // import 'package:flutter/foundation.dart';
 // import 'package:intl/intl.dart';
 // import 'package:konek_app/Config/Config.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+
 import '../providers/profileprovider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -44,7 +46,7 @@ class _MyProfileState extends State<MyProfile> {
 
   var isLoadingSend = false;
 
-  bool isLoading = false;
+  bool isLoading = true;
 
   bool isPhoto = false;
   bool isESignature = false;
@@ -75,6 +77,172 @@ class _MyProfileState extends State<MyProfile> {
   String? _imageFileCamera;
   String? _imageFileSignature;
   String? _imageFileGovIDPath;
+
+  var _jsonResult;
+
+  List<dynamic> _region = [];
+  List<dynamic> _province = [];
+  List<dynamic> _municipality = [];
+  List<dynamic> _barangay = [];
+
+  List<dynamic> _regionsId = [];
+  List<dynamic> _tempMunicipalityKeys = [];
+  List<dynamic> _tempMunicipality = [];
+  var _tempRegion = {};
+
+  String? _regionId;
+  String? _selectedRegion;
+  String? _selectedProvince;
+  String? _selectedMunicipality;
+  String? _selectedBarangay;
+
+  getPH() async {
+    String data = await DefaultAssetBundle.of(context)
+        .loadString("assets/json/address.json");
+    _jsonResult = json.decode(data);
+    getRegion();
+    getProvince();
+    getMunicipality();
+    getBarangay();
+  }
+
+  getRegion() {
+    var region = [];
+    final regions = _jsonResult.values.toList();
+    _regionsId = _jsonResult.keys.toList();
+    for (var x = 0; x < regions.length; x++) {
+      region.add(regions[x]['region_name']);
+    }
+
+    setState(() {
+      _region = region;
+      _selectedRegion = _region[0];
+      _regionId = _regionsId[0];
+      //print(_region);
+      // if (_userData['region'] == null) {
+      //   _selectedRegion = _region[0];
+      //   _regionId = _regionsId[0];
+      // }
+    });
+  }
+
+  getRegionId() {
+    int index = 0;
+    for (var x = 0; x < _region.length; x++) {
+      if (_selectedRegion == _region[x]) {
+        index = x;
+      }
+    }
+
+    setState(() {
+      _regionId = _regionsId[index];
+    });
+  }
+
+  getProvince() {
+    var tempProvince;
+    var provinces = [];
+    var region = [];
+    var tempRegion = {};
+    region = _jsonResult.values.toList();
+    for (var x = 0; x < region.length; x++) {
+      if (region[x]['region_name'] == _selectedRegion) {
+        tempRegion = region[x];
+        tempProvince = region[x]['province_list'].keys.toList();
+        for (var y = 0; y < tempProvince.length; y++) {
+          provinces.add(tempProvince[y]);
+        }
+      }
+    }
+
+    setState(() {
+      _tempRegion = tempRegion;
+      _province = provinces;
+      print(_province);
+      _selectedProvince = _province[0];
+    });
+  }
+
+  // getProvince() {
+  //   var tempProvince;
+  //   var provinces = [];
+  //   var region = [];
+  //   var tempRegion = {};
+  //   region = _jsonResult.values.toList();
+  //   for (var x = 0; x < region.length; x++) {
+  //     tempProvince = region[x]['province_list'].keys.toList();
+  //     for (var y = 0; y < tempProvince.length; y++) {
+  //       provinces.add(tempProvince[y]);
+  //     }
+  //   }
+
+  //   provinces.sort((a, b) {
+  //     return a['name'].toLowerCase().compareTo(b['name'].toLowerCase());
+  //   });
+
+  //   print(provinces);
+
+  //   setState(() {
+  //     _tempRegion = tempRegion;
+  //     _province = provinces;
+
+  //     _selectedProvince = _province[0];
+  //   });
+  // }
+
+  changeRegion() {
+    getProvince();
+    getMunicipality();
+    getBarangay();
+  }
+
+  changeProvince() {
+    getMunicipality();
+    getBarangay();
+  }
+
+  getMunicipality() {
+    var tempProvinceKeys;
+    var tempProvince;
+    var tempMunicipalitiesKeys;
+    var tempMunicipalities;
+    var municipalities = [];
+    tempProvinceKeys = _tempRegion['province_list'].keys.toList();
+    tempProvince = _tempRegion['province_list'].values.toList();
+
+    for (var y = 0; y < tempProvinceKeys.length; y++) {
+      if (tempProvinceKeys[y] == _selectedProvince) {
+        tempMunicipalitiesKeys =
+            tempProvince[y]['municipality_list'].keys.toList();
+        tempMunicipalities =
+            tempProvince[y]['municipality_list'].values.toList();
+
+        for (var z = 0; z < tempMunicipalitiesKeys.length; z++) {
+          municipalities.add(tempMunicipalitiesKeys[z]);
+        }
+        setState(() {
+          _municipality = municipalities;
+
+          _selectedMunicipality = municipalities[0];
+
+          _tempMunicipalityKeys = tempMunicipalitiesKeys;
+          _tempMunicipality = tempMunicipalities;
+        });
+      }
+    }
+  }
+
+  getBarangay() {
+    for (var a = 0; a < _tempMunicipalityKeys.length; a++) {
+      if (_tempMunicipalityKeys[a] == _selectedMunicipality) {
+        setState(() {
+          _barangay = _tempMunicipality[a]['barangay_list'];
+          _selectedBarangay = _barangay[0];
+          isLoading = false;
+        });
+      }
+    }
+  }
 
   void getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -145,6 +313,10 @@ class _MyProfileState extends State<MyProfile> {
   final txtTINnumber = TextEditingController();
   final txtEducational = TextEditingController();
   final txtDegree = TextEditingController();
+  final txtOldPassword = TextEditingController();
+  final txtNewPassword = TextEditingController();
+  final txtConfirmPassword = TextEditingController();
+  final txtEmailAddress = TextEditingController();
 
   final fNameFocus = FocusNode();
   final mNameFocus = FocusNode();
@@ -314,15 +486,107 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    print("here");
+    //getProfile();
+    getPH();
+  }
+
+  getProfile()async{
+           SharedPreferences sharedPreferences;
+
+    sharedPreferences = await SharedPreferences.getInstance();
+
+    final extractedUserData =
+        json.decode(sharedPreferences.getString('userData')!)
+            as Map<String, dynamic>;
+    final data = extractedUserData['data'] as Map<String, dynamic>;
+
+    setState(() {
+              txtFirstName.text = data['first_name'] == null ? '' : data['first_name'];
+    txtMiddleName.text = data['middle_name'] == null ? '' : data['middle_name'];
+    txtLastName.text = data['last_name'] == null ? '' : data['last_name'];
+    txtEmailAddress.text = data['email'] == null ? '' : data['email'];
+    txtPhoneNumber.text = data['mobile_no'] == null ? '' : data['mobile_no'];
+    });
+
+  }
+
+  @override
   void initState() {
     super.initState();
     //getUser();
     editStatus = false;
+    getProfile();
+    // txtFirstName.text = 'John';
+    // txtMiddleName.text = 'Black';
+    // txtLastName.text = 'Doe';
+    // txtEmailAddress.text = 'johndoe@me.com';
+    // txtPhoneNumber.text = '09123456789';
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void enterVoucherCode() {
+    late AwesomeDialog dialog;
+    dialog = AwesomeDialog(
+      context: context,
+      animType: AnimType.scale,
+      dialogType: DialogType.noHeader,
+      keyboardAware: true,
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
+            Text(
+              'Enter Voucher Code',
+              // style: Theme.of(context).textTheme.titleLarge,
+              style: GoogleFonts.poppins(
+                  color: Color.fromARGB(255, 55, 57, 175),
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Material(
+              elevation: 0,
+              color: Colors.blueGrey.withAlpha(40),
+              child: TextFormField(
+                autofocus: true,
+                minLines: 1,
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.all(10),
+                  border: InputBorder.none,
+                  labelText: 'Voucher Code',
+                  //prefixIcon: Icon(Icons.code),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            AnimatedButton(
+              isFixedHeight: false,
+              text: 'OK',
+              color: Color.fromARGB(255, 55, 57, 175),
+              pressEvent: () {
+                dialog.dismiss();
+              },
+            )
+          ],
+        ),
+      ),
+    );
+
+    dialog.show();
   }
 
   // File? _imageGov;
@@ -359,166 +623,308 @@ class _MyProfileState extends State<MyProfile> {
                 fontSize: useMobileLayout ? 16 : 18,
               )),
         ),
-        body: Form(
-          key: _formKey1,
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: SingleChildScrollView(
-                    child: Container(
-                  color: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  child: Column(
-                    children: <Widget>[
-                      // CustomFormField(
-                      //   // initialValue: user['farmer']['rsbsa_no'],
-                      //   status: editStatus,
-                      //   label: 'RSBSA Number',
-                      //   controller: txtRSBSANumber,
-                      //   onFieldSubmitted: (_) {
-                      //     FocusScope.of(context).requestFocus(fNameFocus);
-                      //   },
-                      //   validator: (value) {
-                      //     if (value.isEmpty) {
-                      //       return 'Please enter your first name';
-                      //     }
-                      //     return null;
-                      //   },
-                      //   initialValue: '',
-                      // ),
-                      CustomFormField(
-                        status: editStatus,
-                        label: 'First Name',
-                        controller: txtFirstName,
-                        onFieldSubmitted: (_) {
-                          FocusScope.of(context).requestFocus(mNameFocus);
-                        },
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Please enter your first name';
-                          }
-                          return null;
-                        },
-                        initialValue: '',
-                      ),
-                      SizedBox(height: 4),
-                      CustomFormField(
-                        status: editStatus,
-                        label: 'Middlename (optional)',
-                        controller: txtMiddleName,
-                        validator: (value) {
-                          return null;
-                        },
-                        initialValue: '',
-                        onFieldSubmitted: (_) {
-                          FocusScope.of(context).requestFocus(lNameFocus);
-                        },
-                      ),
-                      SizedBox(height: 4),
-                      CustomFormField(
-                        status: editStatus,
-                        label: 'Lastname',
-                        controller: txtLastName,
-                        onFieldSubmitted: (_) {
-                          FocusScope.of(context).requestFocus(addressFocus);
-                        },
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Please enter your lasst name';
-                          }
-                          return null;
-                        },
-                        initialValue: '',
-                      ),
-                      SizedBox(height: 4),
-                      CustomFormField(
-                        status: editStatus,
-                        label: 'Email Address',
-                        controller: txtTINnumber,
-                        onFieldSubmitted: (_) {
-                          FocusScope.of(context).requestFocus(phoneFocus);
-                        },
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Please enter your TIN No.';
-                          }
-                          return null;
-                        },
-                        initialValue: '',
-                      ),
-                      SizedBox(height: 4),
-                      CustomFormField(
-                        status: editStatus,
-                        label: 'Mobile Number',
-                        controller: txtPhoneNumber,
-                        onFieldSubmitted: (_) {
-                          FocusScope.of(context).requestFocus(educationalFocus);
-                        },
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Please enter your mobile number';
-                          }
-                          return null;
-                        },
-                        initialValue: '',
-                      ),
-                      SizedBox(height: 4),
-                      CustomFormField(
-                        status: editStatus,
-                        label: 'Address',
-                        controller: txtCompleteAddress,
-                        onFieldSubmitted: (_) {
-                          FocusScope.of(context).requestFocus(phoneFocus);
-                        },
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Please enter your complete address';
-                          }
-                          return null;
-                        },
-                        initialValue: '',
-                      ),
-                      SizedBox(height: 4),
-                      CustomFormField(
-                        status: editStatus,
-                        label: 'City',
-                        controller: txtEducational,
-                        onFieldSubmitted: (_) {
-                          FocusScope.of(context).requestFocus(degreeFocus);
-                        },
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Please enter your education attainment.';
-                          }
-                          return null;
-                        },
-                        initialValue: '',
-                      ),
-                      SizedBox(height: 4),
-                      CustomFormField(
-                        status: editStatus,
-                        label: 'Province',
-                        controller: txtDegree,
-                        onFieldSubmitted: (_) {
-                          // FocusScope.of(context)
-                          //     .requestFocus(
-                          //         entityFocus);
-                        },
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Please enter your degree/course.';
-                          }
-                          return null;
-                        },
-                        initialValue: '',
-                      ),
-                    ],
-                  ),
-                )),
-              )
-            ],
-          ),
-        ),
+        body: isLoading
+            ? Container(child: Text("Loading..."))
+            : Form(
+                key: _formKey1,
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      child: SingleChildScrollView(
+                          child: Container(
+                        color: Colors.white,
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                        child: Column(
+                          children: <Widget>[
+                            // CustomFormField(
+                            //   // initialValue: user['farmer']['rsbsa_no'],
+                            //   status: editStatus,
+                            //   label: 'RSBSA Number',
+                            //   controller: txtRSBSANumber,
+                            //   onFieldSubmitted: (_) {
+                            //     FocusScope.of(context).requestFocus(fNameFocus);
+                            //   },
+                            //   validator: (value) {
+                            //     if (value.isEmpty) {
+                            //       return 'Please enter your first name';
+                            //     }
+                            //     return null;
+                            //   },
+                            //   initialValue: '',
+                            // ),
+                            CustomFormField(
+                              status: editStatus,
+                              label: 'First Name',
+                              controller: txtFirstName,
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(context).requestFocus(mNameFocus);
+                              },
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter your first name';
+                                }
+                                return null;
+                              },
+                              initialValue: '',
+                            ),
+                            SizedBox(height: 4),
+                            CustomFormField(
+                              status: editStatus,
+                              label: 'Middlename (optional)',
+                              controller: txtMiddleName,
+                              validator: (value) {
+                                return null;
+                              },
+                              initialValue: '',
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(context).requestFocus(lNameFocus);
+                              },
+                            ),
+                            SizedBox(height: 4),
+                            CustomFormField(
+                              status: editStatus,
+                              label: 'Lastname',
+                              controller: txtLastName,
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(context)
+                                    .requestFocus(addressFocus);
+                              },
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter your lasst name';
+                                }
+                                return null;
+                              },
+                              initialValue: '',
+                            ),
+                            SizedBox(height: 4),
+                            CustomFormField(
+                              status: editStatus,
+                              label: 'Email Address',
+                              controller: txtEmailAddress,
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(context).requestFocus(phoneFocus);
+                              },
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter your TIN No.';
+                                }
+                                return null;
+                              },
+                              initialValue: '',
+                            ),
+                            SizedBox(height: 4),
+                            CustomFormField(
+                              status: editStatus,
+                              label: 'Mobile Number',
+                              controller: txtPhoneNumber,
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(context)
+                                    .requestFocus(educationalFocus);
+                              },
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter your mobile number';
+                                }
+                                return null;
+                              },
+                              initialValue: '',
+                            ),
+                            SizedBox(height: 4),
+                            CustomFormField(
+                              status: editStatus,
+                              label: 'Address',
+                              controller: txtCompleteAddress,
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(context).requestFocus(phoneFocus);
+                              },
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter your complete address';
+                                }
+                                return null;
+                              },
+                              initialValue: '',
+                            ),
+                            SizedBox(height: 4),
+                            // CustomFormField(
+                            //   status: editStatus,
+                            //   label: 'City',
+                            //   controller: txtEducational,
+                            //   onFieldSubmitted: (_) {
+                            //     FocusScope.of(context)
+                            //         .requestFocus(degreeFocus);
+                            //   },
+                            //   validator: (value) {
+                            //     if (value.isEmpty) {
+                            //       return 'Please enter your education attainment.';
+                            //     }
+                            //     return null;
+                            //   },
+                            //   initialValue: '',
+                            // ),
+                            // SizedBox(height: 4),
+                            // CustomFormField(
+                            //   status: editStatus,
+                            //   label: 'Province',
+                            //   controller: txtDegree,
+                            //   onFieldSubmitted: (_) {
+                            //     // FocusScope.of(context)
+                            //     //     .requestFocus(
+                            //     //         entityFocus);
+                            //   },
+                            //   validator: (value) {
+                            //     if (value.isEmpty) {
+                            //       return 'Please enter your degree/course.';
+                            //     }
+                            //     return null;
+                            //   },
+                            //   initialValue: '',
+                            // ),
+                            SizedBox(
+                              height: 4,
+                            ),
+                            CustomDropDown(
+                              status: editStatus,
+                              value: _selectedRegion,
+                              items: _region,
+                              title: "Region",
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedRegion = value.toString();
+                                  _regionId =
+                                      _regionsId[_region.indexOf(value)];
+                                  changeRegion();
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please choose your region';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(
+                              height: 4,
+                            ),
+                            CustomDropDown(
+                               status: editStatus,
+                              value: _selectedProvince,
+                              items: _province,
+                              title: "Province",
+                              onChanged: (value) {
+                                setState(() {
+                                  print(_selectedProvince);
+                                  _selectedProvince = value.toString();
+                                  changeProvince();
+                                  print(value);
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please choose your province';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(
+                              height: 4,
+                            ),
+                            CustomDropDown(
+                               status: editStatus,
+                              value: _selectedMunicipality,
+                              items: _municipality,
+                              title: "Municipality",
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedMunicipality = value.toString();
+                                  getBarangay();
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please choose your city';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(
+                              height: 4,
+                            ),
+                            CustomDropDown(
+                               status: editStatus,
+                              value: _selectedBarangay,
+                              items: _barangay,
+                              title: "Barangay",
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedBarangay = value.toString();
+                                  //_brgyId = (_barangay.indexOf(value) + 1).toString();
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please choose your barangay';
+                                }
+                                return null;
+                              },
+                            ),
+
+                            Container(
+                              // height:  150,
+                              //width: double.infinity,
+                              width: useMobileLayout ? 600 : 700,
+
+                              //height: useMobileLayout ? 90 : 150,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 30, horizontal: 15),
+                              child: Container(
+                                child: SizedBox(
+                                  width: useMobileLayout ? 130 : 180,
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    child: Text(
+                                      //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
+                                      "VOUCHER CODE",
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: useMobileLayout ? 14 : 25,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(50.0),
+                                      ),
+                                      primary: Color.fromARGB(
+                                          255, 55, 57, 175), // background
+                                      onPrimary: Colors.white, // foreground
+                                    ),
+                                    onPressed: () {
+                                      enterVoucherCode();
+                                    },
+                                    // color: Colors.white,
+                                    // textColor: Colors.black,
+                                    // splashColor: Colors.yellowAccent[800],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                    )
+                  ],
+                ),
+              ),
         bottomNavigationBar: Container(
           padding: EdgeInsets.symmetric(horizontal: 5),
           height: 50,
@@ -538,7 +944,309 @@ class _MyProfileState extends State<MyProfile> {
                     ),
                   ),
                   onPressed: () {
-                    _formKey1.currentState!.validate();
+                    //_formKey1.currentState!.validate();
+                    Alert(
+                        context: context,
+                        title: "",
+                        content: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 15),
+                          child: Column(
+                            children: <Widget>[
+                              // Text(
+                              //   'The OTP password was sent to the following recipient:',
+                              //   textAlign: TextAlign.center,
+                              //   style: GoogleFonts.poppins(
+                              //     color: Colors.black,
+                              //     fontSize: 16,
+                              //     fontWeight: FontWeight.w500,
+                              //   ),
+                              // ),
+                              // SizedBox(
+                              //   height: 10,
+                              // ),
+                              Container(
+                                margin: EdgeInsets.only(bottom: 5),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: txtOldPassword,
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.auto,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.green,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey.shade400,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          disabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey.shade400,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          errorBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.redAccent,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey.shade400,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          enabled: true,
+                                          hintText: 'Enter Old Password',
+                                          hintStyle: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          errorStyle: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.redAccent[700],
+                                            ),
+                                          ),
+                                          fillColor: Colors.grey[200],
+                                          filled: true,
+                                        ),
+                                        validator: (value) {
+                                          if (value == null) {
+                                            return 'Please enter old password';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(bottom: 5),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: txtNewPassword,
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.auto,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.green,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey.shade400,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          disabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey.shade400,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          errorBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.redAccent,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey.shade400,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          enabled: true,
+                                          hintText: 'Enter New Password',
+                                          hintStyle: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          errorStyle: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.redAccent[700],
+                                            ),
+                                          ),
+                                          fillColor: Colors.grey[200],
+                                          filled: true,
+                                        ),
+                                        validator: (value) {
+                                          if (value == null) {
+                                            return 'Please enter the password';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(bottom: 5),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: txtConfirmPassword,
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.auto,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.green,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey.shade400,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          disabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey.shade400,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          errorBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.redAccent,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey.shade400,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          enabled: true,
+                                          hintText: 'Enter Confirm Password',
+                                          hintStyle: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          errorStyle: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.redAccent[700],
+                                            ),
+                                          ),
+                                          fillColor: Colors.grey[200],
+                                          filled: true,
+                                        ),
+                                        validator: (value) {
+                                          if (value == null) {
+                                            return 'Please enter confirm password';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        buttons: [
+                          DialogButton(
+                            color: Color.fromARGB(255, 55, 57, 175),
+                            onPressed: () async {
+                              // Navigator.of(context)
+                              //     .pushReplacementNamed(Dashboard.routeName);
+
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              "Change Password",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                          )
+                        ]).show();
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Color.fromARGB(255, 55, 57, 175), // background
@@ -575,7 +1283,8 @@ class _MyProfileState extends State<MyProfile> {
                           // _formKey1.currentState.validate();
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Color.fromARGB(255, 55, 57, 175), // background
+                          primary:
+                              Color.fromARGB(255, 55, 57, 175), // background
                           onPrimary: Colors.white, // foreground
                           //                color: Colors.yellow,
                           // textColor: Colors.black,
@@ -592,7 +1301,7 @@ class _MyProfileState extends State<MyProfile> {
                           "UPDATE",
                           style: GoogleFonts.poppins(
                             textStyle: TextStyle(
-                              color: Colors.black,
+                              color: Colors.yellowAccent,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -603,7 +1312,8 @@ class _MyProfileState extends State<MyProfile> {
                           proceed();
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Color.fromARGB(255, 55, 57, 175), // background
+                          primary:
+                              Color.fromARGB(255, 55, 57, 175), // background
                           onPrimary: Colors.white, // foreground
                           //                color: Colors.yellow,
                           // textColor: Colors.black,
@@ -667,5 +1377,98 @@ class _MyProfileState extends State<MyProfile> {
       return result;
     }
     return null!;
+  }
+
+  Container dropDown(
+      String? value,
+      List<dynamic> items,
+      String title,
+      String? Function(Object?) onChanged,
+      String? Function(Object?) validator) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 15),
+      child: DropdownButtonFormField(
+        value: value,
+        items: items
+            .map((text) => DropdownMenuItem(
+                  child: Text('$text'),
+                  value: text,
+                ))
+            .toList(),
+        style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+          ),
+        ),
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.symmetric(horizontal: 20),
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          // OutlineInputBorder
+          // UnderlineInputBorder
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(50),
+            borderSide: BorderSide(
+              color: value != null ? Colors.green : Colors.grey.shade400,
+              width: 1,
+            ),
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(50),
+            borderSide: BorderSide(
+              color: value != null ? Colors.green : Colors.grey.shade400,
+              width: 1,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(50),
+            borderSide: BorderSide(
+              color: value != null ? Colors.green : Colors.grey.shade400,
+              width: 1,
+            ),
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(50),
+            borderSide: BorderSide(
+              color: value != null ? Colors.green : Colors.grey.shade400,
+              width: 1,
+            ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(50),
+            borderSide: BorderSide(
+              color: Colors.redAccent,
+              width: 1,
+            ),
+          ),
+          errorStyle: GoogleFonts.poppins(
+            textStyle: TextStyle(
+              fontSize: 12,
+              color: Colors.redAccent[700],
+            ),
+          ),
+          labelText: value != null ? title : null,
+          labelStyle: value != null
+              ? GoogleFonts.poppins(
+                  textStyle: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                )
+              : null,
+          hintText: value == null ? title : null,
+          hintStyle: value == null
+              ? GoogleFonts.poppins(
+                  textStyle: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                )
+              : null,
+        ),
+        onChanged: onChanged,
+        validator: validator,
+      ),
+    );
   }
 }

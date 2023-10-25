@@ -53,6 +53,10 @@ dependencies:
   grecaptcha: ^0.0.6
   slider_captcha: ^1.0.0
   hcaptcha: ^0.0.2
+  geolocator: ^10.1.0
+  flutter_spinkit: ^5.2.0
+  mac_address: ^1.0.0
+  string_validator: ^1.0.2
 
 dev_dependencies:
   flutter_test:
