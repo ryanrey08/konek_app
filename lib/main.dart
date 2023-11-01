@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:konek_app/content/scan.dart';
+import 'package:konek_app/content/uploadpic.dart';
 import 'package:konek_app/profile/screens/profile.dart';
 import 'package:provider/provider.dart';
 import 'package:konek_app/auth/screens/login.dart';
@@ -71,6 +73,8 @@ class _MyAppPageState extends State<MyApp> {
               AccountRegister.routeName: (context) => AccountRegister(),
               MyProfile.routeName: (context) => MyProfile(),
               POS.routeName: (context) => POS(),
+              ScanQR.routeName: (context) => ScanQR(),
+              UploadPicture.routeName: (context) => UploadPicture(),
             },
           ),
         ),
