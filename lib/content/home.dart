@@ -32,11 +32,54 @@ class _HomePageState extends State<HomePage> {
   var user;
   var farmer;
   bool isLoading = false;
+  var voucherData;
 
   @override
   void initState() {
     super.initState();
+    //assignData();
     //getUser();
+    getVoucherData();
+  }
+
+  assignData() async {
+    voucherData = {
+      "voucher_code": "",
+      "duration": 0,
+      "description": "",
+      "amount": 0,
+      "claimed_date": "",
+      "expire_date": "",
+      "status": ""
+    };
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('voucherData', json.encode(voucherData));
+  }
+
+  void getVoucherData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('voucherData')) {
+      voucherData = {
+        "voucher_code": "",
+        "duration": 0,
+        "description": "",
+        "amount": 0,
+        "claimed_date": "",
+        "expire_date": "",
+        "status": ""
+      };
+    } else {
+      final extracteduserData =
+          json.decode(prefs.getString('voucherData')!) as Map<String, dynamic>;
+      print(extracteduserData);
+      setState(() {
+        voucherData = extracteduserData;
+      });
+    }
+
+    setState(() {
+      isLoading = true;
+    });
   }
 
   void getUser() async {
@@ -217,7 +260,13 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      '1 Day/s',
+                                      (isLoading
+                                              ? (voucherData['voucher_code'] != ''
+                                                  ? voucherData["duration"]
+                                                      .toString()
+                                                  : "0")
+                                              : "0") +
+                                          " Day/s",
                                       textAlign: TextAlign.center,
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
@@ -250,7 +299,11 @@ class _HomePageState extends State<HomePage> {
                                 Icon(
                                   Icons.wifi,
                                   size: useMobileLayout ? 60 : 70,
-                                  color: Colors.greenAccent,
+                                  color: isLoading
+                                      ? (voucherData['voucher_code'] != ''
+                                          ? Colors.greenAccent
+                                          : Colors.redAccent)
+                                      : Colors.greenAccent,
                                 ),
                                 Container(
                                   child: Row(children: [
@@ -261,10 +314,19 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.white),
                                     ),
                                     Text(
-                                      "Online",
+                                      isLoading
+                                          ? (voucherData['voucher_code'] != ''
+                                              ? "Online"
+                                              : "Offline")
+                                          : 'Offline',
                                       style: GoogleFonts.poppins(
-                                          fontSize: useMobileLayout ? 18 : 30,
-                                          color: Colors.greenAccent),
+                                        fontSize: useMobileLayout ? 18 : 30,
+                                        color: isLoading
+                                            ? (voucherData['voucher_code'] != ''
+                                                ? Colors.greenAccent
+                                                : Colors.redAccent)
+                                            : Colors.greenAccent,
+                                      ),
                                     )
                                   ]),
                                 ),
@@ -275,307 +337,326 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    child: Card(
-                      elevation: 4,
-                      color: Colors.white.withOpacity(0.8),
-                      margin: EdgeInsets.all(8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Container(
-                        // height:  150,
-                        //width: double.infinity,
-                        width: useMobileLayout ? null : 700,
-                        //height: useMobileLayout ? 90 : 150,
-                        decoration: BoxDecoration(
+                  AbsorbPointer(
+                    absorbing: isLoading
+                        ? (voucherData['voucher_code'] != '' ? true : false)
+                        : true,
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      child: Card(
+                        elevation: 4,
+                        color: Colors.white.withOpacity(0.8),
+                        margin: EdgeInsets.all(8),
+                        shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
                         ),
-                        padding:
-                            EdgeInsets.symmetric(vertical: 30, horizontal: 15),
                         child: Container(
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: <Widget>[
-                                        // SizedBox(height: 10),
-                                        SizedBox(
-                                          width: useMobileLayout ? 130 : 180,
-                                          height: 50,
-                                          child: ElevatedButton(
+                          // height:  150,
+                          //width: double.infinity,
+                          width: useMobileLayout ? null : 700,
+                          //height: useMobileLayout ? 90 : 150,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            // color: Colors.white,
+                            // color: Color(0xFF0E3311).withOpacity(0.5),
+                            color: isLoading
+                                ? (voucherData['voucher_code'] != ''
+                                    ? Colors.grey.withOpacity(0.5)
+                                    : Colors.white)
+                                : Colors.white,
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 30, horizontal: 15),
+                          child: Container(
+                            child: Column(
+                              children: <Widget>[
+                                Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          // SizedBox(height: 10),
+                                          SizedBox(
+                                            width: useMobileLayout ? 130 : 180,
+                                            height: 50,
+                                            child: ElevatedButton(
+                                              child: Text(
+                                                //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
+                                                "1 Day",
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: useMobileLayout
+                                                        ? 14
+                                                        : 25,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                              style: ElevatedButton.styleFrom(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          50.0),
+                                                ),
+                                                primary: Color.fromARGB(255, 55,
+                                                    57, 175), // background
+                                                onPrimary:
+                                                    Colors.white, // foreground
+                                              ),
+                                              onPressed: () {
+                                                Navigator.pushReplacementNamed(
+                                                    context, POS.routeName);
+                                              },
+                                              // color: Colors.white,
+                                              // textColor: Colors.black,
+                                              // splashColor: Colors.yellowAccent[800],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 50,
+                                          ),
+                                          Expanded(
                                             child: Text(
-                                              //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
-                                              "1 Day",
+                                              "1 Day Unlimited All Surf Data for P50",
+                                              textAlign: TextAlign.center,
                                               style: GoogleFonts.poppins(
                                                 textStyle: TextStyle(
-                                                  color: Colors.white,
                                                   fontSize:
-                                                      useMobileLayout ? 14 : 25,
-                                                  fontWeight: FontWeight.w600,
+                                                      useMobileLayout ? 12 : 30,
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Colors.black,
                                                 ),
                                               ),
                                             ),
-                                            style: ElevatedButton.styleFrom(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(50.0),
-                                              ),
-                                              primary: Color.fromARGB(
-                                                  255, 55, 57, 175), // background
-                                              onPrimary:
-                                                  Colors.white, // foreground
-                                            ),
-                                            onPressed: () {
-                                              Navigator.pushReplacementNamed(
-                                                  context, POS.routeName);
-                                            },
-                                            // color: Colors.white,
-                                            // textColor: Colors.black,
-                                            // splashColor: Colors.yellowAccent[800],
                                           ),
-                                        ),
-                                        SizedBox(
-                                          width: 50,
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            "1 Day Unlimited All Surf Data for P50",
-                                            textAlign: TextAlign.center,
-                                            style: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize:
-                                                    useMobileLayout ? 12 : 30,
-                                                fontWeight: FontWeight.w800,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: <Widget>[
-                                        // SizedBox(height: 10),
-                                        SizedBox(
-                                          width: useMobileLayout ? 130 : 180,
-                                          height: 50,
-                                          child: ElevatedButton(
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          // SizedBox(height: 10),
+                                          SizedBox(
+                                            width: useMobileLayout ? 130 : 180,
+                                            height: 50,
+                                            child: ElevatedButton(
+                                              child: Text(
+                                                //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
+                                                "5 Days",
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: useMobileLayout
+                                                        ? 14
+                                                        : 25,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                              style: ElevatedButton.styleFrom(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          50.0),
+                                                ),
+                                                primary: Color.fromARGB(255, 55,
+                                                    57, 175), // background
+                                                onPrimary:
+                                                    Colors.white, // foreground
+                                              ),
+                                              onPressed: () {
+                                                Navigator.pushReplacementNamed(
+                                                    context, POS.routeName);
+                                              },
+                                              // color: Colors.white,
+                                              // textColor: Colors.black,
+                                              // splashColor: Colors.yellowAccent[800],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 50,
+                                          ),
+                                          Expanded(
                                             child: Text(
-                                              //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
-                                              "5 Days",
+                                              "5 Days Unlimited All Surf Data for P250",
+                                              textAlign: TextAlign.center,
                                               style: GoogleFonts.poppins(
                                                 textStyle: TextStyle(
-                                                  color: Colors.white,
                                                   fontSize:
-                                                      useMobileLayout ? 14 : 25,
-                                                  fontWeight: FontWeight.w600,
+                                                      useMobileLayout ? 12 : 30,
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Colors.black,
                                                 ),
                                               ),
                                             ),
-                                            style: ElevatedButton.styleFrom(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(50.0),
-                                              ),
-                                              primary: Color.fromARGB(
-                                                  255, 55, 57, 175), // background
-                                              onPrimary:
-                                                  Colors.white, // foreground
-                                            ),
-                                            onPressed: () {
-                                              Navigator.pushReplacementNamed(
-                                                  context, POS.routeName);
-                                            },
-                                            // color: Colors.white,
-                                            // textColor: Colors.black,
-                                            // splashColor: Colors.yellowAccent[800],
                                           ),
-                                        ),
-                                        SizedBox(
-                                          width: 50,
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            "5 Days Unlimited All Surf Data for P250",
-                                            textAlign: TextAlign.center,
-                                            style: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize:
-                                                    useMobileLayout ? 12 : 30,
-                                                fontWeight: FontWeight.w800,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: <Widget>[
-                                        // SizedBox(height: 10),
-                                        SizedBox(
-                                          width: useMobileLayout ? 130 : 180,
-                                          height: 50,
-                                          child: ElevatedButton(
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          // SizedBox(height: 10),
+                                          SizedBox(
+                                            width: useMobileLayout ? 130 : 180,
+                                            height: 50,
+                                            child: ElevatedButton(
+                                              child: Text(
+                                                //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
+                                                "15 Days",
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: useMobileLayout
+                                                        ? 14
+                                                        : 25,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                              style: ElevatedButton.styleFrom(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          50.0),
+                                                ),
+                                                primary: Color.fromARGB(255, 55,
+                                                    57, 175), // background
+                                                onPrimary:
+                                                    Colors.white, // foreground
+                                              ),
+                                              onPressed: () {
+                                                Navigator.pushReplacementNamed(
+                                                    context, POS.routeName);
+                                              },
+                                              // color: Colors.white,
+                                              // textColor: Colors.black,
+                                              // splashColor: Colors.yellowAccent[800],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 50,
+                                          ),
+                                          Expanded(
                                             child: Text(
-                                              //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
-                                              "15 Days",
+                                              "15 Days Unlimited All Surf Data for P550",
+                                              textAlign: TextAlign.center,
                                               style: GoogleFonts.poppins(
                                                 textStyle: TextStyle(
-                                                  color: Colors.white,
                                                   fontSize:
-                                                      useMobileLayout ? 14 : 25,
-                                                  fontWeight: FontWeight.w600,
+                                                      useMobileLayout ? 12 : 30,
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Colors.black,
                                                 ),
                                               ),
                                             ),
-                                            style: ElevatedButton.styleFrom(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(50.0),
-                                              ),
-                                              primary: Color.fromARGB(
-                                                  255, 55, 57, 175), // background
-                                              onPrimary:
-                                                  Colors.white, // foreground
-                                            ),
-                                            onPressed: () {
-                                              Navigator.pushReplacementNamed(
-                                                  context, POS.routeName);
-                                            },
-                                            // color: Colors.white,
-                                            // textColor: Colors.black,
-                                            // splashColor: Colors.yellowAccent[800],
                                           ),
-                                        ),
-                                        SizedBox(
-                                          width: 50,
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            "15 Days Unlimited All Surf Data for P550",
-                                            textAlign: TextAlign.center,
-                                            style: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize:
-                                                    useMobileLayout ? 12 : 30,
-                                                fontWeight: FontWeight.w800,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: <Widget>[
-                                        // SizedBox(height: 10),
-                                        SizedBox(
-                                          width: useMobileLayout ? 130 : 180,
-                                          height: 50,
-                                          child: ElevatedButton(
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          // SizedBox(height: 10),
+                                          SizedBox(
+                                            width: useMobileLayout ? 130 : 180,
+                                            height: 50,
+                                            child: ElevatedButton(
+                                              child: Text(
+                                                //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
+                                                "30 Days",
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: useMobileLayout
+                                                        ? 14
+                                                        : 25,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                              style: ElevatedButton.styleFrom(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          50.0),
+                                                ),
+                                                primary: Color.fromARGB(255, 55,
+                                                    57, 175), // background
+                                                onPrimary:
+                                                    Colors.white, // foreground
+                                              ),
+                                              onPressed: () {
+                                                Navigator.pushReplacementNamed(
+                                                    context, POS.routeName);
+                                              },
+                                              // color: Colors.white,
+                                              // textColor: Colors.black,
+                                              // splashColor: Colors.yellowAccent[800],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 50,
+                                          ),
+                                          Expanded(
                                             child: Text(
-                                              //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
-                                              "30 Days",
+                                              "30 Days Unlimited All Surf Data for P1000",
+                                              textAlign: TextAlign.center,
                                               style: GoogleFonts.poppins(
                                                 textStyle: TextStyle(
-                                                  color: Colors.white,
                                                   fontSize:
-                                                      useMobileLayout ? 14 : 25,
-                                                  fontWeight: FontWeight.w600,
+                                                      useMobileLayout ? 12 : 30,
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Colors.black,
                                                 ),
                                               ),
                                             ),
-                                            style: ElevatedButton.styleFrom(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(50.0),
-                                              ),
-                                              primary: Color.fromARGB(
-                                                  255, 55, 57, 175), // background
-                                              onPrimary:
-                                                  Colors.white, // foreground
-                                            ),
-                                            onPressed: () {
-                                              Navigator.pushReplacementNamed(
-                                                  context, POS.routeName);
-                                            },
-                                            // color: Colors.white,
-                                            // textColor: Colors.black,
-                                            // splashColor: Colors.yellowAccent[800],
                                           ),
-                                        ),
-                                        SizedBox(
-                                          width: 50,
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            "30 Days Unlimited All Surf Data for P1000",
-                                            textAlign: TextAlign.center,
-                                            style: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize:
-                                                    useMobileLayout ? 12 : 30,
-                                                fontWeight: FontWeight.w800,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              )
-                            ],
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -660,8 +741,8 @@ class _HomePageState extends State<HomePage> {
                           // color: Colors.grey[200],
 
                           image: DecorationImage(
-                            image: const AssetImage(
-                                'assets/images/building.png'),
+                            image:
+                                const AssetImage('assets/images/building.png'),
                             fit: BoxFit.cover,
                             // colorFilter: ColorFilter.mode(
                             //   Colors.black.withOpacity(0.2),

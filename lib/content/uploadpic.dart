@@ -1,14 +1,26 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:konek_app/auth/providers/auth.dart';
+import 'package:konek_app/config/notification.dart';
+import 'package:konek_app/content/dashboard.dart';
+import 'package:konek_app/content/provider/voucher.dart';
 import 'package:konek_app/content/scan.dart';
+import 'package:provider/provider.dart';
 import 'package:scan/scan.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
+
+import '../config/httpexception.dart';
 
 class UploadPicture extends StatefulWidget {
   static const routeName = '/uploadpic';
@@ -20,6 +32,8 @@ class UploadPicture extends StatefulWidget {
 
 class _UploadPictureState extends State<UploadPicture> {
   List<XFile>? _mediaFileList;
+  final _formKey = GlobalKey<FormState>();
+  final txtCodeController = TextEditingController();
 
   void _setImageFileListFromFile(XFile? value) {
     _mediaFileList = value == null ? null : <XFile>[value];
@@ -94,8 +108,10 @@ class _UploadPictureState extends State<UploadPicture> {
             // imageQuality: quality,
           );
           setState(() async {
-            _setImageFileListFromFile(pickedFile);
-            getQRCode(pickedFile);
+            if (pickedFile != null) {
+              _setImageFileListFromFile(pickedFile);
+              getQRCode(pickedFile);
+            }
           });
         } catch (e) {
           setState(() {
@@ -104,6 +120,91 @@ class _UploadPictureState extends State<UploadPicture> {
         }
       }
     }
+  }
+
+  void enterVoucherCode() {
+    late AwesomeDialog dialog;
+    dialog = AwesomeDialog(
+      context: context,
+      animType: AnimType.scale,
+      dialogType: DialogType.noHeader,
+      keyboardAware: true,
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
+            Text(
+              'Enter Voucher Code',
+              // style: Theme.of(context).textTheme.titleLarge,
+              style: GoogleFonts.poppins(
+                  color: Color.fromARGB(255, 55, 57, 175),
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Material(
+              elevation: 0,
+              color: Colors.blueGrey.withAlpha(40),
+              child: Form(
+                key: _formKey,
+                child: TextFormField(
+                  controller: txtCodeController,
+                  autofocus: true,
+                  minLines: 1,
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.all(10),
+                    border: InputBorder.none,
+                    labelText: 'Voucher Code',
+                    //prefixIcon: Icon(Icons.code),
+                    errorStyle: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        fontSize: 10,
+                        color: Colors.redAccent[200],
+                      ),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter voucher code';
+                    }
+                    // if (!value.contains('@')) {
+                    //   return 'Invalid username';
+                    // }
+                    return null;
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            AnimatedButton(
+              isFixedHeight: false,
+              text: 'OK',
+              color: Color.fromARGB(255, 55, 57, 175),
+              pressEvent: () {
+                //dialog.dismiss();
+                final isValid = _formKey.currentState!.validate();
+                if (!isValid) {
+                  return;
+                } else {
+                  setState(() {
+                    qrCode = txtCodeController.text;
+                    dialog.dismiss();
+                  });
+                }
+              },
+            )
+          ],
+        ),
+      ),
+    );
+
+    dialog.show();
   }
 
   void getQRCode(pickedFile) async {
@@ -118,6 +219,56 @@ class _UploadPictureState extends State<UploadPicture> {
       }
     });
     print(str);
+  }
+
+  void submitVoucherCode() async {
+    var errorMessage;
+    NotificationController.scheduleNewNotification();
+    try {
+      await Provider.of<Voucher>(context, listen: false)
+          .registerVoucherCode(qrCode);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      if (prefs.containsKey('voucherData')) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => Dashboard(),
+          ),
+        );
+      }
+      //       var voucherData = {
+      //   "voucher_code": "123",
+      //   "duration": 0,
+      //   "description": "fdfsd",
+      //   "amount": 0,
+      //   "claimed_date": "gggf",
+      //   "expire_date": "gfgfg",
+      //   "status": "ggfgfgf"
+      // };
+      //   final preferences = await StreamingSharedPreferences.instance;
+      //   preferences.setString('voucherData', json.encode(voucherData));
+    } on HttpException catch (error) {
+      print(error);
+      showError(error.toString());
+    } catch (error) {
+      showError(error.toString());
+    }
+    // await Future.delayed(const Duration(seconds: 2));
+
+    // setState(() {
+    //   _isLoading = true;
+    // });
+  }
+
+  void showError(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Color(0xff404747),
+      textColor: Colors.white,
+      fontSize: 13.0,
+    );
   }
 
   @override
@@ -142,7 +293,7 @@ class _UploadPictureState extends State<UploadPicture> {
             key: UniqueKey(),
             itemBuilder: (BuildContext context, int index) {
               final String? mime = lookupMimeType(_mediaFileList![index].path);
-      
+
               // Why network for web?
               // See https://pub.dev/packages/image_picker_for_web#limitations-on-the-web-platform
               return Semantics(
@@ -154,7 +305,8 @@ class _UploadPictureState extends State<UploadPicture> {
                           errorBuilder: (BuildContext context, Object error,
                               StackTrace? stackTrace) {
                             return const Center(
-                                child: Text('This image type is not supported'));
+                                child:
+                                    Text('This image type is not supported'));
                           },
                         ));
             },
@@ -332,6 +484,18 @@ class _UploadPictureState extends State<UploadPicture> {
                   child: const Icon(Icons.qr_code),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: FloatingActionButton(
+                  backgroundColor: Color.fromARGB(255, 55, 57, 175),
+                  onPressed: () async {
+                    enterVoucherCode();
+                  },
+                  heroTag: 'image0',
+                  tooltip: 'Enter Voucher Code',
+                  child: const Icon(Icons.input),
+                ),
+              ),
             ],
           ),
           SizedBox(
@@ -396,6 +560,7 @@ class _UploadPictureState extends State<UploadPicture> {
                       : () {
                           // Navigator.pushReplacementNamed(
                           //     context, POS.routeName);
+                          submitVoucherCode();
                         },
                   // color: Colors.white,
                   // textColor: Colors.black,

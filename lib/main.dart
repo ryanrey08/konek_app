@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:konek_app/config/notification.dart';
+import 'package:konek_app/content/notification.dart';
+import 'package:konek_app/content/provider/voucher.dart';
 import 'package:konek_app/content/scan.dart';
 import 'package:konek_app/content/uploadpic.dart';
 import 'package:konek_app/profile/screens/profile.dart';
@@ -13,8 +16,10 @@ import './content/dashboard.dart';
 import 'auth/screens/splashscreen.dart';
 import 'content/pos.dart';
 
-void main() {
+void main()async{
   WidgetsFlutterBinding.ensureInitialized();
+    await NotificationController.initializeLocalNotifications();
+  await NotificationController.initializeIsolateReceivePort();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
     runApp(MyApp());
@@ -47,6 +52,33 @@ class _MyAppPageState extends State<MyApp> {
         ChangeNotifierProvider.value(
           value: Auth(),
         ),
+        // ChangeNotifierProxyProvider<Auth, Voucher>(
+        //   builder: (ctx, auth, userData) => Voucher(
+        //     auth.token,
+        //   ),
+        // ),
+        ChangeNotifierProxyProvider<Auth, Voucher>(
+          //create: (context) => Voucher(''),
+          update: (context, auth, userData) {
+            // Pass the value from AuthProvider to UserProvider
+            // userData?.updateUserData(authProvider?.isLoggedIn ?? false);
+            // return userData!;
+            return userData ?? Voucher(auth.token);
+          },
+               create: (BuildContext context) {
+            // You can pass any required parameters to the create method
+            // In this example, we pass a token from AuthProvider
+            final Auth authProvider = Provider.of<Auth>(context, listen: false);
+            final String token = authProvider.token;
+
+            // Instantiate the UserProvider with the token
+            return Voucher(token);
+          },
+          // create: (BuildContext context) {
+          //   // This won't be used because we use the update function.
+          //   throw UnimplementedError();
+          // },
+        ),
       ],
       child: AppRetainWidget(
         child: Consumer<Auth>(
@@ -75,6 +107,7 @@ class _MyAppPageState extends State<MyApp> {
               POS.routeName: (context) => POS(),
               ScanQR.routeName: (context) => ScanQR(),
               UploadPicture.routeName: (context) => UploadPicture(),
+              NotificationList.routeName: (context) => NotificationList(),
             },
           ),
         ),

@@ -1,31 +1,57 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:konek_app/content/dashboard.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../config/httpexception.dart';
 
 import 'provider/voucher.dart';
 
-class Transaction extends StatefulWidget {
-  const Transaction({super.key});
+class NotificationList extends StatefulWidget {
+  const NotificationList({super.key});
+    static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+    static const routeName = '/notification';
 
   @override
-  State<Transaction> createState() => _TransactionState();
+  State<NotificationList> createState() => _NotificationListState();
 }
 
-class _TransactionState extends State<Transaction> {
+class _NotificationListState extends State<NotificationList> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
   List<String> data = [];
   bool isLoading = false;
   var voucherData;
+  var notificationData;
 
     @override
   void initState() {
     super.initState();
     getVoucherData();
+    getNotification();
+  }
+
+    Future<void> getNotification() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('notificationData')) {
+      notificationData = [];
+    } else {
+      final extracteduserData =
+          json.decode(prefs.getString('notificationData')!) as Map<String, dynamic>;
+      print(extracteduserData);
+      setState(() {
+        notificationData = extracteduserData;
+      });
+    }
+
+    setState(() {
+      isLoading = true;
+    });
   }
 
 
@@ -70,29 +96,29 @@ class _TransactionState extends State<Transaction> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   backgroundColor: Color.fromARGB(255, 55, 57, 175),
-      //   leading: Builder(builder: (BuildContext context) {
-      //     return IconButton(
-      //         icon: Icon(Icons.keyboard_arrow_left),
-      //         onPressed: () {
-      //           Navigator.pushReplacementNamed(context, Dashboard.routeName);
-      //         } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
-      //   }),
-      //   automaticallyImplyLeading: false,
-      //   title: Text('My Profile',
-      //       style: GoogleFonts.poppins(
-      //         fontSize: useMobileLayout ? 16 : 18,
-      //       )),
-      // ),
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 55, 57, 175),
+        leading: Builder(builder: (BuildContext context) {
+          return IconButton(
+              icon: Icon(Icons.keyboard_arrow_left),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, Dashboard.routeName);
+              } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
+        }),
+        automaticallyImplyLeading: false,
+        title: Text('Notifications',
+            style: GoogleFonts.poppins(
+              fontSize: useMobileLayout ? 16 : 18,
+            )),
+      ),
       body: isLoading ? RefreshIndicator(
         key: _refreshIndicatorKey,
         color: Colors.white,
         backgroundColor: Colors.blue,
         strokeWidth: 4.0,
-        onRefresh: getVoucherData,
+        onRefresh: getNotification,
         child: ListView.builder(
-          itemCount: voucherData.length,
+          itemCount: notificationData.length,
           itemBuilder: (BuildContext context, int index) {
             return ListTile(
               title: Text(voucherData[index]['description']),
