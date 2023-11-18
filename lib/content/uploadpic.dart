@@ -223,25 +223,26 @@ class _UploadPictureState extends State<UploadPicture> {
 
   void submitVoucherCode() async {
     var errorMessage;
-    NotificationController.scheduleNewNotification();
     try {
-      await Provider.of<Voucher>(context, listen: false)
+      Map<String, dynamic> vouchData = await Provider.of<Voucher>(context, listen: false)
           .registerVoucherCode(qrCode);
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      if (prefs.containsKey('voucherData')) {
+      if (vouchData['voucher_code'] != '') {
+        // var data = json.decode(prefs.getString('voucherData')!) as Map<String, dynamic>;
+        NotificationController.scheduleNewNotification(vouchData['description'], vouchData['expire_date']);
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => Dashboard(),
           ),
         );
       }
-      //       var voucherData = {
+      // var voucherData = {
       //   "voucher_code": "123",
       //   "duration": 0,
-      //   "description": "fdfsd",
+      //   "description": "1 DAY UNLI DATA-ABC",
       //   "amount": 0,
-      //   "claimed_date": "gggf",
-      //   "expire_date": "gfgfg",
+      //   "claimed_date": "2023-11-15 13:20:41",
+      //   "expire_date": "2023-11-16 13:20:41",
       //   "status": "ggfgfgf"
       // };
       //   final preferences = await StreamingSharedPreferences.instance;

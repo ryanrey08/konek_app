@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:isolate';
 import 'dart:ui';
 
@@ -8,6 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:konek_app/content/notification.dart';
 import 'package:palette_generator/palette_generator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 
 class NotificationController {
   static ReceivedAction? initialAction;
@@ -18,7 +21,8 @@ class NotificationController {
   ///
   static Future<void> initializeLocalNotifications() async {
     await AwesomeNotifications().initialize(
-        null, //'resource://drawable/res_app_icon',//
+        // null,
+        'resource://drawable/launch_background',
         [
           NotificationChannel(
               channelKey: 'alerts',
@@ -31,7 +35,7 @@ class NotificationController {
               defaultPrivacy: NotificationPrivacy.Private,
               defaultColor: Colors.deepPurple,
               ledColor: Colors.deepPurple),
-                        NotificationChannel(
+          NotificationChannel(
               channelKey: 'basic_channel',
               channelName: 'Alerts',
               channelDescription: 'Notification tests as alerts',
@@ -66,13 +70,41 @@ class NotificationController {
   ///  *********************************************
   ///  Notifications events are only delivered after call this method
   static Future<void> startListeningNotificationEvents() async {
-    AwesomeNotifications()
-        .setListeners(onActionReceivedMethod: onActionReceivedMethod, onNotificationDisplayedMethod: onNotificationDisplayedMethod);
+    AwesomeNotifications().setListeners(
+        onActionReceivedMethod: onActionReceivedMethod,
+        onNotificationDisplayedMethod: onNotificationDisplayedMethod);
   }
 
- static Future <void> onNotificationDisplayedMethod(ReceivedNotification receivedNotification) async {
+   @pragma('vm:entry-point')
+  static Future<void> onNotificationDisplayedMethod(
+      ReceivedNotification receivedNotification) async {
     // Your code goes here
-    print("hello");
+    final pref = await SharedPreferences.getInstance();
+    final preferences = await StreamingSharedPreferences.instance;
+    // var date = json.decode(pref.getString("voucherData")!);
+    // var nowDate = DateTime.now();
+    // var toDate = DateTime.parse(date['expire_date']);
+    // int interval = toDate.difference(nowDate).inSeconds;
+    if(pref.containsKey('showFirst')){
+      var isShow = pref.getString("showFirst");
+      if(isShow == 'true'){
+                    var data = {
+          "voucher_code": "",
+          "duration": 0,
+          "description": "",
+          "amount": 0,
+          "claimed_date": "",
+          "expire_date": "",
+          "status": ""
+        };
+        preferences.setString('voucherData', json.encode(data));
+        pref.setString('showFirst', 'false');
+      }else{
+        pref.setString('showFirst', 'true');
+      }
+    }else{
+       pref.setString('showFirst', 'true');
+    }
   }
 
   ///  *********************************************
@@ -82,7 +114,7 @@ class NotificationController {
   @pragma('vm:entry-point')
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
-        print("hello");
+    print("hello");
     if (receivedAction.actionType == ActionType.SilentAction ||
         receivedAction.actionType == ActionType.SilentBackgroundAction) {
       // For background actions, you must hold the execution until the end
@@ -230,18 +262,34 @@ class NotificationController {
         ]);
   }
 
-  static Future<void> scheduleNewNotification() async {
+  static Future<void> scheduleNewNotification(
+      String description, String expDate) async {
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
     if (!isAllowed) isAllowed = await displayNotificationRationale();
     if (!isAllowed) return;
 
+    var nowDate = DateTime.now();
+    var toDate = DateTime.parse(expDate);
+    int interval = toDate.difference(nowDate).inSeconds;
+
     await myNotifyScheduleInHours(
-        title: 'test',
-        msg: 'test message',
+        title: 'Data Expiry',
+        msg: 'Your promo ${description} is about to expire on ${expDate}',
         heroThumbUrl:
             'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
         hoursFromNow: 5,
         username: 'test user',
+        interval: (interval - 60),
+        repeatNotif: false);
+
+    await myNotifyScheduleInHours(
+        title: 'Data Expiry',
+        msg: 'Your promo ${description} has been expired (Date: ${expDate})',
+        heroThumbUrl:
+            'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
+        hoursFromNow: 5,
+        username: 'test user',
+        interval: interval,
         repeatNotif: false);
   }
 
@@ -260,9 +308,10 @@ Future<void> myNotifyScheduleInHours({
   required String username,
   required String title,
   required String msg,
+  required int interval,
   bool repeatNotif = false,
 }) async {
-  var nowDate = DateTime.now().add(Duration(hours: hoursFromNow, seconds: 5));
+  // var nowDate = DateTime.now().add(Duration(hours: hoursFromNow, seconds: 5));
   await AwesomeNotifications().createNotification(
     // schedule: NotificationCalendar(
     //   //weekday: nowDate.day,
@@ -274,29 +323,31 @@ Future<void> myNotifyScheduleInHours({
     // ),
     // schedule: NotificationCalendar.fromDate(
     //    date: DateTime.now().add(const Duration(seconds: 10))),
-    schedule: NotificationInterval(interval: 5, repeats: false),
+    schedule: NotificationInterval(interval: interval, repeats: false),
     content: NotificationContent(
       id: -1,
       channelKey: 'basic_channel',
-      title: '${Emojis.food_bowl_with_spoon} $title',
-      body: '$username, $msg',
-      bigPicture: heroThumbUrl,
+      title: title,
+      body: msg,
+      bigPicture: null,
       notificationLayout: NotificationLayout.BigPicture,
       //actionType : ActionType.DismissAction,
-      color: Colors.black,
-      backgroundColor: Colors.black,
+      color: Colors.transparent,
+      backgroundColor: Colors.transparent,
+      largeIcon: 'asset://assets/images/novulutions.png',
+      // icon: 'asset://assets/images/novulutions.png',
       // customSound: 'resource://raw/notif',
       payload: {'actPag': 'myAct', 'actType': 'food', 'username': username},
     ),
-    actionButtons: [
-      NotificationActionButton(
-        key: 'NOW',
-        label: 'btnAct1',
-      ),
-      NotificationActionButton(
-        key: 'LATER',
-        label: 'btnAct2',
-      ),
-    ],
+    // actionButtons: [
+    //   NotificationActionButton(
+    //     key: 'NOW',
+    //     label: 'btnAct1',
+    //   ),
+    //   NotificationActionButton(
+    //     key: 'LATER',
+    //     label: 'btnAct2',
+    //   ),
+    // ],
   );
 }

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:konek_app/auth/providers/auth.dart';
 import 'package:konek_app/auth/screens/login.dart';
 import 'package:konek_app/config/config.dart';
+import 'package:konek_app/config/notification.dart';
 import 'package:konek_app/content/network.dart';
 import 'package:konek_app/content/notification.dart';
 import 'package:konek_app/content/uploadpic.dart';
@@ -45,21 +46,30 @@ class _DashboardState extends State<Dashboard> {
 
   var voucherData;
 
+  late Preference<String> globalVoucherData;
+
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _currentIndex = 0;
     _pageTitle = pageTitle[0];
     // startTime();
     //assignData();
     showLoading();
-    getVoucherData();
     getStreamData();
+    NotificationController.startListeningNotificationEvents();
+    //getVoucherData();
   }
 
-  getStreamData() async{
-        final preferences =  await StreamingSharedPreferences.instance;
-        globalVoucherData = preferences.getString('voucherData', defaultValue: '');
+  getStreamData() async {
+    final preferences = await StreamingSharedPreferences.instance;
+
+    setState(() {
+      globalVoucherData = preferences.getString('voucherData',
+          defaultValue:
+              '{ "voucher_code": "","duration": 0,"description": "","amount": 0,"claimed_date": "","expire_date": "","status": ""}');
+      isLoading = true;
+    });
   }
 
   assignData() async {
@@ -89,8 +99,8 @@ class _DashboardState extends State<Dashboard> {
         "status": ""
       };
     } else {
-      final extracteduserData = json.decode(prefs.getString('voucherData')!)
-              as Map<String, dynamic>;
+      final extracteduserData =
+          json.decode(prefs.getString('voucherData')!) as Map<String, dynamic>;
       print(extracteduserData);
 
       setState(() {
@@ -123,8 +133,6 @@ class _DashboardState extends State<Dashboard> {
         extractedUserData['data']['last_name'];
   }
 
-  late Preference<String> globalVoucherData;
-
   @override
   Widget build(BuildContext context) {
     double appBarHeight = AppBar().preferredSize.height;
@@ -153,10 +161,8 @@ class _DashboardState extends State<Dashboard> {
                   onTap: () async {
                     // await Provider.of<Auth>(context, listen: false).logout();
                     // Navigator.of(context).pushReplacementNamed(Login.routeName);
-                                         Navigator.of(context)
-                                                    .pushReplacementNamed(
-                                                        NotificationList
-                                                            .routeName);
+                    Navigator.of(context)
+                        .pushReplacementNamed(NotificationList.routeName);
                   },
                   child: Icon(
                     Icons.notifications,
@@ -167,117 +173,122 @@ class _DashboardState extends State<Dashboard> {
         ),
         // body: pages[_currentIndex],
         body: tabs[_currentIndex!],
-        bottomNavigationBar: BottomAppBar(
-          child: BottomNavigationBar(
-            // selectedItemColor: Colors.white,
-            // unselectedItemColor: Colors.black,
-            type: BottomNavigationBarType.fixed,
-            onTap: (index) {
-              setState(() {
-                if (voucherData['voucher_code'] != '') {
-                  if (index == 1) {
-                    _currentIndex = _currentIndex;
-                  } else {
-                    _currentIndex = index;
-                    _pageTitle = pageTitle[index];
-                  }
-                } else {
-                  _currentIndex = index;
-                  _pageTitle = pageTitle[index];
-                }
-                print(index.toString());
-              });
-            },
-            backgroundColor: Color.fromARGB(255, 55, 57, 175),
-            currentIndex: 0,
-            items: [
-              BottomNavigationBarItem(
-                  icon: new Icon(
-                    Icons.home,
-                    size: 20,
-                    color: Colors.white,
-                  ),
-                  label: ""
-                  // title: Text(
-                  //   'Home',
-                  //   style: GoogleFonts.poppins(
-                  //     textStyle: TextStyle(
-                  //       fontSize: 10,
-                  //       color: Colors.white,
-                  //     ),
-                  //   ),
-                  // ),
-                  // backgroundColor: Colors.green[50],
-                  ),
-              BottomNavigationBarItem(
-                  icon: new Icon(
-                    Icons.qr_code,
-                    size: 40,
-                    // color: Colors.white,
-                    color: !isLoading
-                        ? (voucherData['voucher_code'] != ''
-                            ? Colors.redAccent
-                            : Colors.white)
-                        : Colors.white,
-                  ),
-                  label: ""
-                  // backgroundColor: Colors.green[50],
-                  ),
-              BottomNavigationBarItem(
-                  icon: new Icon(
-                    Icons.list,
-                    size: 20,
-                    color: Colors.white,
-                  ),
-                  label: ""
-                  // title: Text(
-                  //   'Application',
-                  //   style: GoogleFonts.poppins(
-                  //     textStyle: TextStyle(
-                  //       fontSize: 13,
-                  //       color: Colors.white,
-                  //     ),
-                  //   ),
-                  // ),
-                  // backgroundColor: Colors.green[50],
-                  ),
-              // BottomNavigationBarItem(
-              //   icon: new Icon(
-              //     Icons.star,
-              //     size: 20,
-              //     color: Colors.white,
-              //   ),
-              //   title: Text(
-              //     'Misc',
-              //     style: GoogleFonts.poppins(
-              //       textStyle: TextStyle(
-              //         fontSize: 13,
-              //         color: Colors.white,
-              //       ),
-              //     ),
-              //   ),
-              //   // backgroundColor: Colors.green[50],
-              // ),
-              // BottomNavigationBarItem(
-              //   icon: new Icon(
-              //     Icons.settings_applications,
-              //     size: 20,
-              //     color: Colors.white,
-              //   ),
-              //   title: Text(
-              //     'Components',
-              //     style: GoogleFonts.poppins(
-              //       textStyle: TextStyle(
-              //         fontSize: 13,
-              //         color: Colors.white,
-              //       ),
-              //     ),
-              //   ),
-              //   // backgroundColor: Colors.green[50],
-              // )
-            ],
-          ),
-        ),
+        bottomNavigationBar: !isLoading ? BottomAppBar(
+          child: PreferenceBuilder<String>(
+              preference: globalVoucherData,
+              builder: (context, vouchData) {
+                var newVoucherData = json.decode(vouchData);
+                return BottomNavigationBar(
+                  // selectedItemColor: Colors.white,
+                  // unselectedItemColor: Colors.black,
+                  type: BottomNavigationBarType.fixed,
+                  onTap: (index) {
+                    setState(() {
+                      if (newVoucherData['voucher_code'] != '') {
+                        if (index == 2) {
+                          _currentIndex = _currentIndex;
+                        } else {
+                          _currentIndex = index;
+                          _pageTitle = pageTitle[index];
+                        }
+                      } else {
+                        _currentIndex = index;
+                        _pageTitle = pageTitle[index];
+                      }
+                      print(index.toString());
+                    });
+                  },
+                  backgroundColor: Color.fromARGB(255, 55, 57, 175),
+                  currentIndex: 0,
+                  items: [
+                    BottomNavigationBarItem(
+                        icon: new Icon(
+                          Icons.home,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                        label: ""
+                        // title: Text(
+                        //   'Home',
+                        //   style: GoogleFonts.poppins(
+                        //     textStyle: TextStyle(
+                        //       fontSize: 10,
+                        //       color: Colors.white,
+                        //     ),
+                        //   ),
+                        // ),
+                        // backgroundColor: Colors.green[50],
+                        ),
+                    BottomNavigationBarItem(
+                        icon: new Icon(
+                          Icons.qr_code,
+                          size: 40,
+                          // color: Colors.white,
+                          color: !isLoading
+                              ? (newVoucherData['voucher_code'] != ''
+                                  ? Colors.redAccent
+                                  : Colors.white)
+                              : Colors.white,
+                        ),
+                        label: ""
+                        // backgroundColor: Colors.green[50],
+                        ),
+                    BottomNavigationBarItem(
+                        icon: new Icon(
+                          Icons.list,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                        label: ""
+                        // title: Text(
+                        //   'Application',
+                        //   style: GoogleFonts.poppins(
+                        //     textStyle: TextStyle(
+                        //       fontSize: 13,
+                        //       color: Colors.white,
+                        //     ),
+                        //   ),
+                        // ),
+                        // backgroundColor: Colors.green[50],
+                        ),
+                    // BottomNavigationBarItem(
+                    //   icon: new Icon(
+                    //     Icons.star,
+                    //     size: 20,
+                    //     color: Colors.white,
+                    //   ),
+                    //   title: Text(
+                    //     'Misc',
+                    //     style: GoogleFonts.poppins(
+                    //       textStyle: TextStyle(
+                    //         fontSize: 13,
+                    //         color: Colors.white,
+                    //       ),
+                    //     ),
+                    //   ),
+                    //   // backgroundColor: Colors.green[50],
+                    // ),
+                    // BottomNavigationBarItem(
+                    //   icon: new Icon(
+                    //     Icons.settings_applications,
+                    //     size: 20,
+                    //     color: Colors.white,
+                    //   ),
+                    //   title: Text(
+                    //     'Components',
+                    //     style: GoogleFonts.poppins(
+                    //       textStyle: TextStyle(
+                    //         fontSize: 13,
+                    //         color: Colors.white,
+                    //       ),
+                    //     ),
+                    //   ),
+                    //   // backgroundColor: Colors.green[50],
+                    // )
+                  ],
+                );
+              }),
+        ) : Container(child: Center(child: CircularProgressIndicator())),
 
         drawer: Container(
           color: Colors.white,
@@ -294,75 +305,59 @@ class _DashboardState extends State<Dashboard> {
                   Flexible(
                     child: ListView(
                       children: <Widget>[
-                        PreferenceBuilder<String>(
-                          preference: globalVoucherData,
-                          builder: (context, vouchData) {
-                            var newVoucherData = json.decode(vouchData);
-                            return Container(
-                            height: 180,
-                            child: Theme(
-                              data: ThemeData(dividerColor: Colors.transparent),
-                              child: DrawerHeader(
-                                decoration: BoxDecoration(
-                                    color: Color.fromARGB(255, 55, 57, 175)),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Container(
-                                      height: 90,
-                                      width: 180,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: AssetImage(
-                                              'assets/images/novulutions.png'),
-                                        ),
-                                        // border: Border.all(color: Colors.grey),
-                                        // borderRadius: BorderRadius.circular(50),
+                        Container(
+                          height: 180,
+                          child: Theme(
+                            data: ThemeData(dividerColor: Colors.transparent),
+                            child: DrawerHeader(
+                              decoration: BoxDecoration(
+                                  color: Color.fromARGB(255, 55, 57, 175)),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    height: 90,
+                                    width: 180,
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                            'assets/images/novulutions.png'),
+                                      ),
+                                      // border: Border.all(color: Colors.grey),
+                                      // borderRadius: BorderRadius.circular(50),
+                                    ),
+                                  ),
+                                  Text(
+                                    fullName.toString(),
+                                    style: GoogleFonts.poppins(
+                                      textStyle: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    Text(
-                                      fullName.toString(),
-                                      style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                                 Text(
-                                      newVoucherData['voucher_code'].toString(),
-                                      style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    )
-                                    // isLoading
-                                    //     ?
-                                    //     Text(
-                                    //    '',
-                                    //         style: GoogleFonts.poppins(
-                                    //           textStyle: TextStyle(
-                                    //             fontSize: 14,
-                                    //             color: Color(0xFF255946),
-                                    //             fontWeight: FontWeight.w600,
-                                    //           ),
-                                    //         ),
-                                    //       )
-                                    //     : Container(),
-                                    // isLoading
-                                    //     ? Text(farmer['rsbsa_no'] == null ? "---" : farmer['rsbsa_no'])
-                                    //     : Container(),
-                                  ],
-                                ),
+                                  )
+                                  // isLoading
+                                  //     ?
+                                  //     Text(
+                                  //    '',
+                                  //         style: GoogleFonts.poppins(
+                                  //           textStyle: TextStyle(
+                                  //             fontSize: 14,
+                                  //             color: Color(0xFF255946),
+                                  //             fontWeight: FontWeight.w600,
+                                  //           ),
+                                  //         ),
+                                  //       )
+                                  //     : Container(),
+                                  // isLoading
+                                  //     ? Text(farmer['rsbsa_no'] == null ? "---" : farmer['rsbsa_no'])
+                                  //     : Container(),
+                                ],
                               ),
                             ),
-                          );
-                          }
+                          ),
                         ),
                         Container(
                           decoration: BoxDecoration(

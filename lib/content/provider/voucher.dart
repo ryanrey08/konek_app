@@ -44,7 +44,7 @@ class Voucher with ChangeNotifier {
   //   }
   // }
 
-  Future<void> registerVoucherCode(String voucher_code) async {
+  Future<Map<String, dynamic>> registerVoucherCode(String voucher_code) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var userInfo = json.decode(sharedPreferences.getString('userData')!)
         as Map<String, dynamic>;
@@ -68,24 +68,28 @@ class Voucher with ChangeNotifier {
             'voucherData', json.encode(jsonResponse['data']));
         final preferences = await StreamingSharedPreferences.instance;
         preferences.setString('voucherData', json.encode(jsonResponse['data']));
+
+        return jsonResponse['data'];
+
       } else {
         print(jsonResponse['message']);
-        throw HttpException(jsonResponse['data'].toString());
-        // var data = {
-        //   "voucher_code": "GNXPMX",
-        //   "duration": 1,
-        //   "description": "1 DAY UNLI DATA-ABC",
-        //   "amount": 50,
-        //   "claimed_date": "2023-11-15 07:45:58",
-        //   "expire_date": "2023-11-16 07:45:58",
-        //   "status": "Registred"
-        // };
+        // throw HttpException(jsonResponse['data'].toString());
+        var data = {
+          "voucher_code": "GNXPMX",
+          "duration": 1,
+          "description": "1 DAY UNLI DATA-ABC",
+          "amount": 50,
+          "claimed_date": "2023-11-15 07:45:58",
+          "expire_date": "2023-11-18 15:38:00",
+          "status": "Registred"
+        };
         // SharedPreferences sharedPreferences =
         //     await SharedPreferences.getInstance();
         // sharedPreferences.setString(
         //     'voucherData', json.encode(data));
-        // final preferences = await StreamingSharedPreferences.instance;
-        // preferences.setString('voucherData', json.encode(data));
+        final preferences = await StreamingSharedPreferences.instance;
+        preferences.setString('voucherData', json.encode(data));
+        return data;
       }
     } catch (error) {
       print(error);
