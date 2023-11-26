@@ -205,22 +205,22 @@ class _HomePageState extends State<HomePage> {
               decoration: BoxDecoration(
                 //  color: Colors.white,
                 image: DecorationImage(
-                  image: AssetImage('assets/images/novulutions.png'),
+                  image: AssetImage('assets/images/swak-img.png'),
                 ),
               ),
               child: Column(children: [
                 SizedBox(
                   height: 45,
                 ),
-                Expanded(
-                  child: Text(
-                    "WELCOME",
-                    style: GoogleFonts.poppins(
-                        fontSize: 50,
-                        color: Color.fromARGB(255, 55, 57, 175),
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
+                // Expanded(
+                //   child: Text(
+                //     "WELCOME",
+                //     style: GoogleFonts.poppins(
+                //         fontSize: 50,
+                //         color: Color.fromARGB(255, 55, 57, 175),
+                //         fontWeight: FontWeight.bold),
+                //   ),
+                // ),
                 //      Text(
                 //   "John Doe",
                 //   style: GoogleFonts.poppins(

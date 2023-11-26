@@ -7,6 +7,6 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@mipmap/novulutions_icon" />
+            android:src="@mipmap/swak_img" />
     </item>
 </layer-list>

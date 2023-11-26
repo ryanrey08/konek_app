@@ -75,7 +75,7 @@ class NotificationController {
         onNotificationDisplayedMethod: onNotificationDisplayedMethod);
   }
 
-   @pragma('vm:entry-point')
+  @pragma('vm:entry-point')
   static Future<void> onNotificationDisplayedMethod(
       ReceivedNotification receivedNotification) async {
     // Your code goes here
@@ -85,10 +85,10 @@ class NotificationController {
     // var nowDate = DateTime.now();
     // var toDate = DateTime.parse(date['expire_date']);
     // int interval = toDate.difference(nowDate).inSeconds;
-    if(pref.containsKey('showFirst')){
+    if (pref.containsKey('showFirst')) {
       var isShow = pref.getString("showFirst");
-      if(isShow == 'true'){
-                    var data = {
+      if (isShow == 'true') {
+        var data = {
           "voucher_code": "",
           "duration": 0,
           "description": "",
@@ -99,11 +99,11 @@ class NotificationController {
         };
         preferences.setString('voucherData', json.encode(data));
         pref.setString('showFirst', 'false');
-      }else{
+      } else {
         pref.setString('showFirst', 'true');
       }
-    }else{
-       pref.setString('showFirst', 'true');
+    } else {
+      pref.setString('showFirst', 'true');
     }
   }
 
@@ -145,10 +145,16 @@ class NotificationController {
   static Future<void> onActionReceivedImplementationMethod(
       ReceivedAction receivedAction) async {
     NotificationList.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-        '/notification-page',
+        '/notification',
         (route) =>
-            (route.settings.name != '/notification-page') || route.isFirst,
+            (route.settings.name != '/notification') || route.isFirst,
         arguments: receivedAction);
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => NotificationList(),
+    //   ),
+    // );
   }
 
   ///  *********************************************
@@ -272,15 +278,17 @@ class NotificationController {
     var toDate = DateTime.parse(expDate);
     int interval = toDate.difference(nowDate).inSeconds;
 
-    await myNotifyScheduleInHours(
+    if(interval < 1800){
+          await myNotifyScheduleInHours(
         title: 'Data Expiry',
         msg: 'Your promo ${description} is about to expire on ${expDate}',
         heroThumbUrl:
             'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
         hoursFromNow: 5,
         username: 'test user',
-        interval: (interval - 60),
+        interval: (interval - 1800),
         repeatNotif: false);
+    }
 
     await myNotifyScheduleInHours(
         title: 'Data Expiry',
@@ -334,7 +342,7 @@ Future<void> myNotifyScheduleInHours({
       //actionType : ActionType.DismissAction,
       color: Colors.transparent,
       backgroundColor: Colors.transparent,
-      largeIcon: 'asset://assets/images/novulutions.png',
+      largeIcon: 'asset://assets/images/swak-img.png',
       // icon: 'asset://assets/images/novulutions.png',
       // customSound: 'resource://raw/notif',
       payload: {'actPag': 'myAct', 'actType': 'food', 'username': username},

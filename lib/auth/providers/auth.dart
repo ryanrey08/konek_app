@@ -69,7 +69,7 @@ class Auth with ChangeNotifier {
         sharedPreferences.setString('userData', json.encode(jsonResponse));
       } else {
         print(jsonResponse['message']);
-        throw HttpException('Something went wrong');
+        throw HttpException(jsonResponse['data'].toString());
       }
     } catch (error) {
       print(error);
@@ -122,7 +122,7 @@ class Auth with ChangeNotifier {
         sharedPreferences.setString('userData', userData);
         notifyListeners();
       } else {
-        throw HttpException('Something went wrong.');
+        throw HttpException(jsonResponse['data'].toString());
       }
 
       print(jsonResponse['message']);

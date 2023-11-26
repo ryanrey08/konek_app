@@ -9,9 +9,9 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <application
-        android:label="1KoneK"
+        android:label="SWAK"
         android:name="${applicationName}"
-        android:icon="@mipmap/novulutions_icon">
+        android:icon="@mipmap/swak_img">
         <activity
             android:name=".MainActivity"
             android:exported="true"

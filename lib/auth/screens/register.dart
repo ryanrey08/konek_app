@@ -417,7 +417,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                             decoration: BoxDecoration(
                               image: const DecorationImage(
                                 image:
-                                    AssetImage('assets/images/novulutions.png'),
+                                    AssetImage('assets/images/swak-img.png'),
                               ),
                             ),
                           ),

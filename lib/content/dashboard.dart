@@ -185,7 +185,7 @@ class _DashboardState extends State<Dashboard> {
                   onTap: (index) {
                     setState(() {
                       if (newVoucherData['voucher_code'] != '') {
-                        if (index == 2) {
+                        if (index == 1) {
                           _currentIndex = _currentIndex;
                         } else {
                           _currentIndex = index;
@@ -322,7 +322,7 @@ class _DashboardState extends State<Dashboard> {
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
                                         image: AssetImage(
-                                            'assets/images/novulutions.png'),
+                                            'assets/images/swak-img.png'),
                                       ),
                                       // border: Border.all(color: Colors.grey),
                                       // borderRadius: BorderRadius.circular(50),

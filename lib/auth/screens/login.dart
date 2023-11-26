@@ -137,7 +137,7 @@ class _LoginState extends State<Login> {
                                           // image: NetworkImage(
                                           //     'assets/images/novulutions.png'),
                                           image: AssetImage(
-                                              'assets/images/novulutions.png'),
+                                              'assets/images/swak-img.png'),
                                         )),
                                     SizedBox(
                                       height: 15,
