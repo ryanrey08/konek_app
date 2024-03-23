@@ -502,7 +502,7 @@ class _MyProfileState extends State<MyProfile> {
     final extractedUserData =
         json.decode(sharedPreferences.getString('userData')!)
             as Map<String, dynamic>;
-    final data = extractedUserData['data'] as Map<String, dynamic>;
+    final data = extractedUserData['data']['user'] as Map<String, dynamic>;
 
     setState(() {
               txtFirstName.text = data['first_name'] == null ? '' : data['first_name'];

@@ -48,6 +48,8 @@ class _DashboardState extends State<Dashboard> {
 
   late Preference<String> globalVoucherData;
 
+  int currentPageIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -128,9 +130,9 @@ class _DashboardState extends State<Dashboard> {
     final sharedPreferences = await SharedPreferences.getInstance();
     final extractedUserData =
         json.decode(sharedPreferences.getString('userData')!) as Map;
-    fullName = extractedUserData['data']['first_name'] +
+    fullName = extractedUserData['data']['user']['first_name'] +
         " " +
-        extractedUserData['data']['last_name'];
+        extractedUserData['data']['user']['last_name'];
   }
 
   @override
@@ -173,122 +175,155 @@ class _DashboardState extends State<Dashboard> {
         ),
         // body: pages[_currentIndex],
         body: tabs[_currentIndex!],
-        bottomNavigationBar: !isLoading ? BottomAppBar(
-          child: PreferenceBuilder<String>(
-              preference: globalVoucherData,
-              builder: (context, vouchData) {
-                var newVoucherData = json.decode(vouchData);
-                return BottomNavigationBar(
-                  // selectedItemColor: Colors.white,
-                  // unselectedItemColor: Colors.black,
-                  type: BottomNavigationBarType.fixed,
-                  onTap: (index) {
-                    setState(() {
-                      if (newVoucherData['voucher_code'] != '') {
-                        if (index == 1) {
-                          _currentIndex = _currentIndex;
-                        } else {
-                          _currentIndex = index;
-                          _pageTitle = pageTitle[index];
-                        }
-                      } else {
-                        _currentIndex = index;
-                        _pageTitle = pageTitle[index];
-                      }
-                      print(index.toString());
-                    });
-                  },
-                  backgroundColor: Color.fromARGB(255, 55, 57, 175),
-                  currentIndex: 0,
-                  items: [
-                    BottomNavigationBarItem(
-                        icon: new Icon(
-                          Icons.home,
-                          size: 20,
-                          color: Colors.white,
-                        ),
-                        label: ""
-                        // title: Text(
-                        //   'Home',
-                        //   style: GoogleFonts.poppins(
-                        //     textStyle: TextStyle(
-                        //       fontSize: 10,
-                        //       color: Colors.white,
-                        //     ),
-                        //   ),
-                        // ),
-                        // backgroundColor: Colors.green[50],
-                        ),
-                    BottomNavigationBarItem(
-                        icon: new Icon(
-                          Icons.qr_code,
-                          size: 40,
-                          // color: Colors.white,
-                          color: !isLoading
-                              ? (newVoucherData['voucher_code'] != ''
-                                  ? Colors.redAccent
-                                  : Colors.white)
-                              : Colors.white,
-                        ),
-                        label: ""
-                        // backgroundColor: Colors.green[50],
-                        ),
-                    BottomNavigationBarItem(
-                        icon: new Icon(
-                          Icons.list,
-                          size: 20,
-                          color: Colors.white,
-                        ),
-                        label: ""
-                        // title: Text(
-                        //   'Application',
-                        //   style: GoogleFonts.poppins(
-                        //     textStyle: TextStyle(
-                        //       fontSize: 13,
-                        //       color: Colors.white,
-                        //     ),
-                        //   ),
-                        // ),
-                        // backgroundColor: Colors.green[50],
-                        ),
-                    // BottomNavigationBarItem(
-                    //   icon: new Icon(
-                    //     Icons.star,
-                    //     size: 20,
-                    //     color: Colors.white,
-                    //   ),
-                    //   title: Text(
-                    //     'Misc',
-                    //     style: GoogleFonts.poppins(
-                    //       textStyle: TextStyle(
-                    //         fontSize: 13,
-                    //         color: Colors.white,
-                    //       ),
-                    //     ),
-                    //   ),
-                    //   // backgroundColor: Colors.green[50],
-                    // ),
-                    // BottomNavigationBarItem(
-                    //   icon: new Icon(
-                    //     Icons.settings_applications,
-                    //     size: 20,
-                    //     color: Colors.white,
-                    //   ),
-                    //   title: Text(
-                    //     'Components',
-                    //     style: GoogleFonts.poppins(
-                    //       textStyle: TextStyle(
-                    //         fontSize: 13,
-                    //         color: Colors.white,
-                    //       ),
-                    //     ),
-                    //   ),
-                    //   // backgroundColor: Colors.green[50],
-                    // )
-                  ],
-                );
-              }),
-        ) : Container(child: Center(child: CircularProgressIndicator())),
+        bottomNavigationBar: !isLoading
+            ? BottomAppBar(
+              height: 70,
+              padding: EdgeInsets.zero,
+              color: Color.fromARGB(255, 55, 57, 175),
+                child: PreferenceBuilder<String>(
+                    preference: globalVoucherData,
+                    builder: (context, vouchData) {
+                      var newVoucherData = json.decode(vouchData);
+                      return BottomNavigationBar(
+                        // selectedItemColor: Colors.white,
+                        // unselectedItemColor: Colors.black,
+                        type: BottomNavigationBarType.fixed,
+                        onTap: (index) {
+                          setState(() {
+                            if (newVoucherData['voucher_code'] != '') {
+                              if (index == 1) {
+                                _currentIndex = _currentIndex;
+                              } else {
+                                _currentIndex = index;
+                                _pageTitle = pageTitle[index];
+                              }
+                            } else {
+                              _currentIndex = index;
+                              _pageTitle = pageTitle[index];
+                            }
+                            print(index.toString());
+                          });
+                        },
+                        backgroundColor: Color.fromARGB(255, 55, 57, 175),
+                        currentIndex: 0,
+                        items: [
+                          BottomNavigationBarItem(
+                              icon: new Icon(
+                                Icons.home,
+                                size: 20,
+                                color: Colors.white,
+                              ),
+                              label: ""
+                              // title: Text(
+                              //   'Home',
+                              //   style: GoogleFonts.poppins(
+                              //     textStyle: TextStyle(
+                              //       fontSize: 10,
+                              //       color: Colors.white,
+                              //     ),
+                              //   ),
+                              // ),
+                              // backgroundColor: Colors.green[50],
+                              ),
+                          BottomNavigationBarItem(
+                              icon: new Icon(
+                                Icons.qr_code,
+                                size: 30,
+                                // color: Colors.white,
+                                color: !isLoading
+                                    ? (newVoucherData['voucher_code'] != ''
+                                        ? Colors.redAccent
+                                        : Colors.white)
+                                    : Colors.white,
+                              ),
+                              label: ""
+                              // backgroundColor: Colors.green[50],
+                              ),
+                          BottomNavigationBarItem(
+                              icon: new Icon(
+                                Icons.list,
+                                size: 20,
+                                color: Colors.white,
+                              ),
+                              label: ""
+                              // title: Text(
+                              //   'Application',
+                              //   style: GoogleFonts.poppins(
+                              //     textStyle: TextStyle(
+                              //       fontSize: 13,
+                              //       color: Colors.white,
+                              //     ),
+                              //   ),
+                              // ),
+                              // backgroundColor: Colors.green[50],
+                              ),
+                          // BottomNavigationBarItem(
+                          //   icon: new Icon(
+                          //     Icons.star,
+                          //     size: 20,
+                          //     color: Colors.white,
+                          //   ),
+                          //   title: Text(
+                          //     'Misc',
+                          //     style: GoogleFonts.poppins(
+                          //       textStyle: TextStyle(
+                          //         fontSize: 13,
+                          //         color: Colors.white,
+                          //       ),
+                          //     ),
+                          //   ),
+                          //   // backgroundColor: Colors.green[50],
+                          // ),
+                          // BottomNavigationBarItem(
+                          //   icon: new Icon(
+                          //     Icons.settings_applications,
+                          //     size: 20,
+                          //     color: Colors.white,
+                          //   ),
+                          //   title: Text(
+                          //     'Components',
+                          //     style: GoogleFonts.poppins(
+                          //       textStyle: TextStyle(
+                          //         fontSize: 13,
+                          //         color: Colors.white,
+                          //       ),
+                          //     ),
+                          //   ),
+                          //   // backgroundColor: Colors.green[50],
+                          // )
+                        ],
+                      );
+                      // return NavigationBar(
+                      //   onDestinationSelected: (int index) {
+                      //     setState(() {
+                      //       currentPageIndex = index;
+                      //     });
+                      //   },
+                      //   backgroundColor: Color.fromARGB(255, 55, 57, 175),
+                      //   indicatorColor: Colors.amber,
+                      //   selectedIndex: currentPageIndex,
+                      //   destinations: const <Widget>[
+                      //     NavigationDestination(
+                      //       selectedIcon: Icon(Icons.home, color: Colors.white,),
+                      //       icon: Icon(Icons.home_outlined, color: Colors.white),
+                      //       label: 'Home',
+                      //     ),
+                      //     NavigationDestination(
+                      //       icon: Badge(child: Icon(Icons.notifications_sharp)),
+                      //       label: 'Notifications',
+                      //     ),
+                      //     NavigationDestination(
+                      //       icon: Badge(
+                      //         label: Text('2'),
+                      //         child: Icon(Icons.messenger_sharp),
+                      //       ),
+                      //       label: 'Messages',
+                      //     ),
+                      //   ],
+                      // );
+                    }),
+              )
+            : Container(child: Center(child: CircularProgressIndicator())),
 
         drawer: Container(
           color: Colors.white,

@@ -1,6 +1,8 @@
 // Packages and Libraries
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:konek_app/content/provider/content.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
@@ -11,7 +13,8 @@ import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 import 'dashboard.dart';
 import '../features/Widgets.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
-
+import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
+import 'package:carousel_slider/carousel_slider.dart';
 import 'pos.dart';
 
 class HomePage extends StatefulWidget {
@@ -37,6 +40,88 @@ class _HomePageState extends State<HomePage> {
 
   late Preference<String> globalVoucherData;
 
+  final List<Map<dynamic, dynamic>> imageLists = [
+    {
+      'title': 'PNP',
+      'phone_number': '0932543543534',
+      'image': 'assets/images/pnp_image.png'
+    },
+    {
+      'title': 'PNP',
+      'phone_number': '0932543543534',
+      'image': 'assets/images/pnp_image.png'
+    },
+    {
+      'title': 'PNP',
+      'phone_number': '0932543543534',
+      'image': 'assets/images/pnp_image.png'
+    },
+    {
+      'title': 'PNP',
+      'phone_number': '0932543543534',
+      'image': 'assets/images/pnp_image.png'
+    },
+    {
+      'title': 'PNP',
+      'phone_number': '0932543543534',
+      'image': 'assets/images/pnp_image.png'
+    },
+  ];
+
+  final List<Map<dynamic, dynamic>> imgLists = [
+    {
+      'title': '',
+      'image': 'assets/images/shoes.gif',
+    },
+    {
+      'title': '',
+      'image': 'assets/images/shoes2.gif',
+    },
+    {
+      'title': '',
+      'image': 'assets/images/cow.gif',
+    },
+    {
+      'title': '',
+      'image': 'assets/images/burger.gif',
+    },
+    {
+      'title': '',
+      'image': 'assets/images/ice_cream.gif',
+    },
+  ];
+
+  final List<Map<dynamic, dynamic>> imgListsMandaue = [
+    {
+      'title': '',
+      'image': 'assets/images/move_mandaue.jpg',
+    },
+    {
+      'title': '',
+      'image': 'assets/images/shoes.gif',
+    },
+    {
+      'title': '',
+      'image': 'assets/images/shoes2.gif',
+    },
+    {
+      'title': '',
+      'image': 'assets/images/cow.gif',
+    },
+    {
+      'title': '',
+      'image': 'assets/images/burger.gif',
+    },
+    {
+      'title': '',
+      'image': 'assets/images/ice_cream.gif',
+    },
+  ];
+
+  List subscriptions = [];
+  List quickLinks = [];
+  List ads = [];
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +129,7 @@ class _HomePageState extends State<HomePage> {
     //getUser();
     getVoucherData();
     getStreamData();
+    refreshPage();
   }
 
   getStreamData() async {
@@ -53,6 +139,53 @@ class _HomePageState extends State<HomePage> {
       globalVoucherData = preferences.getString('voucherData',
           defaultValue:
               '{ "voucher_code": "","duration": 0,"description": "","amount": 0,"claimed_date": "","expire_date": "","status": ""}');
+      isLoading = true;
+    });
+  }
+
+  getSubscription() async {
+    var subscriptionsData =
+        await Provider.of<Content>(context, listen: false).getSubscription();
+    setState(() {
+      subscriptions = subscriptionsData;
+      //isLoading = false;
+    });
+  }
+
+  getQuickLinks() async {
+    var quickLinksData =
+        await Provider.of<Content>(context, listen: false).getQuickLinks();
+    setState(() {
+      // quickLinks = quickLinksData;
+      var newQuicklinks = [];
+      // int arrLength = ((quickLinksData.length / 2) ~/ 1000);
+      var myQuickLinks = [];
+      for (var x = 0;x < quickLinksData.length;x++){
+        myQuickLinks.add(quickLinksData[x]);
+        if(x % 2 == 1){
+          newQuicklinks.add(myQuickLinks);
+          myQuickLinks = [];
+        }else if(x == (quickLinksData.length -1)){
+          newQuicklinks.add(myQuickLinks);
+        }
+      }
+      quickLinks = newQuicklinks;
+      // print(newQuicklinks);
+      //isLoading = false;
+    });
+  }
+
+  getAds() async {
+    var adsData = await Provider.of<Content>(context, listen: false).getAds();
+    setState(() {
+      ads = adsData;
+      //isLoading = false;
+      print(ads);
+    });
+  }
+
+  loadData() async {
+    setState(() {
       isLoading = true;
     });
   }
@@ -92,9 +225,9 @@ class _HomePageState extends State<HomePage> {
       });
     }
 
-    setState(() {
-      isLoading = true;
-    });
+    // setState(() {
+    //   isLoading = true;
+    // });
   }
 
   void getUser() async {
@@ -169,6 +302,16 @@ class _HomePageState extends State<HomePage> {
     dialog.show();
   }
 
+  refreshPage() async {
+    setState(() {
+      isLoading = false;
+    });
+    await getSubscription();
+    await getQuickLinks();
+    await getAds();
+    await loadData();
+  }
+
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
     final bool useMobileLayout = shortestSide < 600.0;
@@ -195,680 +338,675 @@ class _HomePageState extends State<HomePage> {
         //   colors: [Colors.white, Colors.green[400]],
         // ),
       ),
-      child: SingleChildScrollView(
-        //padding: EdgeInsets.all(10),
-        child: Column(
-          children: <Widget>[
-            Container(
-              width: useMobileLayout ? 300 : 350,
-              height: useMobileLayout ? 200 : 250,
-              decoration: BoxDecoration(
-                //  color: Colors.white,
-                image: DecorationImage(
-                  image: AssetImage('assets/images/swak-img.png'),
+      child: RefreshIndicator(
+        onRefresh: () {
+          return refreshPage();
+        },
+        child: SingleChildScrollView(
+          //padding: EdgeInsets.all(10),
+          child: Column(
+            children: <Widget>[
+              Container(
+                width: useMobileLayout ? 300 : 350,
+                height: useMobileLayout ? 130 : 180,
+                decoration: const BoxDecoration(
+                  //  color: Colors.white,
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/swak-img.png'),
+                  ),
                 ),
+                child: Column(children: [
+                  SizedBox(
+                    height: 45,
+                  ),
+                  // Expanded(
+                  //   child: Text(
+                  //     "WELCOME",
+                  //     style: GoogleFonts.poppins(
+                  //         fontSize: 50,
+                  //         color: Color.fromARGB(255, 55, 57, 175),
+                  //         fontWeight: FontWeight.bold),
+                  //   ),
+                  // ),
+                  //      Text(
+                  //   "John Doe",
+                  //   style: GoogleFonts.poppins(
+                  //       fontSize: 30, color: Color.fromARGB(255, 55, 57, 175),fontWeight: FontWeight.bold),
+                  // )
+                ]),
               ),
-              child: Column(children: [
-                SizedBox(
-                  height: 45,
-                ),
-                // Expanded(
-                //   child: Text(
-                //     "WELCOME",
-                //     style: GoogleFonts.poppins(
-                //         fontSize: 50,
-                //         color: Color.fromARGB(255, 55, 57, 175),
-                //         fontWeight: FontWeight.bold),
-                //   ),
-                // ),
-                //      Text(
-                //   "John Doe",
-                //   style: GoogleFonts.poppins(
-                //       fontSize: 30, color: Color.fromARGB(255, 55, 57, 175),fontWeight: FontWeight.bold),
-                // )
-              ]),
-            ),
-            Container(
-              width: double.infinity,
-              child: isLoading ? Column(
-                children: <Widget>[
-                  PreferenceBuilder<String>(
-                      preference: globalVoucherData,
-                      builder: (context, vouchData) {
-                        var newVoucherData = json.decode(vouchData);
-                        return Container(
-                          padding: EdgeInsets.all(10),
-                          child: Card(
-                            elevation: 4,
-                            color: Colors.white.withOpacity(0.8),
-                            margin: EdgeInsets.all(8),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Container(
-                              // height:  150,
-                              //width: double.infinity,
-                              width: useMobileLayout ? null : 700,
-                              //width: 500,
-                              height: useMobileLayout ? 110 : 170,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Color.fromARGB(255, 55, 57, 175)),
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 15),
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        SizedBox(height: 10),
-                                        Expanded(
-                                          child: Text(
-                                            'MY ACCOUNT',
-                                            textAlign: TextAlign.center,
-                                            style: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize:
-                                                    useMobileLayout ? 14 : 20,
-                                                fontWeight: FontWeight.w400,
-                                                color: Colors.white,
-                                              ),
+              Container(
+                width: double.infinity,
+                child: isLoading
+                    ? Column(
+                        children: <Widget>[
+                          PreferenceBuilder<String>(
+                              preference: globalVoucherData,
+                              builder: (context, vouchData) {
+                                var newVoucherData = json.decode(vouchData);
+                                return Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Card(
+                                    elevation: 4,
+                                    color: Colors.white.withOpacity(0.8),
+                                    margin: EdgeInsets.all(8),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Container(
+                                      // height:  150,
+                                      //width: double.infinity,
+                                      width: useMobileLayout ? null : 700,
+                                      //width: 500,
+                                      height: useMobileLayout ? 110 : 170,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color:
+                                              Color.fromARGB(255, 55, 57, 175)),
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 5, horizontal: 15),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                SizedBox(height: 10),
+                                                Expanded(
+                                                  child: Text(
+                                                    'MY ACCOUNT',
+                                                    textAlign: TextAlign.center,
+                                                    style: GoogleFonts.poppins(
+                                                      textStyle: TextStyle(
+                                                        fontSize:
+                                                            useMobileLayout
+                                                                ? 12
+                                                                : 18,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    (isLoading
+                                                            ? (newVoucherData[
+                                                                        'voucher_code'] !=
+                                                                    ''
+                                                                ? newVoucherData[
+                                                                        "duration"]
+                                                                    .toString()
+                                                                : "0")
+                                                            : "0") +
+                                                        " Day/s",
+                                                    textAlign: TextAlign.center,
+                                                    style: GoogleFonts.poppins(
+                                                      textStyle: TextStyle(
+                                                        fontSize:
+                                                            useMobileLayout
+                                                                ? 16
+                                                                : 28,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    'Remaining',
+                                                    textAlign: TextAlign.center,
+                                                    style: GoogleFonts.poppins(
+                                                      textStyle: TextStyle(
+                                                        fontSize:
+                                                            useMobileLayout
+                                                                ? 16
+                                                                : 28,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            (isLoading
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                SizedBox(height: 10),
+                                                SizedBox(
+                                                  height: 30,
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    (isLoading
+                                                        ? "13.26 GB"
+                                                        : ""),
+                                                    textAlign: TextAlign.center,
+                                                    style: GoogleFonts.poppins(
+                                                      textStyle: TextStyle(
+                                                        fontSize:
+                                                            useMobileLayout
+                                                                ? 16
+                                                                : 28,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    'Data Spent',
+                                                    textAlign: TextAlign.center,
+                                                    style: GoogleFonts.poppins(
+                                                      textStyle: TextStyle(
+                                                        fontSize:
+                                                            useMobileLayout
+                                                                ? 16
+                                                                : 28,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            alignment: Alignment.centerLeft,
+                                            child: Column(children: [
+                                              SizedBox(
+                                                height: 15,
+                                              ),
+                                              Icon(
+                                                Icons.wifi,
+                                                size: useMobileLayout ? 55 : 65,
+                                                color: isLoading
                                                     ? (newVoucherData[
                                                                 'voucher_code'] !=
                                                             ''
-                                                        ? newVoucherData[
-                                                                "duration"]
-                                                            .toString()
-                                                        : "0")
-                                                    : "0") +
-                                                " Day/s",
-                                            textAlign: TextAlign.center,
-                                            style: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize:
-                                                    useMobileLayout ? 18 : 30,
-                                                fontWeight: FontWeight.w800,
-                                                color: Colors.white,
+                                                        ? Colors.greenAccent
+                                                        : Colors.redAccent)
+                                                    : Colors.greenAccent,
                                               ),
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            'Remaining',
-                                            textAlign: TextAlign.center,
-                                            style: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize:
-                                                    useMobileLayout ? 18 : 30,
-                                                fontWeight: FontWeight.w800,
-                                                color: Colors.white,
+                                              Container(
+                                                child: Row(children: [
+                                                  Text(
+                                                    "Status: ",
+                                                    style: GoogleFonts.poppins(
+                                                        fontSize:
+                                                            useMobileLayout
+                                                                ? 16
+                                                                : 28,
+                                                        color: Colors.white),
+                                                  ),
+                                                  Text(
+                                                    isLoading
+                                                        ? (newVoucherData[
+                                                                    'voucher_code'] !=
+                                                                ''
+                                                            ? "Online"
+                                                            : "Offline")
+                                                        : 'Offline',
+                                                    style: GoogleFonts.poppins(
+                                                      fontSize: useMobileLayout
+                                                          ? 16
+                                                          : 28,
+                                                      color: isLoading
+                                                          ? (newVoucherData[
+                                                                      'voucher_code'] !=
+                                                                  ''
+                                                              ? Colors
+                                                                  .greenAccent
+                                                              : Colors
+                                                                  .redAccent)
+                                                          : Colors.greenAccent,
+                                                    ),
+                                                  )
+                                                ]),
                                               ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                            ]),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    child: Column(children: [
-                                      Icon(
-                                        Icons.wifi,
-                                        size: useMobileLayout ? 60 : 70,
-                                        color: isLoading
-                                            ? (newVoucherData['voucher_code'] !=
-                                                    ''
-                                                ? Colors.greenAccent
-                                                : Colors.redAccent)
-                                            : Colors.greenAccent,
+                                );
+                              }),
+                          PreferenceBuilder<String>(
+                              preference: globalVoucherData,
+                              builder: (context, vouchData) {
+                                var newVoucherData = json.decode(vouchData);
+                                return AbsorbPointer(
+                                  absorbing: isLoading
+                                      ? (newVoucherData['voucher_code'] != ''
+                                          ? true
+                                          : false)
+                                      : true,
+                                  child: Container(
+                                    padding: EdgeInsets.all(10),
+                                    child: Card(
+                                      elevation: 4,
+                                      color: Colors.white.withOpacity(0.8),
+                                      margin: EdgeInsets.all(8),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
-                                      Container(
-                                        child: Row(children: [
-                                          Text(
-                                            "Status: ",
-                                            style: GoogleFonts.poppins(
-                                                fontSize:
-                                                    useMobileLayout ? 18 : 30,
-                                                color: Colors.white),
+                                      child: Container(
+                                        // height:  150,
+                                        //width: double.infinity,
+                                        width: useMobileLayout ? null : 700,
+                                        //height: useMobileLayout ? 90 : 150,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          // color: Colors.white,
+                                          // color: Color(0xFF0E3311).withOpacity(0.5),
+                                          color: isLoading
+                                              ? (newVoucherData[
+                                                          'voucher_code'] !=
+                                                      ''
+                                                  ? Colors.grey.withOpacity(0.5)
+                                                  : Colors.white)
+                                              : Colors.white,
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 30, horizontal: 15),
+                                        child: Container(
+                                          child: Column(
+                                            children: <Widget>[
+                                              for (var x = 0;
+                                                  x < subscriptions!.length;
+                                                  x++) ...[
+                                                Row(
+                                                  children: <Widget>[
+                                                    Expanded(
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: <Widget>[
+                                                          // SizedBox(height: 10),
+                                                          SizedBox(
+                                                            width:
+                                                                useMobileLayout
+                                                                    ? 130
+                                                                    : 180,
+                                                            height: 50,
+                                                            child:
+                                                                ElevatedButton(
+                                                              child: Text(
+                                                                //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
+                                                                subscriptions[x]
+                                                                        [
+                                                                        'duration'] +
+                                                                    " " +
+                                                                    subscriptions[
+                                                                            x][
+                                                                        'duration_unit'],
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .poppins(
+                                                                  textStyle:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        useMobileLayout
+                                                                            ? 14
+                                                                            : 25,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              style:
+                                                                  ElevatedButton
+                                                                      .styleFrom(
+                                                                shape:
+                                                                    RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              50.0),
+                                                                ),
+                                                                primary: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        55,
+                                                                        57,
+                                                                        175), // background
+                                                                onPrimary: Colors
+                                                                    .white, // foreground
+                                                              ),
+                                                              onPressed: () {
+                                                                Navigator
+                                                                    .pushReplacementNamed(
+                                                                        context,
+                                                                        POS.routeName);
+                                                              },
+                                                              // color: Colors.white,
+                                                              // textColor: Colors.black,
+                                                              // splashColor: Colors.yellowAccent[800],
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                            width: 50,
+                                                          ),
+                                                          Expanded(
+                                                            child: Text(
+                                                              subscriptions[x]
+                                                                      ['name'] +
+                                                                  " for P" +
+                                                                  subscriptions[
+                                                                              x]
+                                                                          [
+                                                                          'price']
+                                                                      .toString(),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: GoogleFonts
+                                                                  .poppins(
+                                                                textStyle:
+                                                                    TextStyle(
+                                                                  fontSize:
+                                                                      useMobileLayout
+                                                                          ? 12
+                                                                          : 30,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w800,
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                              ]
+                                            ],
                                           ),
-                                          Text(
-                                            isLoading
-                                                ? (newVoucherData[
-                                                            'voucher_code'] !=
-                                                        ''
-                                                    ? "Online"
-                                                    : "Offline")
-                                                : 'Offline',
-                                            style: GoogleFonts.poppins(
-                                              fontSize:
-                                                  useMobileLayout ? 18 : 30,
-                                              color: isLoading
-                                                  ? (newVoucherData[
-                                                              'voucher_code'] !=
-                                                          ''
-                                                      ? Colors.greenAccent
-                                                      : Colors.redAccent)
-                                                  : Colors.greenAccent,
-                                            ),
-                                          )
-                                        ]),
+                                        ),
                                       ),
-                                    ]),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                  PreferenceBuilder<String>(
-                      preference: globalVoucherData,
-                      builder: (context, vouchData) {
-                        var newVoucherData = json.decode(vouchData);
-                        return AbsorbPointer(
-                          absorbing: isLoading
-                              ? (newVoucherData['voucher_code'] != ''
-                                  ? true
-                                  : false)
-                              : true,
-                          child: Container(
-                            padding: EdgeInsets.all(10),
+                                    ),
+                                  ),
+                                );
+                              }),
+                          // Card(
+                          //   elevation: 4,
+                          //   color: Colors.white.withOpacity(0.8),
+                          //   margin: EdgeInsets.all(8),
+                          //   shape: RoundedRectangleBorder(
+                          //     borderRadius: BorderRadius.circular(10),
+                          //   ),
+                          //   child: Container(
+                          //     // height:  150,
+                          //     //width: double.infinity,
+                          //     width: useMobileLayout ? 600 : 700,
+
+                          //     //height: useMobileLayout ? 90 : 150,
+                          //     decoration: BoxDecoration(
+                          //       borderRadius: BorderRadius.circular(10),
+                          //       color: Colors.white,
+                          //     ),
+                          //     padding:
+                          //         EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                          //     child: Container(
+                          //       child: SizedBox(
+                          //         width: useMobileLayout ? 130 : 180,
+                          //         height: 50,
+                          //         child: ElevatedButton(
+                          //           child: Text(
+                          //             //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
+                          //             "VOUCHER CODE",
+                          //             style: GoogleFonts.poppins(
+                          //               textStyle: TextStyle(
+                          //                 color: Colors.white,
+                          //                 fontSize: useMobileLayout ? 14 : 25,
+                          //                 fontWeight: FontWeight.w600,
+                          //               ),
+                          //             ),
+                          //           ),
+                          //           style: ElevatedButton.styleFrom(
+                          //             shape: RoundedRectangleBorder(
+                          //               borderRadius: BorderRadius.circular(50.0),
+                          //             ),
+                          //             primary: Color.fromARGB(
+                          //                 255, 55, 57, 175), // background
+                          //             onPrimary: Colors.white, // foreground
+                          //           ),
+                          //           onPressed: () {
+                          //             enterVoucherCode();
+                          //           },
+                          //           // color: Colors.white,
+                          //           // textColor: Colors.black,
+                          //           // splashColor: Colors.yellowAccent[800],
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            alignment: Alignment.center,
+                            //        decoration: BoxDecoration(
+                            //   borderRadius: BorderRadius.circular(10),
+                            //   color: Colors.white,
+                            // ),
                             child: Card(
-                              elevation: 4,
-                              color: Colors.white.withOpacity(0.8),
-                              margin: EdgeInsets.all(8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                              // elevation: 4,
+                              color: Colors.white,
+                              //margin: EdgeInsets.all(8),
+                              // shape: RoundedRectangleBorder(
+                              //   borderRadius: BorderRadius.circular(10),
+                              // ),
                               child: Container(
                                 // height:  150,
-                                //width: double.infinity,
-                                width: useMobileLayout ? null : 700,
+                                width: double.infinity,
+                                //width: useMobileLayout ? 600 : 700,
+
                                 //height: useMobileLayout ? 90 : 150,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  // color: Colors.white,
-                                  // color: Color(0xFF0E3311).withOpacity(0.5),
-                                  color: isLoading
-                                      ? (newVoucherData['voucher_code'] != ''
-                                          ? Colors.grey.withOpacity(0.5)
-                                          : Colors.white)
-                                      : Colors.white,
-                                ),
+                                // decoration: BoxDecoration(
+                                //   borderRadius: BorderRadius.circular(10),
+                                //   color: Colors.white,
+                                // ),
+                                // color: Colors.white,
                                 padding: EdgeInsets.symmetric(
                                     vertical: 30, horizontal: 15),
                                 child: Container(
-                                  child: Column(
+                                  height: 200.0,
+                                  // color: Colors.blue[50],
+                                  // padding: EdgeInsets.symmetric(
+                                  //     vertical: 15, horizontal: 5),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    // color: Colors.white,
+                                  ),
+                                  alignment: Alignment.centerLeft,
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 15, horizontal: 5),
+                                  child: ListView(
+                                    scrollDirection: Axis.horizontal,
+                                    shrinkWrap: true,
                                     children: <Widget>[
-                                      Row(
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: <Widget>[
-                                                // SizedBox(height: 10),
-                                                SizedBox(
-                                                  width: useMobileLayout
-                                                      ? 130
-                                                      : 180,
-                                                  height: 50,
-                                                  child: ElevatedButton(
-                                                    child: Text(
-                                                      //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
-                                                      "1 Day",
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                        textStyle: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize:
-                                                              useMobileLayout
-                                                                  ? 14
-                                                                  : 25,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.0),
-                                                      ),
-                                                      primary: Color.fromARGB(
-                                                          255,
-                                                          55,
-                                                          57,
-                                                          175), // background
-                                                      onPrimary: Colors
-                                                          .white, // foreground
-                                                    ),
-                                                    onPressed: () {
-                                                      Navigator
-                                                          .pushReplacementNamed(
-                                                              context,
-                                                              POS.routeName);
-                                                    },
-                                                    // color: Colors.white,
-                                                    // textColor: Colors.black,
-                                                    // splashColor: Colors.yellowAccent[800],
-                                                  ),
+                                      for (var x = 0;
+                                          x < quickLinks!.length;
+                                          x++) ...[
+                                        (Container(
+                                          alignment: Alignment.center,
+                                          child: Column(children: [
+                                            for(var y=0;y < quickLinks[x].length;y++)...[
+                                                              GestureDetector(
+                                              onTap: () {
+                                                print("here");
+                                                UrlLauncher.launch(
+                                                    'tel:+${quickLinks[x][y]['link']}');
+                                              },
+                                              child: Container(
+                                                width: 120.0,
+                                                height: 70.0,
+                                                alignment: Alignment.center,
+                                                decoration: new BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          quickLinks[x][y]['image_url']),
+                                                      fit: BoxFit.contain),
                                                 ),
-                                                SizedBox(
-                                                  width: 50,
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    "1 Day Unlimited All Surf Data for P50",
-                                                    textAlign: TextAlign.center,
-                                                    style: GoogleFonts.poppins(
-                                                      textStyle: TextStyle(
-                                                        fontSize:
-                                                            useMobileLayout
-                                                                ? 12
-                                                                : 30,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
+                                                // child: Text(quickLinks[x][y]['description']),
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Row(
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: <Widget>[
-                                                // SizedBox(height: 10),
-                                                SizedBox(
-                                                  width: useMobileLayout
-                                                      ? 130
-                                                      : 180,
-                                                  height: 50,
-                                                  child: ElevatedButton(
-                                                    child: Text(
-                                                      //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
-                                                      "5 Days",
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                        textStyle: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize:
-                                                              useMobileLayout
-                                                                  ? 14
-                                                                  : 25,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.0),
-                                                      ),
-                                                      primary: Color.fromARGB(
-                                                          255,
-                                                          55,
-                                                          57,
-                                                          175), // background
-                                                      onPrimary: Colors
-                                                          .white, // foreground
-                                                    ),
-                                                    onPressed: () {
-                                                      Navigator
-                                                          .pushReplacementNamed(
-                                                              context,
-                                                              POS.routeName);
-                                                    },
-                                                    // color: Colors.white,
-                                                    // textColor: Colors.black,
-                                                    // splashColor: Colors.yellowAccent[800],
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  width: 50,
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    "5 Days Unlimited All Surf Data for P250",
-                                                    textAlign: TextAlign.center,
-                                                    style: GoogleFonts.poppins(
-                                                      textStyle: TextStyle(
-                                                        fontSize:
-                                                            useMobileLayout
-                                                                ? 12
-                                                                : 30,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Row(
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: <Widget>[
-                                                // SizedBox(height: 10),
-                                                SizedBox(
-                                                  width: useMobileLayout
-                                                      ? 130
-                                                      : 180,
-                                                  height: 50,
-                                                  child: ElevatedButton(
-                                                    child: Text(
-                                                      //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
-                                                      "15 Days",
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                        textStyle: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize:
-                                                              useMobileLayout
-                                                                  ? 14
-                                                                  : 25,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.0),
-                                                      ),
-                                                      primary: Color.fromARGB(
-                                                          255,
-                                                          55,
-                                                          57,
-                                                          175), // background
-                                                      onPrimary: Colors
-                                                          .white, // foreground
-                                                    ),
-                                                    onPressed: () {
-                                                      Navigator
-                                                          .pushReplacementNamed(
-                                                              context,
-                                                              POS.routeName);
-                                                    },
-                                                    // color: Colors.white,
-                                                    // textColor: Colors.black,
-                                                    // splashColor: Colors.yellowAccent[800],
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  width: 50,
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    "15 Days Unlimited All Surf Data for P550",
-                                                    textAlign: TextAlign.center,
-                                                    style: GoogleFonts.poppins(
-                                                      textStyle: TextStyle(
-                                                        fontSize:
-                                                            useMobileLayout
-                                                                ? 12
-                                                                : 30,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Row(
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: <Widget>[
-                                                // SizedBox(height: 10),
-                                                SizedBox(
-                                                  width: useMobileLayout
-                                                      ? 130
-                                                      : 180,
-                                                  height: 50,
-                                                  child: ElevatedButton(
-                                                    child: Text(
-                                                      //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
-                                                      "30 Days",
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                        textStyle: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize:
-                                                              useMobileLayout
-                                                                  ? 14
-                                                                  : 25,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.0),
-                                                      ),
-                                                      primary: Color.fromARGB(
-                                                          255,
-                                                          55,
-                                                          57,
-                                                          175), // background
-                                                      onPrimary: Colors
-                                                          .white, // foreground
-                                                    ),
-                                                    onPressed: () {
-                                                      Navigator
-                                                          .pushReplacementNamed(
-                                                              context,
-                                                              POS.routeName);
-                                                    },
-                                                    // color: Colors.white,
-                                                    // textColor: Colors.black,
-                                                    // splashColor: Colors.yellowAccent[800],
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  width: 50,
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    "30 Days Unlimited All Surf Data for P1000",
-                                                    textAlign: TextAlign.center,
-                                                    style: GoogleFonts.poppins(
-                                                      textStyle: TextStyle(
-                                                        fontSize:
-                                                            useMobileLayout
-                                                                ? 12
-                                                                : 30,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      )
+                                            SizedBox(height: 15,)
+                                            ]
+                                          ]),
+                                        )), SizedBox(height: 10,)]
                                     ],
                                   ),
                                 ),
                               ),
                             ),
+                          )
+                        ],
+                      )
+                    : Container(
+                        child: Center(
+                        child: CircularProgressIndicator(),
+                      )),
+              ),
+              isLoading
+                  ? Card(
+                      elevation: 4,
+                      color: Colors.white.withOpacity(0.8),
+                      //margin: EdgeInsets.all(8),
+                      shape: RoundedRectangleBorder(
+                          // borderRadius: BorderRadius.circular(10),
                           ),
-                        );
-                      }),
-                  // Card(
-                  //   elevation: 4,
-                  //   color: Colors.white.withOpacity(0.8),
-                  //   margin: EdgeInsets.all(8),
-                  //   shape: RoundedRectangleBorder(
-                  //     borderRadius: BorderRadius.circular(10),
-                  //   ),
-                  //   child: Container(
-                  //     // height:  150,
-                  //     //width: double.infinity,
-                  //     width: useMobileLayout ? 600 : 700,
-
-                  //     //height: useMobileLayout ? 90 : 150,
-                  //     decoration: BoxDecoration(
-                  //       borderRadius: BorderRadius.circular(10),
-                  //       color: Colors.white,
-                  //     ),
-                  //     padding:
-                  //         EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                  //     child: Container(
-                  //       child: SizedBox(
-                  //         width: useMobileLayout ? 130 : 180,
-                  //         height: 50,
-                  //         child: ElevatedButton(
-                  //           child: Text(
-                  //             //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
-                  //             "VOUCHER CODE",
-                  //             style: GoogleFonts.poppins(
-                  //               textStyle: TextStyle(
-                  //                 color: Colors.white,
-                  //                 fontSize: useMobileLayout ? 14 : 25,
-                  //                 fontWeight: FontWeight.w600,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //           style: ElevatedButton.styleFrom(
-                  //             shape: RoundedRectangleBorder(
-                  //               borderRadius: BorderRadius.circular(50.0),
-                  //             ),
-                  //             primary: Color.fromARGB(
-                  //                 255, 55, 57, 175), // background
-                  //             onPrimary: Colors.white, // foreground
-                  //           ),
-                  //           onPressed: () {
-                  //             enterVoucherCode();
-                  //           },
-                  //           // color: Colors.white,
-                  //           // textColor: Colors.black,
-                  //           // splashColor: Colors.yellowAccent[800],
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  Card(
-                    elevation: 4,
-                    color: Colors.white.withOpacity(0.8),
-                    //margin: EdgeInsets.all(8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Container(
-                      // height:  150,
-                      width: double.infinity,
-                      //width: useMobileLayout ? 600 : 700,
-
-                      //height: useMobileLayout ? 90 : 150,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
-                      ),
-                      // padding:
-                      //     EdgeInsets.symmetric(vertical: 30, horizontal: 15),
                       child: Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                          // color: Colors.grey[200],
+                        // height:  150,
+                        width: double.infinity,
+                        //width: useMobileLayout ? 600 : 700,
 
-                          image: DecorationImage(
-                            image:
-                                const AssetImage('assets/images/building.png'),
-                            fit: BoxFit.cover,
-                            // colorFilter: ColorFilter.mode(
-                            //   Colors.black.withOpacity(0.2),
-                            //   BlendMode.dstATop,
-                            // ),
-                          ),
-                          // gradient: LinearGradient(
-                          //   begin: Alignment.topCenter,
-                          //   end: Alignment.bottomCenter,
-                          //   stops: [0.1, 0.8],
-                          //   colors: [Colors.white, Colors.green[400]],
+                        //height: useMobileLayout ? 90 : 150,
+                        // decoration: BoxDecoration(
+                        //   borderRadius: BorderRadius.circular(10),
+                        //   color: Colors.white,
+                        // ),
+                        // padding:
+                        //     EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                        child: Column(children: [
+                          // Container(
+                          //   height: 100,
+                          //   decoration: BoxDecoration(
+                          //     // color: Colors.grey[200],
+
+                          //     image: DecorationImage(
+                          //       image:
+                          //           const AssetImage('assets/images/move_mandaue.jpg'),
+                          //       fit: BoxFit.cover,
+                          //       // colorFilter: ColorFilter.mode(
+                          //       //   Colors.black.withOpacity(0.2),
+                          //       //   BlendMode.dstATop,
+                          //       // ),
+                          //     ),
+                          //   ),
                           // ),
-                        ),
+                          Container(
+                            width: double.infinity,
+                            child: CarouselSlider(
+                              options: CarouselOptions(
+                                autoPlay: true,
+                                aspectRatio: 2.0,
+                                // enlargeCenterPage: true,
+                                viewportFraction: 1.0,
+                                height: 100,
+                                enlargeStrategy:
+                                    CenterPageEnlargeStrategy.height,
+                                    scrollPhysics: NeverScrollableScrollPhysics()
+                              ),
+                              items: ads.map((i) {
+                                return Builder(
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      // margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: NetworkImage(i['image_url']),
+                                            fit: BoxFit.fitWidth),
+                                      ),
+                                      // child: Text(i['description']),
+                                    );
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          // Container(
+                          //   width: double.infinity,
+                          //   child: CarouselSlider(
+                          //     options: CarouselOptions(
+                          //       autoPlay: true,
+                          //       aspectRatio: 2.0,
+                          //       // enlargeCenterPage: true,
+                          //       viewportFraction: 1.0,
+                          //       height: 100,
+                          //       enlargeStrategy:
+                          //           CenterPageEnlargeStrategy.height,
+                          //     ),
+                          //     items: imgLists.map((i) {
+                          //       return Builder(
+                          //         builder: (BuildContext context) {
+                          //           return Container(
+                          //             width: MediaQuery.of(context).size.width,
+                          //             // margin: EdgeInsets.symmetric(horizontal: 5.0),
+                          //             decoration: BoxDecoration(
+                          //               image: DecorationImage(
+                          //                   image: AssetImage(i['image']),
+                          //                   fit: BoxFit.fitWidth),
+                          //             ),
+                          //           );
+                          //         },
+                          //       );
+                          //     }).toList(),
+                          //   ),
+                          // )
+                        ]),
                       ),
-                    ),
-                  )
-                ],
-              ) : Container(),
-            ),
-          ],
+                    )
+                  : Container()
+            ],
+          ),
         ),
       ),
     );

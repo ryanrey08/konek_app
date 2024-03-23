@@ -143,45 +143,45 @@ class _LoginState extends State<Login> {
                                       height: 15,
                                     ),
                                     loginEmailFields(
-                                        "MOBILE.NO/EMAIL",
+                                        "ENTER MOBILE NO.",
                                         Icons.person_2,
                                         txtUsernameController,
                                         useMobileLayout),
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    loginFields("", Icons.lock,
-                                        txtPasswordController, useMobileLayout),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: <Widget>[
-                                        Container(
-                                          child: GestureDetector(
-                                            child: Text(
-                                              'Forgot password?',
-                                              style: GoogleFonts.poppins(
-                                                textStyle: TextStyle(
-                                                    fontSize: 15,
-                                                    // decoration: TextDecoration.underline,
-                                                    color: Colors.grey),
-                                              ),
-                                            ),
-                                            onTap: () {
-                                              // Navigator.push(
-                                              //   context,
-                                              //   MaterialPageRoute(
-                                              //       builder: (context) => ForgotPassword()),
-                                              // );\
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    // loginFields("", Icons.lock,
+                                    //     txtPasswordController, useMobileLayout),
+                                    // SizedBox(
+                                    //   height: 10,
+                                    // ),
+                                    // Column(
+                                    //   mainAxisAlignment: MainAxisAlignment.end,
+                                    //   crossAxisAlignment:
+                                    //       CrossAxisAlignment.end,
+                                    //   children: <Widget>[
+                                    //     Container(
+                                    //       child: GestureDetector(
+                                    //         child: Text(
+                                    //           'Forgot password?',
+                                    //           style: GoogleFonts.poppins(
+                                    //             textStyle: TextStyle(
+                                    //                 fontSize: 15,
+                                    //                 // decoration: TextDecoration.underline,
+                                    //                 color: Colors.grey),
+                                    //           ),
+                                    //         ),
+                                    //         onTap: () {
+                                    //           // Navigator.push(
+                                    //           //   context,
+                                    //           //   MaterialPageRoute(
+                                    //           //       builder: (context) => ForgotPassword()),
+                                    //           // );\
+                                    //         },
+                                    //       ),
+                                    //     ),
+                                    //   ],
+                                    // ),
                                     SizedBox(
                                       height: 10,
                                     ),
@@ -288,6 +288,7 @@ class _LoginState extends State<Login> {
           Expanded(
             child: TextFormField(
               controller: control,
+              keyboardType: TextInputType.phone,
               style: GoogleFonts.poppins(
                 textStyle: TextStyle(
                     fontSize: useMobileLayout ? 16 : 18, color: Colors.black),
@@ -360,7 +361,7 @@ class _LoginState extends State<Login> {
               ),
               validator: (value) {
                 if (value!.isEmpty) {
-                  return 'Please enter your Email/UserName.';
+                  return 'Please enter your mobile number.';
                 }
                 // if (!value.contains('@')) {
                 //   return 'Invalid username';
@@ -522,6 +523,7 @@ class _LoginState extends State<Login> {
                       size: 50.0,
                     ),
               style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50.0),
                   ),

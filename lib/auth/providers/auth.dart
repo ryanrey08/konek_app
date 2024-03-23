@@ -60,7 +60,7 @@ class Auth with ChangeNotifier {
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       var response =
-          await http.post(Uri.parse(config.pre_url + "/login"), body: data);
+          await http.post(Uri.parse(config.pre_url + "/login-via-mobile"), body: data);
       var jsonResponse = json.decode(response.body);
       print(jsonResponse);
       if (jsonResponse['success'] == true) {

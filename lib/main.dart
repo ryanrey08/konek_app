@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:konek_app/config/notification.dart';
 import 'package:konek_app/content/notification.dart';
+import 'package:konek_app/content/provider/content.dart';
 import 'package:konek_app/content/provider/voucher.dart';
 import 'package:konek_app/content/scan.dart';
 import 'package:konek_app/content/uploadpic.dart';
@@ -16,9 +17,9 @@ import './content/dashboard.dart';
 import 'auth/screens/splashscreen.dart';
 import 'content/pos.dart';
 
-void main()async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-    await NotificationController.initializeLocalNotifications();
+  await NotificationController.initializeLocalNotifications();
   await NotificationController.initializeIsolateReceivePort();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
@@ -65,7 +66,7 @@ class _MyAppPageState extends State<MyApp> {
             // return userData!;
             return userData ?? Voucher(auth.token);
           },
-               create: (BuildContext context) {
+          create: (BuildContext context) {
             // You can pass any required parameters to the create method
             // In this example, we pass a token from AuthProvider
             final Auth authProvider = Provider.of<Auth>(context, listen: false);
@@ -73,6 +74,28 @@ class _MyAppPageState extends State<MyApp> {
 
             // Instantiate the UserProvider with the token
             return Voucher(token);
+          },
+          // create: (BuildContext context) {
+          //   // This won't be used because we use the update function.
+          //   throw UnimplementedError();
+          // },
+        ),
+        ChangeNotifierProxyProvider<Auth, Content>(
+          //create: (context) => Voucher(''),
+          update: (context, auth, userData) {
+            // Pass the value from AuthProvider to UserProvider
+            // userData?.updateUserData(authProvider?.isLoggedIn ?? false);
+            // return userData!;
+            return userData ?? Content(auth.token);
+          },
+          create: (BuildContext context) {
+            // You can pass any required parameters to the create method
+            // In this example, we pass a token from AuthProvider
+            final Auth authProvider = Provider.of<Auth>(context, listen: false);
+            final String token = authProvider.token;
+
+            // Instantiate the UserProvider with the token
+            return Content(token);
           },
           // create: (BuildContext context) {
           //   // This won't be used because we use the update function.
