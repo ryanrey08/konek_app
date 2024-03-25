@@ -152,9 +152,11 @@ class _DashboardState extends State<Dashboard> {
             style: GoogleFonts.poppins(
               textStyle: TextStyle(
                 fontSize: useMobileLayout ? 16 : 18,
+                color: Colors.white
               ),
             ),
           ),
+          iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: Color.fromARGB(255, 55, 57, 175),
           actions: <Widget>[
             Padding(

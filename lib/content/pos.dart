@@ -14,6 +14,21 @@ class POS extends StatefulWidget {
 class _POSState extends State<POS> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
+  var subscription = {};
+  bool isLoading = true;
+
+    @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    final  Map<String, dynamic>subsData = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    setState(() {
+      subscription = subsData['subscription'];
+      isLoading = false;
+    });
+    print(subscription);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -41,7 +56,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
         backgroundColor: Color.fromARGB(255, 55, 57, 175),
         leading: Builder(builder: (BuildContext context) {
           return IconButton(
-              icon: Icon(Icons.keyboard_arrow_left),
+              icon: Icon(Icons.keyboard_arrow_left, color: Colors.white),
               onPressed: () {
                 Navigator.pushReplacementNamed(context, Dashboard.routeName);
               } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
@@ -50,6 +65,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
         title: Text('POS',
             style: GoogleFonts.poppins(
               fontSize: useMobileLayout ? 16 : 18,
+              color: Colors.white
             )),
       ),
       body: Container(
@@ -91,8 +107,8 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          Text(
-                            '1 Day',
+                          isLoading ? Text('') :  Text(
+                            subscription['duration'].toString() + " " + subscription['duration_unit'].toString(),
                             textAlign: TextAlign.center,
                             style: GoogleFonts.poppins(
                               textStyle: TextStyle(
@@ -139,8 +155,8 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                                   ),
                                 ),
                               ),
-                              Text(
-                                '1 Day Unlimited All Surf Data for P50',
+                              isLoading ? Text('') : Text(
+                                subscription['name'].toString() + " for P " + subscription['price'].toString(),
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.poppins(
                                   textStyle: TextStyle(
@@ -204,6 +220,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                                     onChanged: (value) {
                                       setState(() {
                                         paymentMethod = value.toString();
+                                        print(paymentMethod);
                                       });
                                     }),
                                 SizedBox(
@@ -225,6 +242,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                                     onChanged: (value) {
                                       setState(() {
                                         paymentMethod = value.toString();
+                                        print(paymentMethod);
                                       });
                                     }),
                                 SizedBox(

@@ -612,7 +612,7 @@ class _MyProfileState extends State<MyProfile> {
           backgroundColor: Color.fromARGB(255, 55, 57, 175),
           leading: Builder(builder: (BuildContext context) {
             return IconButton(
-                icon: Icon(Icons.keyboard_arrow_left),
+                icon: Icon(Icons.keyboard_arrow_left, color: Colors.white),
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, Dashboard.routeName);
                 } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
@@ -621,6 +621,7 @@ class _MyProfileState extends State<MyProfile> {
           title: Text('My Profile',
               style: GoogleFonts.poppins(
                 fontSize: useMobileLayout ? 16 : 18,
+                color: Colors.white
               )),
         ),
         body: isLoading

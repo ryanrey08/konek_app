@@ -704,7 +704,7 @@ class _HomePageState extends State<HomePage> {
                                                                 Navigator
                                                                     .pushReplacementNamed(
                                                                         context,
-                                                                        POS.routeName);
+                                                                        POS.routeName, arguments: {'subscription': subscriptions[x]});
                                                               },
                                                               // color: Colors.white,
                                                               // textColor: Colors.black,
