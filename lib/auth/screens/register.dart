@@ -19,6 +19,11 @@ import 'package:hcaptcha/hcaptcha.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mac_address/mac_address.dart';
 import 'package:string_validator/string_validator.dart';
+import 'package:flutter_device_identifier/flutter_device_identifier.dart';
+import 'package:flutter/services.dart';
+import 'package:simnumber/siminfo.dart';
+import 'package:simnumber/sim_number.dart';
+import 'package:mobile_device_identifier/mobile_device_identifier.dart';
 // import 'package:loader_overlay/loader_overlay.dart';
 
 import 'dart:convert';
@@ -128,10 +133,62 @@ class _AccountRegisterState extends State<AccountRegister> {
   final _form = GlobalKey<FormState>();
   bool isNotARobot = false;
 
+ String _platformVersion = 'Unknown';
+  String _serialNumber = "--";
+
+  SimInfo simInfo = SimInfo([]);
+
+    String _deviceId = 'Unknown';
+  final _mobileDeviceIdentifierPlugin = MobileDeviceIdentifier();
+
   void initState() {
     super.initState();
 
-    _selectedUserType = 'FARMER';
+    // _selectedUserType = 'FARMER';
+    // getMyMac();
+    // initPlatformState();
+    //  SimNumber.listenPhonePermission((isPermissionGranted) {
+    //   print("isPermissionGranted : " + isPermissionGranted.toString());
+    //   if (isPermissionGranted) {
+    //     initPlatformState();
+    //   } else {}
+    // });
+    // initPlatformState();
+
+    initDeviceId();
+  }
+
+    Future<void> initDeviceId() async {
+    String deviceId;
+    try {
+      deviceId = await _mobileDeviceIdentifierPlugin.getDeviceId() ??
+          'Unknown platform version';
+    } on PlatformException {
+      deviceId = 'Failed to get platform version.';
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _deviceId = deviceId;
+
+      print(_deviceId);
+    });
+  }
+
+  Future<void> initPlatformState() async {
+    try {
+      simInfo = await SimNumber.getSimData();
+         for (var s in simInfo.cards) {
+      print('Serial number: ${s.phoneNumber}');
+    }
+      setState(() {});
+    } on PlatformException {
+      print("simInfo  : " + "2");
+    }
+    if (!mounted) return;
+  }
+  getMyMac()async{
+    await initPlatformState();
   }
 
   Future<void> register() async {
@@ -297,7 +354,7 @@ class _AccountRegisterState extends State<AccountRegister> {
           'password': txtPassword.text,
           'confirm_password': txtConfirmPassword.text,
           'location': json.encode({'longitude': position.longitude.toString(), 'latitude': position.latitude.toString() }),
-          'mac_address': await _getMacAddress()
+          'mac_address': _deviceId
         };
 
         await Provider.of<Auth>(context, listen: false).register(user);
@@ -312,20 +369,37 @@ class _AccountRegisterState extends State<AccountRegister> {
         errorMessage = 'Authentication failed';
         if (error.toString().contains('something went wrong')) {
           errorMessage = 'something went wrong';
+        }else{
+          errorMessage = error.toString();
         }
+        setState(() {
+          _isLoading = false;
+        });
         _showError(errorMessage);
       } catch (error) {
         print(error);
         errorMessage = config.throwErrorAuth(error.toString());
+               setState(() {
+          _isLoading = false;
+        });
         _showError(errorMessage);
       }
   }
 
-  Future<String>  _getMacAddress() async {
-    String mac = await GetMac.macAddress;
+  // getMyMac(){
+  //   _getMacAddress();
+  // }
+  
+
+  // Future<void>  _getMacAddress() async {
+  //   String mac = await GetMac.macAddress;
+  //   print("here" + mac);
     
-    return mac;
-  }
+  //      setState(() { 
+  //     _deviceMAC = mac; 
+  //   }); 
+  // }
+
 
   @override
   Widget build(BuildContext context) {
@@ -343,324 +417,327 @@ class _AccountRegisterState extends State<AccountRegister> {
 
     //getToken();
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 55, 57, 175),
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          // decoration: BoxDecoration(
-          //   image: DecorationImage(
-          //     image: AssetImage('assets/images/eaggro-bg.jpg'),
-          //     fit: BoxFit.cover,
-          //     // colorFilter: ColorFilter.mode(
-          //     //   Colors.black.withOpacity(0.2),
-          //     //   BlendMode.dstATop,
-          //     // ),
-          //   ),
-          //   gradient: LinearGradient(
-          //     begin: Alignment.topCenter,
-          //     end: Alignment.bottomCenter,
-          //     stops: [0.1, 0.8],
-          //     colors: [Colors.green.shade300],
-          //   ),
-          // ),
-          child: SingleChildScrollView(
-            child: Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  // Container(
-                  //   width: useMobileLayout ? 280 : 400,
-                  //   height: useMobileLayout ? 280 : 400,
-                  //   // width: 250,
-                  //   // height: 250,
-                  //   decoration: BoxDecoration(
-                  //     image: DecorationImage(
-                  //       image: AssetImage('assets/images/eaggro-1.png'),
-                  //     ),
-                  //   ),
-                  // ),
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    //  height: MediaQuery.of(context).size.height / 1.65,
-                    width: useMobileLayout
-                        ? MediaQuery.of(context).size.width
-                        : MediaQuery.of(context).size.width - 200,
-                    // decoration: BoxDecoration(
-                    //     borderRadius: BorderRadius.only(
-                    //         topLeft: Radius.circular(30),
-                    //         topRight: Radius.circular(30),
-                    //         bottomLeft: Radius.circular(30),
-                    //         bottomRight: Radius.circular(30)),
-                    //     color: Colors.white.withOpacity(0.8)),
-                    padding: EdgeInsets.symmetric(
-                        horizontal: useMobileLayout ? 15 : 30),
-                    margin: EdgeInsets.only(left: 10, bottom: 10, right: 10),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Container(
-                            width: useMobileLayout ? 100 : 220,
-                            height: useMobileLayout ? 100 : 220,
-                            alignment: Alignment.topRight,
-                            // width: 250,
-                            // height: 250,
-
-                            decoration: BoxDecoration(
-                              image: const DecorationImage(
-                                image:
-                                    AssetImage('assets/images/swak-img.png'),
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: const Color.fromARGB(255, 55, 57, 175),
+          body: Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            // decoration: BoxDecoration(
+            //   image: DecorationImage(
+            //     image: AssetImage('assets/images/eaggro-bg.jpg'),
+            //     fit: BoxFit.cover,
+            //     // colorFilter: ColorFilter.mode(
+            //     //   Colors.black.withOpacity(0.2),
+            //     //   BlendMode.dstATop,
+            //     // ),
+            //   ),
+            //   gradient: LinearGradient(
+            //     begin: Alignment.topCenter,
+            //     end: Alignment.bottomCenter,
+            //     stops: [0.1, 0.8],
+            //     colors: [Colors.green.shade300],
+            //   ),
+            // ),
+            child: SingleChildScrollView(
+              child: Container(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    // Container(
+                    //   width: useMobileLayout ? 280 : 400,
+                    //   height: useMobileLayout ? 280 : 400,
+                    //   // width: 250,
+                    //   // height: 250,
+                    //   decoration: BoxDecoration(
+                    //     image: DecorationImage(
+                    //       image: AssetImage('assets/images/eaggro-1.png'),
+                    //     ),
+                    //   ),
+                    // ),
+                    Container(
+                      alignment: Alignment.bottomCenter,
+                      //  height: MediaQuery.of(context).size.height / 1.65,
+                      width: useMobileLayout
+                          ? MediaQuery.of(context).size.width
+                          : MediaQuery.of(context).size.width - 200,
+                      // decoration: BoxDecoration(
+                      //     borderRadius: BorderRadius.only(
+                      //         topLeft: Radius.circular(30),
+                      //         topRight: Radius.circular(30),
+                      //         bottomLeft: Radius.circular(30),
+                      //         bottomRight: Radius.circular(30)),
+                      //     color: Colors.white.withOpacity(0.8)),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: useMobileLayout ? 15 : 30),
+                      margin: EdgeInsets.only(left: 10, bottom: 10, right: 10),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              width: useMobileLayout ? 100 : 220,
+                              height: useMobileLayout ? 100 : 220,
+                              alignment: Alignment.topRight,
+                              // width: 250,
+                              // height: 250,
+      
+                              decoration: BoxDecoration(
+                                image: const DecorationImage(
+                                  image:
+                                      AssetImage('assets/images/swak-img.png'),
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Text(
-                            "CREATE YOUR ACCOUNT",
-                            textAlign: TextAlign.left,
-                            style: GoogleFonts.poppins(
-                              textStyle: TextStyle(
-                                color: Colors.white,
-                                fontSize: useMobileLayout ? 15 : 18,
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                              "CREATE YOUR ACCOUNT",
+                              textAlign: TextAlign.left,
+                              style: GoogleFonts.poppins(
+                                textStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: useMobileLayout ? 15 : 18,
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          customTextField(
-                            TextInputType.text,
-                            'First Name',
-                            txtFirstName,
-                            useMobileLayout,
-                            'Please enter your First Name',
-                            (value) {
+                            SizedBox(
+                              height: 20,
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            customTextField(
+                              TextInputType.text,
+                              'First Name',
+                              txtFirstName,
+                              useMobileLayout,
+                              'Please enter your First Name',
+                              (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please enter your First Name';
+                                }
+      
+                                if (!RegExp(r"^[\p{L} ,.'-]*$",caseSensitive: false, unicode: true, dotAll: true).hasMatch(value)) {
+                                  return 'Invalid Input';
+                                }
+      
+                                return null;
+                              },
+                            ),
+                            customTextField(
+                                TextInputType.text,
+                                'Middle Name',
+                                txtMiddleName,
+                                useMobileLayout,
+                                'Please enter your Middle Name', (value) {
                               if (value!.isEmpty) {
-                                return 'Please enter your First Name';
+                                return 'Please enter your Middle Name';
                               }
-
+      
                               if (!RegExp(r"^[\p{L} ,.'-]*$",caseSensitive: false, unicode: true, dotAll: true).hasMatch(value)) {
                                 return 'Invalid Input';
                               }
-
                               return null;
-                            },
-                          ),
-                          customTextField(
-                              TextInputType.text,
-                              'Middle Name',
-                              txtMiddleName,
-                              useMobileLayout,
-                              'Please enter your Middle Name', (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter your Middle Name';
-                            }
-
-                            if (!RegExp(r"^[\p{L} ,.'-]*$",caseSensitive: false, unicode: true, dotAll: true).hasMatch(value)) {
-                              return 'Invalid Input';
-                            }
-                            return null;
-                          }),
-//                           customTextField('Middle Name', txtMiddleName,
-//                               useMobileLayout, 'Please enter your Middle Name'),
-                          customTextField(
-                              TextInputType.text,
-                              'Last Name',
-                              txtLastName,
-                              useMobileLayout,
-                              'Please enter your Last Name', (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter your Last Name';
-                            }
-
-                            if (!RegExp(r"^[\p{L} ,.'-]*$",caseSensitive: false, unicode: true, dotAll: true).hasMatch(value)) {
-                              return 'Invalid Input';
-                            }
-                            return null;
-                          }),
-                          // SizedBox(
-                          //   height: 15,
-                          // ),
-                          customTextField(
-                              TextInputType.emailAddress,
-                              'Email',
-                              txtEmail,
-                              useMobileLayout,
-                              'Please enter your Email', (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter your Email Address';
-                            }
-
-                            if (!RegExp(
-                                    r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$')
-                                .hasMatch(value)) {
-                              return 'Invalid Email Address';
-                            }
-                            return null;
-                          }),
-                          customTextField(
-                              TextInputType.number,
-                              'Mobile Number (09XXXXXXXXX)',
-                              txtContactNumber,
-                              useMobileLayout,
-                              'Please enter your contact number', (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter your Contact Number';
-                            }
-
-                            if (txtContactNumber.text.toString().length != 11) {
-                              return 'Invalid Number';
-                            }
-                            return null;
-                          }),
-                          mypassword(
-                              '', Icons.password, txtPassword, useMobileLayout),
-                          confirmpassword("", Icons.password,
-                              txtConfirmPassword, useMobileLayout),
-                          Container(
-                              child: Row(
-                            children: [
-                              Checkbox(
-                                checkColor: Colors.black,
-                                //fillColor: MaterialStateProperty.resolveWith(getColor),
-                                value: isChecked,
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    isChecked = value!;
-                                  });
-                                },
+                            }),
+      //                           customTextField('Middle Name', txtMiddleName,
+      //                               useMobileLayout, 'Please enter your Middle Name'),
+                            customTextField(
+                                TextInputType.text,
+                                'Last Name',
+                                txtLastName,
+                                useMobileLayout,
+                                'Please enter your Last Name', (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter your Last Name';
+                              }
+      
+                              if (!RegExp(r"^[\p{L} ,.'-]*$",caseSensitive: false, unicode: true, dotAll: true).hasMatch(value)) {
+                                return 'Invalid Input';
+                              }
+                              return null;
+                            }),
+                            // SizedBox(
+                            //   height: 15,
+                            // ),
+                            customTextField(
+                                TextInputType.emailAddress,
+                                'Email',
+                                txtEmail,
+                                useMobileLayout,
+                                'Please enter your Email', (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter your Email Address';
+                              }
+      
+                              if (!RegExp(
+                                      r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$')
+                                  .hasMatch(value)) {
+                                return 'Invalid Email Address';
+                              }
+                              return null;
+                            }),
+                            customTextField(
+                                TextInputType.number,
+                                'Mobile Number (09XXXXXXXXX)',
+                                txtContactNumber,
+                                useMobileLayout,
+                                'Please enter your contact number', (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter your Contact Number';
+                              }
+      
+                              if (txtContactNumber.text.toString().length != 11) {
+                                return 'Invalid Number';
+                              }
+                              return null;
+                            }),
+                            mypassword(
+                                '', Icons.password, txtPassword, useMobileLayout),
+                            confirmpassword("", Icons.password,
+                                txtConfirmPassword, useMobileLayout),
+                            Container(
+                                child: Row(
+                              children: [
+                                Checkbox(
+                                  checkColor: Colors.black,
+                                  //fillColor: MaterialStateProperty.resolveWith(getColor),
+                                  value: isChecked,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      isChecked = value!;
+                                    });
+                                  },
+                                ),
+                                Expanded(
+                                    child: Text(
+                                  "I agree the Terms and Conditions and Privacy Policy",
+                                  style: GoogleFonts.poppins(color: Colors.white),
+                                ))
+                              ],
+                            )),
+                            isCheckedLoad
+                                ? (!isChecked
+                                    ? Text(
+                                        "Please check terms and conditions",
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.redAccent[200],
+                                          ),
+                                        ),
+                                      )
+                                    : Container())
+                                : Container(),
+      
+                            Card(
+                              elevation: 5,
+                              child: Container(
+                                height: 100,
+                                child: Row(
+                                  children: <Widget>[
+                                    Checkbox(
+                                        value: isNotARobot,
+                                        onChanged: (bool? value) {
+                                          _openReCaptcha();
+                                        }),
+                                    Expanded(
+                                      child: Text("I'm not a robot"),
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Container(
+                                      alignment: Alignment.centerRight,
+                                      child: Image.asset(
+                                        'assets/images/captcha.jpg',
+                                        width: 80,
+                                        height: 80,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              Expanded(
-                                  child: Text(
-                                "I agree the Terms and Conditions and Privacy Policy",
-                                style: GoogleFonts.poppins(color: Colors.white),
-                              ))
-                            ],
-                          )),
-                          isCheckedLoad
-                              ? (!isChecked
-                                  ? Text(
-                                      "Please check terms and conditions",
+                            ),
+                            isCheckedLoad
+                                ? (!isNotARobot
+                                    ? Text(
+                                        "Please check not a robot",
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.redAccent[200],
+                                          ),
+                                        ),
+                                      )
+                                    : Container())
+                                : Container(),
+                            SizedBox(
+                              height: 10,
+                            ),
+      //                           mypassword(
+      //                               "", Icons.lock, txtPassword, useMobileLayout),
+      //                           confirmpassword("", Icons.lock, txtConfirmPassword,
+      //                               useMobileLayout),
+                            // Proceed(proceed),
+                            signUpButton(useMobileLayout),
+                            SizedBox(
+                              height: 30,
+                            ),
+                            Container(
+                              alignment: Alignment.center,
+                              width: useMobileLayout ? null : 500,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      'Already have an account?',
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.redAccent[200],
+                                          fontSize:
+                                              useMobileLayout ? 16 : 18, // tablet
+                                          color: Colors.black,
                                         ),
                                       ),
-                                    )
-                                  : Container())
-                              : Container(),
-
-                          Card(
-                            elevation: 5,
-                            child: Container(
-                              height: 100,
-                              child: Row(
-                                children: <Widget>[
-                                  Checkbox(
-                                      value: isNotARobot,
-                                      onChanged: (bool? value) {
-                                        _openReCaptcha();
-                                      }),
+                                    ),
+                                  ),
                                   Expanded(
-                                    child: Text("I'm not a robot"),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Container(
-                                    alignment: Alignment.centerRight,
-                                    child: Image.asset(
-                                      'assets/images/captcha.jpg',
-                                      width: 80,
-                                      height: 80,
+                                    child: TextButton(
+                                      onPressed: () => Navigator.of(context)
+                                          .pushReplacementNamed(Login.routeName),
+                                      child: Text(
+                                        'Login',
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                              fontSize: useMobileLayout ? 16 : 18,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.amberAccent),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                          isCheckedLoad
-                              ? (!isNotARobot
-                                  ? Text(
-                                      "Please check not a robot",
-                                      style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.redAccent[200],
-                                        ),
-                                      ),
-                                    )
-                                  : Container())
-                              : Container(),
-                          SizedBox(
-                            height: 10,
-                          ),
-//                           mypassword(
-//                               "", Icons.lock, txtPassword, useMobileLayout),
-//                           confirmpassword("", Icons.lock, txtConfirmPassword,
-//                               useMobileLayout),
-                          // Proceed(proceed),
-                          signUpButton(useMobileLayout),
-                          SizedBox(
-                            height: 30,
-                          ),
-                          Container(
-                            alignment: Alignment.center,
-                            width: useMobileLayout ? null : 500,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Expanded(
-                                  child: Text(
-                                    'Already have an account?',
-                                    style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(
-                                        fontSize:
-                                            useMobileLayout ? 16 : 18, // tablet
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: TextButton(
-                                    onPressed: () => Navigator.of(context)
-                                        .pushReplacementNamed(Login.routeName),
-                                    child: Text(
-                                      'Login',
-                                      style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
-                                            fontSize: useMobileLayout ? 16 : 18,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.amberAccent),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 30,
-                          )
-                        ],
+                            SizedBox(
+                              height: 30,
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -923,7 +1000,7 @@ class _AccountRegisterState extends State<AccountRegister> {
           Expanded(
             child: TextFormField(
               controller: control,
-              obscureText: hintTextP != "" ? false : _hidePassword,
+              obscureText: hintTextP != "" ? false : _hideConfirmPassword,
               style: GoogleFonts.poppins(
                 textStyle: TextStyle(
                   fontSize: 16,
@@ -1268,7 +1345,7 @@ class _AccountRegisterState extends State<AccountRegister> {
           }, // your tap handler moved here
           builder: (context, onTap) {
             return ElevatedButton(
-              child: Text(
+              child: _isLoading ? CircularProgressIndicator() : Text(
                 "SIGN UP",
                 style: GoogleFonts.poppins(
                   textStyle: TextStyle(
@@ -1289,7 +1366,7 @@ class _AccountRegisterState extends State<AccountRegister> {
               // shape: RoundedRectangleBorder(
               //   borderRadius: BorderRadius.circular(50.0),
               // ),
-              onPressed: onTap,
+              onPressed: _isLoading ? null : onTap,
               // color: Colors.green,
               // textColor: Colors.black,
               // splashColor: Colors.yellowAccent[800],

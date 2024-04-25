@@ -108,7 +108,7 @@ class Voucher with ChangeNotifier {
       var response = await http.get(
           Uri.parse(config.pre_url_voucher + "/get-my-vouchers"),
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
-      //print(json.decode(response.body));
+      print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
       notifyListeners();
       return jsonResponse["data"];

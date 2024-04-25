@@ -94,40 +94,43 @@ class _NotificationListState extends State<NotificationList> {
     final bool useMobileLayout = shortestSide < 600.0;
     final Orientation orientation = MediaQuery.of(context).orientation;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 55, 57, 175),
-        leading: Builder(builder: (BuildContext context) {
-          return IconButton(
-              icon: Icon(Icons.keyboard_arrow_left, color: Colors.white),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, Dashboard.routeName);
-              } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
-        }),
-        automaticallyImplyLeading: false,
-        title: Text('Notifications',
-            style: GoogleFonts.poppins(
-              fontSize: useMobileLayout ? 16 : 18,
-              color: Colors.white
-            )),
-      ),
-      body: isLoading ? RefreshIndicator(
-        key: _refreshIndicatorKey,
-        color: Colors.white,
-        backgroundColor: Colors.blue,
-        strokeWidth: 4.0,
-        onRefresh: getNotification,
-        child: ListView.builder(
-          itemCount: notificationData.length,
-          itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-              title: Text(voucherData[index]['description']),
-              subtitle: Text(voucherData[index]['claimed_date'] + " - " + (voucherData[index]['expire_date'])),
-            );
-          },
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Color.fromARGB(255, 55, 57, 175),
+          leading: Builder(builder: (BuildContext context) {
+            return IconButton(
+                icon: Icon(Icons.keyboard_arrow_left, color: Colors.white),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, Dashboard.routeName);
+                } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
+          }),
+          automaticallyImplyLeading: false,
+          title: Text('Notifications',
+              style: GoogleFonts.poppins(
+                fontSize: useMobileLayout ? 16 : 18,
+                color: Colors.white
+              )),
         ),
-      ) : Container(),
+        body: isLoading ? RefreshIndicator(
+          key: _refreshIndicatorKey,
+          color: Colors.white,
+          backgroundColor: Colors.blue,
+          strokeWidth: 4.0,
+          onRefresh: getNotification,
+          child: ListView.builder(
+            itemCount: notificationData.length,
+            itemBuilder: (BuildContext context, int index) {
+              return ListTile(
+                title: Text(voucherData[index]['description']),
+                subtitle: Text(voucherData[index]['claimed_date'] + " - " + (voucherData[index]['expire_date'])),
+              );
+            },
+          ),
+        ) : Container(),
+      ),
     );
   }
 }

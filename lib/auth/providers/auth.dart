@@ -9,7 +9,7 @@ import '../../config/config.dart' as config;
 
 // Config and Providers
 // import '../../Config/Config.dart' as config;
-// import '../../Config/HttpException.dart';
+import '../../config/HttpException.dart';
 
 class Auth with ChangeNotifier {
   String _token = '';
@@ -122,7 +122,19 @@ class Auth with ChangeNotifier {
         sharedPreferences.setString('userData', userData);
         notifyListeners();
       } else {
-        throw HttpException(jsonResponse['data'].toString());
+        if(jsonResponse['data']['email'] != null){
+          throw HttpException(jsonResponse['data']['email'][0].toString());
+        }else if(jsonResponse['data']['mobile_number'] != null){
+          throw HttpException(jsonResponse['data']['mobile_number'][0].toString());
+        }else if(jsonResponse['data']['first_name'] != null){
+          throw HttpException(jsonResponse['data']['first_name'][0].toString());
+        }else if(jsonResponse['data']['middle_name'] != null){
+          throw HttpException(jsonResponse['data']['middle_name'][0].toString());
+        }else if(jsonResponse['data']['last_name'] != null){
+          throw HttpException(jsonResponse['data']['last_name'][0].toString());
+        }else{
+           throw HttpException('something went wrong');
+        }
       }
 
       print(jsonResponse['message']);

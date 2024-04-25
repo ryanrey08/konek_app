@@ -46,228 +46,231 @@ class _LoginState extends State<Login> {
     final bool useMobileLayout = shortestSide < 600.0;
     var height = MediaQuery.of(context).size.height;
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Container(
-          height: height,
-          decoration: const BoxDecoration(
-            // image: DecorationImage(
-            //   image: AssetImage('images/connections-clipart-md.png'),
-            //   fit: BoxFit.cover,
-
-            //   // colorFilter: ColorFilter.mode(
-            //   //   Colors.black.withOpacity(0.2),
-            //   //   BlendMode.dstATop,
-            //   // ),
-            // ),
-            gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: [0.1, 0.8],
-                //colors: [CupertinoColors.systemBlue, CupertinoColors.systemPurple],
-                //colors: [Colors.blue, Colors.purple]
-                colors: [Colors.white, Colors.white]),
-          ),
-          child: Center(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.zero,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    width: useMobileLayout ? 600 : 800,
-                    height: useMobileLayout ? 280 : 400,
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage('assets/images/connection.png'),
-                          fit: BoxFit.cover),
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Container(
+            height: height,
+            decoration: const BoxDecoration(
+              // image: DecorationImage(
+              //   image: AssetImage('images/connections-clipart-md.png'),
+              //   fit: BoxFit.cover,
+      
+              //   // colorFilter: ColorFilter.mode(
+              //   //   Colors.black.withOpacity(0.2),
+              //   //   BlendMode.dstATop,
+              //   // ),
+              // ),
+              gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [0.1, 0.8],
+                  //colors: [CupertinoColors.systemBlue, CupertinoColors.systemPurple],
+                  //colors: [Colors.blue, Colors.purple]
+                  colors: [Colors.white, Colors.white]),
+            ),
+            child: Center(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.zero,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      width: useMobileLayout ? 600 : 800,
+                      height: useMobileLayout ? 280 : 400,
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                            image: AssetImage('assets/images/connection.png'),
+                            fit: BoxFit.cover),
+                      ),
                     ),
-                  ),
-                  //const SizedBox(height: 250),
-                  Card(
-                    elevation: 4,
-                    //color: Colors.white.withOpacity(0.8),
-                    color: const Color.fromARGB(255, 55, 57, 175),
-                    margin: EdgeInsets.zero,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30)),
-                    ),
-                    child: Container(
-                      height: MediaQuery.of(context).size.height / 2 + 100,
-                      width: useMobileLayout
-                          ? MediaQuery.of(context).size.width
-                          : MediaQuery.of(context).size.width - 200,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 25),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Form(
-                              key: _formKey,
-                              child: Center(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    // SizedBox(height: 20),
-                                    Container(
-                                      alignment: Alignment.topCenter,
-                                      child: Text(
-                                        "SIGN IN",
-                                        textAlign: TextAlign.left,
-                                        style: GoogleFonts.poppins(
-                                          textStyle: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: useMobileLayout ? 18 : 30,
+                    //const SizedBox(height: 250),
+                    Card(
+                      elevation: 4,
+                      //color: Colors.white.withOpacity(0.8),
+                      color: const Color.fromARGB(255, 55, 57, 175),
+                      margin: EdgeInsets.zero,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(30),
+                            topRight: Radius.circular(30)),
+                      ),
+                      child: Container(
+                        height: MediaQuery.of(context).size.height / 2 + 100,
+                        width: useMobileLayout
+                            ? MediaQuery.of(context).size.width
+                            : MediaQuery.of(context).size.width - 200,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 25),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Form(
+                                key: _formKey,
+                                child: Center(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      // SizedBox(height: 20),
+                                      Container(
+                                        alignment: Alignment.topCenter,
+                                        child: Text(
+                                          "SIGN IN",
+                                          textAlign: TextAlign.left,
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: useMobileLayout ? 18 : 30,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    Container(
-                                        width: 100,
-                                        height: 100,
-                                        child: const Image(
-                                          // image: NetworkImage(
-                                          //     'assets/images/novulutions.png'),
-                                          image: AssetImage(
-                                              'assets/images/swak-img.png'),
-                                        )),
-                                    SizedBox(
-                                      height: 15,
-                                    ),
-                                    loginEmailFields(
-                                        "ENTER MOBILE NO.",
-                                        Icons.person_2,
-                                        txtUsernameController,
-                                        useMobileLayout),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    // loginFields("", Icons.lock,
-                                    //     txtPasswordController, useMobileLayout),
-                                    // SizedBox(
-                                    //   height: 10,
-                                    // ),
-                                    // Column(
-                                    //   mainAxisAlignment: MainAxisAlignment.end,
-                                    //   crossAxisAlignment:
-                                    //       CrossAxisAlignment.end,
-                                    //   children: <Widget>[
-                                    //     Container(
-                                    //       child: GestureDetector(
-                                    //         child: Text(
-                                    //           'Forgot password?',
-                                    //           style: GoogleFonts.poppins(
-                                    //             textStyle: TextStyle(
-                                    //                 fontSize: 15,
-                                    //                 // decoration: TextDecoration.underline,
-                                    //                 color: Colors.grey),
-                                    //           ),
-                                    //         ),
-                                    //         onTap: () {
-                                    //           // Navigator.push(
-                                    //           //   context,
-                                    //           //   MaterialPageRoute(
-                                    //           //       builder: (context) => ForgotPassword()),
-                                    //           // );\
-                                    //         },
-                                    //       ),
-                                    //     ),
-                                    //   ],
-                                    // ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    loginButton(useMobileLayout),
-                                    SizedBox(height: 5),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      width: useMobileLayout ? null : 500,
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: Text(
-                                              'Don\'t have any account?',
-                                              style: GoogleFonts.poppins(
-                                                textStyle: TextStyle(
-                                                  fontSize:
-                                                      useMobileLayout ? 13 : 18,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context)
-                                                    .pushReplacementNamed(
-                                                        AccountRegister
-                                                            .routeName);
-                                              },
+                                      Container(
+                                          width: 100,
+                                          height: 100,
+                                          child: const Image(
+                                            // image: NetworkImage(
+                                            //     'assets/images/novulutions.png'),
+                                            image: AssetImage(
+                                                'assets/images/swak-img.png'),
+                                          )),
+                                      SizedBox(
+                                        height: 15,
+                                      ),
+                                      loginEmailFields(
+                                          "ENTER MOBILE NO.",
+                                          Icons.person_2,
+                                          txtUsernameController,
+                                          useMobileLayout),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      // loginFields("", Icons.lock,
+                                      //     txtPasswordController, useMobileLayout),
+                                      // SizedBox(
+                                      //   height: 10,
+                                      // ),
+                                      // Column(
+                                      //   mainAxisAlignment: MainAxisAlignment.end,
+                                      //   crossAxisAlignment:
+                                      //       CrossAxisAlignment.end,
+                                      //   children: <Widget>[
+                                      //     Container(
+                                      //       child: GestureDetector(
+                                      //         child: Text(
+                                      //           'Forgot password?',
+                                      //           style: GoogleFonts.poppins(
+                                      //             textStyle: TextStyle(
+                                      //                 fontSize: 15,
+                                      //                 // decoration: TextDecoration.underline,
+                                      //                 color: Colors.grey),
+                                      //           ),
+                                      //         ),
+                                      //         onTap: () {
+                                      //           // Navigator.push(
+                                      //           //   context,
+                                      //           //   MaterialPageRoute(
+                                      //           //       builder: (context) => ForgotPassword()),
+                                      //           // );\
+                                      //         },
+                                      //       ),
+                                      //     ),
+                                      //   ],
+                                      // ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      loginButton(useMobileLayout),
+                                      SizedBox(height: 5),
+                                      Container(
+                                        alignment: Alignment.center,
+                                        width: useMobileLayout ? null : 500,
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Expanded(
                                               child: Text(
-                                                'Register Here',
+                                                'Don\'t have any account?',
                                                 style: GoogleFonts.poppins(
                                                   textStyle: TextStyle(
-                                                    fontSize: useMobileLayout
-                                                        ? 13
-                                                        : 18,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Colors.amberAccent,
+                                                    fontSize:
+                                                        useMobileLayout ? 13 : 18,
+                                                    color: Colors.black,
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                            Expanded(
+                                              child: TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .pushReplacementNamed(
+                                                          AccountRegister
+                                                              .routeName);
+                                                },
+                                                child: Text(
+                                                  'Register Here',
+                                                  style: GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                      fontSize: useMobileLayout
+                                                          ? 13
+                                                          : 18,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: Colors.amberAccent,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    // Container(
-                                    //   alignment: Alignment.bottomRight,
-                                    //   child: Text(
-
-                                    //     'v.1-staging',
-                                    //     style: GoogleFonts.poppins(
-                                    //       textStyle: TextStyle(
-                                    //         // fontSize: useMobileLayout ? 13 : 18,
-                                    //         fontSize: 12,
-                                    //       ),
-                                    //     ),
-                                    //   ),
-                                    // )
-                                  ],
+                                      // Container(
+                                      //   alignment: Alignment.bottomRight,
+                                      //   child: Text(
+      
+                                      //     'v.1-staging',
+                                      //     style: GoogleFonts.poppins(
+                                      //       textStyle: TextStyle(
+                                      //         // fontSize: useMobileLayout ? 13 : 18,
+                                      //         fontSize: 12,
+                                      //       ),
+                                      //     ),
+                                      //   ),
+                                      // )
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  // Container(
-                  //   alignment: Alignment.bottomRight,
-                  //   child: Text(
-                  //  'v.1-Staging',
-                  //     style: GoogleFonts.poppins(
-                  //       textStyle: TextStyle(
-                  //           // fontSize: useMobileLayout ? 13 : 18,
-                  //           fontSize: 14,
-                  //           color: Colors.white),
-                  //     ),
-                  //   ),
-                  // )
-                ],
+                    // Container(
+                    //   alignment: Alignment.bottomRight,
+                    //   child: Text(
+                    //  'v.1-Staging',
+                    //     style: GoogleFonts.poppins(
+                    //       textStyle: TextStyle(
+                    //           // fontSize: useMobileLayout ? 13 : 18,
+                    //           fontSize: 14,
+                    //           color: Colors.white),
+                    //     ),
+                    //   ),
+                    // )
+                  ],
+                ),
               ),
             ),
           ),

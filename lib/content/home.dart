@@ -1,7 +1,10 @@
 // Packages and Libraries
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:konek_app/config/httpexception.dart';
 import 'package:konek_app/content/provider/content.dart';
+import 'package:konek_app/content/provider/pos.dart';
+import 'package:konek_app/content/provider/voucher.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -118,16 +121,37 @@ class _HomePageState extends State<HomePage> {
     },
   ];
 
-  List subscriptions = [];
+  List subscriptions = [
+    {
+      "id": 1,
+      "name": "1 Day Surf",
+      "price": "30.00",
+      "duration": "1",
+      "duration_unit": "day",
+      "start_date": "2024-03-03 00:00:00",
+      "end_date": "2024-04-27 00:00:00",
+      "status": 1 // 1 = Active; 0 = Inactive
+    },
+    {
+      "id": 1,
+      "name": "1 Day Surf",
+      "price": "30.00",
+      "duration": "1",
+      "duration_unit": "day",
+      "start_date": "2024-03-03 00:00:00",
+      "end_date": "2024-04-27 00:00:00",
+      "status": 1 // 1 = Active; 0 = Inactive
+    },
+  ];
   List quickLinks = [];
   List ads = [];
 
   @override
   void initState() {
     super.initState();
-    //assignData();
+    // assignData();
     //getUser();
-    getVoucherData();
+    // getVoucherData();
     getStreamData();
     refreshPage();
   }
@@ -139,7 +163,7 @@ class _HomePageState extends State<HomePage> {
       globalVoucherData = preferences.getString('voucherData',
           defaultValue:
               '{ "voucher_code": "","duration": 0,"description": "","amount": 0,"claimed_date": "","expire_date": "","status": ""}');
-      isLoading = true;
+      // isLoading = true;
     });
   }
 
@@ -160,12 +184,12 @@ class _HomePageState extends State<HomePage> {
       var newQuicklinks = [];
       // int arrLength = ((quickLinksData.length / 2) ~/ 1000);
       var myQuickLinks = [];
-      for (var x = 0;x < quickLinksData.length;x++){
+      for (var x = 0; x < quickLinksData.length; x++) {
         myQuickLinks.add(quickLinksData[x]);
-        if(x % 2 == 1){
+        if (x % 2 == 1) {
           newQuicklinks.add(myQuickLinks);
           myQuickLinks = [];
-        }else if(x == (quickLinksData.length -1)){
+        } else if (x == (quickLinksData.length - 1)) {
           newQuicklinks.add(myQuickLinks);
         }
       }
@@ -190,7 +214,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  assignData() async {
+  assignData(vouchData) async {
     voucherData = {
       "voucher_code": "",
       "duration": 0,
@@ -201,34 +225,70 @@ class _HomePageState extends State<HomePage> {
       "status": ""
     };
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('voucherData', json.encode(voucherData));
+    prefs.setString('voucherData', json.encode(vouchData));
   }
 
-  void getVoucherData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('voucherData')) {
-      voucherData = {
-        "voucher_code": "",
-        "duration": 0,
-        "description": "",
-        "amount": 0,
-        "claimed_date": "",
-        "expire_date": "",
-        "status": ""
-      };
-    } else {
-      final extracteduserData =
-          json.decode(prefs.getString('voucherData')!) as Map<String, dynamic>;
-      print(extracteduserData);
-      setState(() {
-        voucherData = extracteduserData;
-      });
-    }
+  Future<void> getVoucherData() async {
+    var errorMessage;
+    // setState(() {
+    //   isLoading = true;
+    // });
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // if (prefs.containsKey("swakPaymentRefNo")) {
+    //   final extracteduserData = json
+    //       .decode(prefs.getString('swakPaymentRefNo')!) as Map<String, dynamic>;
+    //   print(extracteduserData['reference_number']);
+    // }
 
+    try {
+      //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
+      var vouchData =
+          await Provider.of<POSProvider>(context, listen: false).getMyPaymentStatus();
+
+      setState(() {
+        voucherData = vouchData;
+      });
+      assignData(vouchData);
+
+      print(vouchData);
+
+    } on HttpException catch (error) {
+      print(error);
+      showError(error.toString());
+    } catch (error) {
+      showError(error.toString());
+    }
     // setState(() {
     //   isLoading = true;
     // });
   }
+
+  // void getVoucherData() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  //   if (!prefs.containsKey('voucherData')) {
+  //     voucherData = {
+  //       "voucher_code": "",
+  //       "duration": 0,
+  //       "description": "",
+  //       "amount": 0,
+  //       "claimed_date": "",
+  //       "expire_date": "",
+  //       "status": ""
+  //     };
+  //   } else {
+  //     final extracteduserData =
+  //         json.decode(prefs.getString('voucherData')!) as Map<String, dynamic>;
+  //     print(extracteduserData);
+  //     setState(() {
+  //       voucherData = extracteduserData;
+  //     });
+  //   }
+
+  //   // setState(() {
+  //   //   isLoading = true;
+  //   // });
+  // }
 
   void getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -309,6 +369,7 @@ class _HomePageState extends State<HomePage> {
     await getSubscription();
     await getQuickLinks();
     await getAds();
+    await getVoucherData();
     await loadData();
   }
 
@@ -398,7 +459,7 @@ class _HomePageState extends State<HomePage> {
                                       //width: double.infinity,
                                       width: useMobileLayout ? null : 700,
                                       //width: 500,
-                                      height: useMobileLayout ? 110 : 170,
+                                      height: useMobileLayout ? 150 : 190,
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(10),
@@ -437,8 +498,8 @@ class _HomePageState extends State<HomePage> {
                                                   child: Text(
                                                     (isLoading
                                                             ? (newVoucherData[
-                                                                        'voucher_code'] !=
-                                                                    ''
+                                                                        'status'] ==
+                                                                    'completed'
                                                                 ? newVoucherData[
                                                                         "duration"]
                                                                     .toString()
@@ -488,7 +549,7 @@ class _HomePageState extends State<HomePage> {
                                               children: <Widget>[
                                                 SizedBox(height: 10),
                                                 SizedBox(
-                                                  height: 30,
+                                                  height: 40,
                                                 ),
                                                 Expanded(
                                                   child: Text(
@@ -533,15 +594,15 @@ class _HomePageState extends State<HomePage> {
                                             alignment: Alignment.centerLeft,
                                             child: Column(children: [
                                               SizedBox(
-                                                height: 15,
+                                                height: 40,
                                               ),
                                               Icon(
                                                 Icons.wifi,
                                                 size: useMobileLayout ? 55 : 65,
                                                 color: isLoading
                                                     ? (newVoucherData[
-                                                                'voucher_code'] !=
-                                                            ''
+                                                                'status'] ==
+                                                            'completed'
                                                         ? Colors.greenAccent
                                                         : Colors.redAccent)
                                                     : Colors.greenAccent,
@@ -560,8 +621,8 @@ class _HomePageState extends State<HomePage> {
                                                   Text(
                                                     isLoading
                                                         ? (newVoucherData[
-                                                                    'voucher_code'] !=
-                                                                ''
+                                                                    'status'] ==
+                                                                'completed'
                                                             ? "Online"
                                                             : "Offline")
                                                         : 'Offline',
@@ -571,8 +632,8 @@ class _HomePageState extends State<HomePage> {
                                                           : 28,
                                                       color: isLoading
                                                           ? (newVoucherData[
-                                                                      'voucher_code'] !=
-                                                                  ''
+                                                                      'status'] ==
+                                                                  'completed'
                                                               ? Colors
                                                                   .greenAccent
                                                               : Colors
@@ -596,7 +657,7 @@ class _HomePageState extends State<HomePage> {
                                 var newVoucherData = json.decode(vouchData);
                                 return AbsorbPointer(
                                   absorbing: isLoading
-                                      ? (newVoucherData['voucher_code'] != ''
+                                      ? (newVoucherData['status'] == 'completed'
                                           ? true
                                           : false)
                                       : true,
@@ -620,9 +681,8 @@ class _HomePageState extends State<HomePage> {
                                           // color: Colors.white,
                                           // color: Color(0xFF0E3311).withOpacity(0.5),
                                           color: isLoading
-                                              ? (newVoucherData[
-                                                          'voucher_code'] !=
-                                                      ''
+                                              ? (newVoucherData['status'] ==
+                                                      'completed'
                                                   ? Colors.grey.withOpacity(0.5)
                                                   : Colors.white)
                                               : Colors.white,
@@ -631,129 +691,160 @@ class _HomePageState extends State<HomePage> {
                                             vertical: 30, horizontal: 15),
                                         child: Container(
                                           child: Column(
-                                            children: <Widget>[
-                                              for (var x = 0;
-                                                  x < subscriptions!.length;
-                                                  x++) ...[
-                                                Row(
-                                                  children: <Widget>[
-                                                    Expanded(
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
+                                            children: subscriptions!.length > 0
+                                                ? <Widget>[
+                                                    for (var x = 0;
+                                                        x <
+                                                            subscriptions!
+                                                                .length;
+                                                        x++) ...[
+                                                      Row(
                                                         children: <Widget>[
-                                                          // SizedBox(height: 10),
-                                                          SizedBox(
-                                                            width:
-                                                                useMobileLayout
-                                                                    ? 130
-                                                                    : 180,
-                                                            height: 50,
-                                                            child:
-                                                                ElevatedButton(
-                                                              child: Text(
-                                                                //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
-                                                                subscriptions[x]
-                                                                        [
-                                                                        'duration'] +
-                                                                    " " +
-                                                                    subscriptions[
-                                                                            x][
-                                                                        'duration_unit'],
-                                                                style:
-                                                                    GoogleFonts
-                                                                        .poppins(
-                                                                  textStyle:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        useMobileLayout
-                                                                            ? 14
-                                                                            : 25,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
+                                                          Expanded(
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: <Widget>[
+                                                                // SizedBox(height: 10),
+                                                                SizedBox(
+                                                                  width:
+                                                                      useMobileLayout
+                                                                          ? 130
+                                                                          : 180,
+                                                                  height: 50,
+                                                                  child:
+                                                                      ElevatedButton(
+                                                                    child: Text(
+                                                                      //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
+                                                                      subscriptions[x]
+                                                                              [
+                                                                              'duration'] +
+                                                                          " " +
+                                                                          subscriptions[x]
+                                                                              [
+                                                                              'duration_unit'],
+                                                                      style: GoogleFonts
+                                                                          .poppins(
+                                                                        textStyle:
+                                                                            TextStyle(
+                                                                          color:
+                                                                              Colors.white,
+                                                                          fontSize: useMobileLayout
+                                                                              ? 14
+                                                                              : 25,
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      shape:
+                                                                          RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(50.0),
+                                                                      ),
+                                                                      primary: Color.fromARGB(
+                                                                          255,
+                                                                          55,
+                                                                          57,
+                                                                          175), // background
+                                                                      onPrimary:
+                                                                          Colors
+                                                                              .white, // foreground
+                                                                    ),
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.pushReplacementNamed(
+                                                                          context,
+                                                                          POS.routeName,
+                                                                          arguments: {
+                                                                            'subscription':
+                                                                                subscriptions[x]
+                                                                          });
+                                                                    },
+                                                                    // color: Colors.white,
+                                                                    // textColor: Colors.black,
+                                                                    // splashColor: Colors.yellowAccent[800],
                                                                   ),
                                                                 ),
-                                                              ),
-                                                              style:
-                                                                  ElevatedButton
-                                                                      .styleFrom(
-                                                                shape:
-                                                                    RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              50.0),
+                                                                SizedBox(
+                                                                  width: 50,
                                                                 ),
-                                                                primary: Color
-                                                                    .fromARGB(
-                                                                        255,
-                                                                        55,
-                                                                        57,
-                                                                        175), // background
-                                                                onPrimary: Colors
-                                                                    .white, // foreground
-                                                              ),
-                                                              onPressed: () {
-                                                                Navigator
-                                                                    .pushReplacementNamed(
-                                                                        context,
-                                                                        POS.routeName, arguments: {'subscription': subscriptions[x]});
-                                                              },
-                                                              // color: Colors.white,
-                                                              // textColor: Colors.black,
-                                                              // splashColor: Colors.yellowAccent[800],
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                            width: 50,
-                                                          ),
-                                                          Expanded(
-                                                            child: Text(
-                                                              subscriptions[x]
-                                                                      ['name'] +
-                                                                  " for P" +
-                                                                  subscriptions[
-                                                                              x]
-                                                                          [
-                                                                          'price']
-                                                                      .toString(),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              style: GoogleFonts
-                                                                  .poppins(
-                                                                textStyle:
-                                                                    TextStyle(
-                                                                  fontSize:
-                                                                      useMobileLayout
-                                                                          ? 12
-                                                                          : 30,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w800,
-                                                                  color: Colors
-                                                                      .black,
+                                                                Expanded(
+                                                                  child: Text(
+                                                                    subscriptions[x]
+                                                                            [
+                                                                            'name'] +
+                                                                        " for P" +
+                                                                        subscriptions[x]['price']
+                                                                            .toString(),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: GoogleFonts
+                                                                        .poppins(
+                                                                      textStyle:
+                                                                          TextStyle(
+                                                                        fontSize: useMobileLayout
+                                                                            ? 12
+                                                                            : 30,
+                                                                        fontWeight:
+                                                                            FontWeight.w800,
+                                                                        color: Colors
+                                                                            .black,
+                                                                      ),
+                                                                    ),
+                                                                  ),
                                                                 ),
-                                                              ),
+                                                              ],
                                                             ),
                                                           ),
                                                         ],
                                                       ),
+                                                      SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                    ]
+                                                  ]
+                                                : <Widget>[
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: <Widget>[
+                                                        Expanded(
+                                                          child: Center(
+                                                            child: Text(
+                                                              "NO CURRENT SUBSCRIPTION",
+                                                              style: GoogleFonts
+                                                                  .poppins(
+                                                                textStyle:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .red,
+                                                                  fontSize:
+                                                                      useMobileLayout
+                                                                          ? 14
+                                                                          : 25,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ],
-                                                ),
-                                                SizedBox(
-                                                  height: 10,
-                                                ),
-                                              ]
-                                            ],
                                           ),
                                         ),
                                       ),
@@ -854,42 +945,72 @@ class _HomePageState extends State<HomePage> {
                                   alignment: Alignment.centerLeft,
                                   padding: EdgeInsets.symmetric(
                                       vertical: 15, horizontal: 5),
-                                  child: ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    shrinkWrap: true,
-                                    children: <Widget>[
-                                      for (var x = 0;
-                                          x < quickLinks!.length;
-                                          x++) ...[
-                                        (Container(
-                                          alignment: Alignment.center,
-                                          child: Column(children: [
-                                            for(var y=0;y < quickLinks[x].length;y++)...[
-                                                              GestureDetector(
-                                              onTap: () {
-                                                print("here");
-                                                UrlLauncher.launch(
-                                                    'tel:+${quickLinks[x][y]['link']}');
-                                              },
-                                              child: Container(
-                                                width: 120.0,
-                                                height: 70.0,
-                                                alignment: Alignment.center,
-                                                decoration: new BoxDecoration(
-                                                  image: DecorationImage(
-                                                      image: NetworkImage(
-                                                          quickLinks[x][y]['image_url']),
-                                                      fit: BoxFit.contain),
+                                  child: quickLinks!.length > 0
+                                      ? ListView(
+                                          scrollDirection: Axis.horizontal,
+                                          shrinkWrap: true,
+                                          children: <Widget>[
+                                              for (var x = 0;
+                                                  x < quickLinks!.length;
+                                                  x++) ...[
+                                                (Container(
+                                                  alignment: Alignment.center,
+                                                  child: Column(children: [
+                                                    for (var y = 0;
+                                                        y <
+                                                            quickLinks[x]
+                                                                .length;
+                                                        y++) ...[
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          print("here");
+                                                          UrlLauncher.launch(
+                                                              'tel:+${quickLinks[x][y]['link']}');
+                                                        },
+                                                        child: Container(
+                                                          width: 120.0,
+                                                          height: 70.0,
+                                                          alignment:
+                                                              Alignment.center,
+                                                          decoration:
+                                                              new BoxDecoration(
+                                                            image: DecorationImage(
+                                                                image: NetworkImage(
+                                                                    quickLinks[x]
+                                                                            [y][
+                                                                        'image_url']),
+                                                                fit: BoxFit
+                                                                    .contain),
+                                                          ),
+                                                          // child: Text(quickLinks[x][y]['description']),
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 15,
+                                                      )
+                                                    ]
+                                                  ]),
+                                                )),
+                                                SizedBox(
+                                                  height: 10,
+                                                )
+                                              ]
+                                            ])
+                                      : Expanded(
+                                          child: Center(
+                                            child: Text(
+                                              "NO CURRENT DATA",
+                                              style: GoogleFonts.poppins(
+                                                textStyle: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize:
+                                                      useMobileLayout ? 14 : 25,
+                                                  fontWeight: FontWeight.w600,
                                                 ),
-                                                // child: Text(quickLinks[x][y]['description']),
                                               ),
                                             ),
-                                            SizedBox(height: 15,)
-                                            ]
-                                          ]),
-                                        )), SizedBox(height: 10,)]
-                                    ],
-                                  ),
+                                          ),
+                                        ),
                                 ),
                               ),
                             ),
@@ -940,34 +1061,52 @@ class _HomePageState extends State<HomePage> {
                           // ),
                           Container(
                             width: double.infinity,
-                            child: CarouselSlider(
-                              options: CarouselOptions(
-                                autoPlay: true,
-                                aspectRatio: 2.0,
-                                // enlargeCenterPage: true,
-                                viewportFraction: 1.0,
-                                height: 100,
-                                enlargeStrategy:
-                                    CenterPageEnlargeStrategy.height,
-                                    scrollPhysics: NeverScrollableScrollPhysics()
-                              ),
-                              items: ads.map((i) {
-                                return Builder(
-                                  builder: (BuildContext context) {
-                                    return Container(
-                                      width: MediaQuery.of(context).size.width,
-                                      // margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                            image: NetworkImage(i['image_url']),
-                                            fit: BoxFit.fitWidth),
+                            child: ads.length > 0
+                                ? CarouselSlider(
+                                    options: CarouselOptions(
+                                        autoPlay: true,
+                                        aspectRatio: 2.0,
+                                        // enlargeCenterPage: true,
+                                        viewportFraction: 1.0,
+                                        height: 100,
+                                        enlargeStrategy:
+                                            CenterPageEnlargeStrategy.height,
+                                        scrollPhysics:
+                                            NeverScrollableScrollPhysics()),
+                                    items: ads.map((i) {
+                                      return Builder(
+                                        builder: (BuildContext context) {
+                                          return Container(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            // margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                  image: NetworkImage(
+                                                      i['image_url']),
+                                                  fit: BoxFit.fitWidth),
+                                            ),
+                                            // child: Text(i['description']),
+                                          );
+                                        },
+                                      );
+                                    }).toList(),
+                                  )
+                                : Expanded(
+                                    child: Center(
+                                      child: Text(
+                                        "NO CURRENT ADS",
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: useMobileLayout ? 14 : 25,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
                                       ),
-                                      // child: Text(i['description']),
-                                    );
-                                  },
-                                );
-                              }).toList(),
-                            ),
+                                    ),
+                                  ),
                           ),
                           SizedBox(
                             height: 5,

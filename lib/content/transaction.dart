@@ -45,9 +45,9 @@ class _TransactionState extends State<Transaction> {
     } catch (error) {
       showError(error.toString());
     }
-    setState(() {
-      isLoading = true;
-    });
+    // setState(() {
+    //   isLoading = true;
+    // });
   }
 
   void showError(String message) {

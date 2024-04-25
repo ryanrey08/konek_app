@@ -64,6 +64,9 @@ dependencies:
   palette_generator: ^0.3.3+3
   url_launcher: ^6.2.5
   carousel_slider: ^4.2.1
+  flutter_device_identifier: ^0.0.1
+  simnumber: ^0.0.12
+  mobile_device_identifier: ^0.0.2
 
 dev_dependencies:
   flutter_test:

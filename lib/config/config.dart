@@ -13,12 +13,13 @@ import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 
 //my local
 //final String pre_url = "http://192.168.42.88:8000";
-final String pre_url = "http://157.230.37.42/api/v1/auth";
-final String pre_url_voucher = "http://157.230.37.42/api/v1/voucher";
-final String pre_url_subscription = "http://157.230.37.42/api/v1/subscriptions";
-final String pre_url_ads = "http://157.230.37.42/api/v1/quick-links-and-ads";
+final String pre_url = "http://165.22.253.81:1904/api/v1/auth";
+final String pre_url_voucher = "http://165.22.253.81:1904/api/v1/voucher";
+final String pre_url_subscription = "http://165.22.253.81:1904/api/v1/subscriptions";
+final String pre_url_ads = "http://165.22.253.81:1904/api/v1/quick-links-and-ads";
 final String img_url = "http://192.168.42.88:8000/storage/";
-final String file_storage = "http://157.230.37.42/storage/";
+final String file_storage = "http://165.22.253.81:1904/storage/";
+final String hit_pay = "http://165.22.253.81:1904/api/v1/hitpay/";
 
 //staging
 // final String pre_url = "http://128.199.240.216";

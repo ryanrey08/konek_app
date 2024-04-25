@@ -605,724 +605,727 @@ class _MyProfileState extends State<MyProfile> {
     final bool useMobileLayout = shortestSide < 600.0;
     final Orientation orientation = MediaQuery.of(context).orientation;
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 55, 57, 175),
-          leading: Builder(builder: (BuildContext context) {
-            return IconButton(
-                icon: Icon(Icons.keyboard_arrow_left, color: Colors.white),
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, Dashboard.routeName);
-                } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
-          }),
-          automaticallyImplyLeading: false,
-          title: Text('My Profile',
-              style: GoogleFonts.poppins(
-                fontSize: useMobileLayout ? 16 : 18,
-                color: Colors.white
-              )),
-        ),
-        body: isLoading
-            ? Container(child: Text("Loading..."))
-            : Form(
-                key: _formKey1,
-                child: Column(
-                  children: <Widget>[
-                    Expanded(
-                      child: SingleChildScrollView(
-                          child: Container(
-                        color: Colors.white,
-                        padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                        child: Column(
-                          children: <Widget>[
-                            // CustomFormField(
-                            //   // initialValue: user['farmer']['rsbsa_no'],
-                            //   status: editStatus,
-                            //   label: 'RSBSA Number',
-                            //   controller: txtRSBSANumber,
-                            //   onFieldSubmitted: (_) {
-                            //     FocusScope.of(context).requestFocus(fNameFocus);
-                            //   },
-                            //   validator: (value) {
-                            //     if (value.isEmpty) {
-                            //       return 'Please enter your first name';
-                            //     }
-                            //     return null;
-                            //   },
-                            //   initialValue: '',
-                            // ),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'First Name',
-                              controller: txtFirstName,
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context).requestFocus(mNameFocus);
-                              },
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter your first name';
-                                }
-                                return null;
-                              },
-                              initialValue: '',
-                            ),
-                            SizedBox(height: 4),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'Middlename (optional)',
-                              controller: txtMiddleName,
-                              validator: (value) {
-                                return null;
-                              },
-                              initialValue: '',
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context).requestFocus(lNameFocus);
-                              },
-                            ),
-                            SizedBox(height: 4),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'Lastname',
-                              controller: txtLastName,
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context)
-                                    .requestFocus(addressFocus);
-                              },
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter your lasst name';
-                                }
-                                return null;
-                              },
-                              initialValue: '',
-                            ),
-                            SizedBox(height: 4),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'Email Address',
-                              controller: txtEmailAddress,
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context).requestFocus(phoneFocus);
-                              },
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter your TIN No.';
-                                }
-                                return null;
-                              },
-                              initialValue: '',
-                            ),
-                            SizedBox(height: 4),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'Mobile Number',
-                              controller: txtPhoneNumber,
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context)
-                                    .requestFocus(educationalFocus);
-                              },
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter your mobile number';
-                                }
-                                return null;
-                              },
-                              initialValue: '',
-                            ),
-                            SizedBox(height: 4),
-                            CustomFormField(
-                              status: editStatus,
-                              label: 'Address',
-                              controller: txtCompleteAddress,
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context).requestFocus(phoneFocus);
-                              },
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter your complete address';
-                                }
-                                return null;
-                              },
-                              initialValue: '',
-                            ),
-                            SizedBox(height: 4),
-                            // CustomFormField(
-                            //   status: editStatus,
-                            //   label: 'City',
-                            //   controller: txtEducational,
-                            //   onFieldSubmitted: (_) {
-                            //     FocusScope.of(context)
-                            //         .requestFocus(degreeFocus);
-                            //   },
-                            //   validator: (value) {
-                            //     if (value.isEmpty) {
-                            //       return 'Please enter your education attainment.';
-                            //     }
-                            //     return null;
-                            //   },
-                            //   initialValue: '',
-                            // ),
-                            // SizedBox(height: 4),
-                            // CustomFormField(
-                            //   status: editStatus,
-                            //   label: 'Province',
-                            //   controller: txtDegree,
-                            //   onFieldSubmitted: (_) {
-                            //     // FocusScope.of(context)
-                            //     //     .requestFocus(
-                            //     //         entityFocus);
-                            //   },
-                            //   validator: (value) {
-                            //     if (value.isEmpty) {
-                            //       return 'Please enter your degree/course.';
-                            //     }
-                            //     return null;
-                            //   },
-                            //   initialValue: '',
-                            // ),
-                            SizedBox(
-                              height: 4,
-                            ),
-                            CustomDropDown(
-                              status: editStatus,
-                              value: _selectedRegion,
-                              items: _region,
-                              title: "Region",
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedRegion = value.toString();
-                                  _regionId =
-                                      _regionsId[_region.indexOf(value)];
-                                  changeRegion();
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please choose your region';
-                                }
-                                return null;
-                              },
-                            ),
-                            SizedBox(
-                              height: 4,
-                            ),
-                            CustomDropDown(
-                               status: editStatus,
-                              value: _selectedProvince,
-                              items: _province,
-                              title: "Province",
-                              onChanged: (value) {
-                                setState(() {
-                                  print(_selectedProvince);
-                                  _selectedProvince = value.toString();
-                                  changeProvince();
-                                  print(value);
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please choose your province';
-                                }
-                                return null;
-                              },
-                            ),
-                            SizedBox(
-                              height: 4,
-                            ),
-                            CustomDropDown(
-                               status: editStatus,
-                              value: _selectedMunicipality,
-                              items: _municipality,
-                              title: "Municipality",
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedMunicipality = value.toString();
-                                  getBarangay();
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please choose your city';
-                                }
-                                return null;
-                              },
-                            ),
-                            SizedBox(
-                              height: 4,
-                            ),
-                            CustomDropDown(
-                               status: editStatus,
-                              value: _selectedBarangay,
-                              items: _barangay,
-                              title: "Barangay",
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedBarangay = value.toString();
-                                  //_brgyId = (_barangay.indexOf(value) + 1).toString();
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please choose your barangay';
-                                }
-                                return null;
-                              },
-                            ),
-
-                            Container(
-                              // height:  150,
-                              //width: double.infinity,
-                              width: useMobileLayout ? 600 : 700,
-
-                              //height: useMobileLayout ? 90 : 150,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 30, horizontal: 15),
-                              child: Container(
-                                child: SizedBox(
-                                  width: useMobileLayout ? 130 : 180,
-                                  height: 50,
-                                  child: ElevatedButton(
-                                    child: Text(
-                                      //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
-                                      "VOUCHER CODE",
-                                      style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: useMobileLayout ? 14 : 25,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(50.0),
-                                      ),
-                                      primary: Color.fromARGB(
-                                          255, 55, 57, 175), // background
-                                      onPrimary: Colors.white, // foreground
-                                    ),
-                                    onPressed: () {
-                                      enterVoucherCode();
-                                    },
-                                    // color: Colors.white,
-                                    // textColor: Colors.black,
-                                    // splashColor: Colors.yellowAccent[800],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
-                    )
-                  ],
-                ),
-              ),
-        bottomNavigationBar: Container(
-          padding: EdgeInsets.symmetric(horizontal: 5),
-          height: 50,
-          width: double.infinity,
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: ElevatedButton(
-                  child: Text(
-                    "CHANGE PASSWORD",
-                    style: GoogleFonts.poppins(
-                      textStyle: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Color.fromARGB(255, 55, 57, 175),
+            leading: Builder(builder: (BuildContext context) {
+              return IconButton(
+                  icon: Icon(Icons.keyboard_arrow_left, color: Colors.white),
                   onPressed: () {
-                    //_formKey1.currentState!.validate();
-                    Alert(
-                        context: context,
-                        title: "",
-                        content: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 15),
+                    Navigator.pushReplacementNamed(context, Dashboard.routeName);
+                  } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
+            }),
+            automaticallyImplyLeading: false,
+            title: Text('My Profile',
+                style: GoogleFonts.poppins(
+                  fontSize: useMobileLayout ? 16 : 18,
+                  color: Colors.white
+                )),
+          ),
+          body: isLoading
+              ? Container(child: Text("Loading..."))
+              : Form(
+                  key: _formKey1,
+                  child: Column(
+                    children: <Widget>[
+                      Expanded(
+                        child: SingleChildScrollView(
+                            child: Container(
+                          color: Colors.white,
+                          padding:
+                              EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                           child: Column(
                             children: <Widget>[
-                              // Text(
-                              //   'The OTP password was sent to the following recipient:',
-                              //   textAlign: TextAlign.center,
-                              //   style: GoogleFonts.poppins(
-                              //     color: Colors.black,
-                              //     fontSize: 16,
-                              //     fontWeight: FontWeight.w500,
-                              //   ),
+                              // CustomFormField(
+                              //   // initialValue: user['farmer']['rsbsa_no'],
+                              //   status: editStatus,
+                              //   label: 'RSBSA Number',
+                              //   controller: txtRSBSANumber,
+                              //   onFieldSubmitted: (_) {
+                              //     FocusScope.of(context).requestFocus(fNameFocus);
+                              //   },
+                              //   validator: (value) {
+                              //     if (value.isEmpty) {
+                              //       return 'Please enter your first name';
+                              //     }
+                              //     return null;
+                              //   },
+                              //   initialValue: '',
                               // ),
-                              // SizedBox(
-                              //   height: 10,
+                              CustomFormField(
+                                status: editStatus,
+                                label: 'First Name',
+                                controller: txtFirstName,
+                                onFieldSubmitted: (_) {
+                                  FocusScope.of(context).requestFocus(mNameFocus);
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter your first name';
+                                  }
+                                  return null;
+                                },
+                                initialValue: '',
+                              ),
+                              SizedBox(height: 4),
+                              CustomFormField(
+                                status: editStatus,
+                                label: 'Middlename (optional)',
+                                controller: txtMiddleName,
+                                validator: (value) {
+                                  return null;
+                                },
+                                initialValue: '',
+                                onFieldSubmitted: (_) {
+                                  FocusScope.of(context).requestFocus(lNameFocus);
+                                },
+                              ),
+                              SizedBox(height: 4),
+                              CustomFormField(
+                                status: editStatus,
+                                label: 'Lastname',
+                                controller: txtLastName,
+                                onFieldSubmitted: (_) {
+                                  FocusScope.of(context)
+                                      .requestFocus(addressFocus);
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter your lasst name';
+                                  }
+                                  return null;
+                                },
+                                initialValue: '',
+                              ),
+                              SizedBox(height: 4),
+                              CustomFormField(
+                                status: editStatus,
+                                label: 'Email Address',
+                                controller: txtEmailAddress,
+                                onFieldSubmitted: (_) {
+                                  FocusScope.of(context).requestFocus(phoneFocus);
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter your TIN No.';
+                                  }
+                                  return null;
+                                },
+                                initialValue: '',
+                              ),
+                              SizedBox(height: 4),
+                              CustomFormField(
+                                status: editStatus,
+                                label: 'Mobile Number',
+                                controller: txtPhoneNumber,
+                                onFieldSubmitted: (_) {
+                                  FocusScope.of(context)
+                                      .requestFocus(educationalFocus);
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter your mobile number';
+                                  }
+                                  return null;
+                                },
+                                initialValue: '',
+                              ),
+                              SizedBox(height: 4),
+                              CustomFormField(
+                                status: editStatus,
+                                label: 'Address',
+                                controller: txtCompleteAddress,
+                                onFieldSubmitted: (_) {
+                                  FocusScope.of(context).requestFocus(phoneFocus);
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter your complete address';
+                                  }
+                                  return null;
+                                },
+                                initialValue: '',
+                              ),
+                              SizedBox(height: 4),
+                              // CustomFormField(
+                              //   status: editStatus,
+                              //   label: 'City',
+                              //   controller: txtEducational,
+                              //   onFieldSubmitted: (_) {
+                              //     FocusScope.of(context)
+                              //         .requestFocus(degreeFocus);
+                              //   },
+                              //   validator: (value) {
+                              //     if (value.isEmpty) {
+                              //       return 'Please enter your education attainment.';
+                              //     }
+                              //     return null;
+                              //   },
+                              //   initialValue: '',
                               // ),
-                              Container(
-                                margin: EdgeInsets.only(bottom: 5),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: txtOldPassword,
-                                        style: GoogleFonts.poppins(
-                                          textStyle: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          floatingLabelBehavior:
-                                              FloatingLabelBehavior.auto,
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.green,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade400,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          disabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade400,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          errorBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.redAccent,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade400,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          enabled: true,
-                                          hintText: 'Enter Old Password',
-                                          hintStyle: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          errorStyle: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.redAccent[700],
-                                            ),
-                                          ),
-                                          fillColor: Colors.grey[200],
-                                          filled: true,
-                                        ),
-                                        validator: (value) {
-                                          if (value == null) {
-                                            return 'Please enter old password';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              // SizedBox(height: 4),
+                              // CustomFormField(
+                              //   status: editStatus,
+                              //   label: 'Province',
+                              //   controller: txtDegree,
+                              //   onFieldSubmitted: (_) {
+                              //     // FocusScope.of(context)
+                              //     //     .requestFocus(
+                              //     //         entityFocus);
+                              //   },
+                              //   validator: (value) {
+                              //     if (value.isEmpty) {
+                              //       return 'Please enter your degree/course.';
+                              //     }
+                              //     return null;
+                              //   },
+                              //   initialValue: '',
+                              // ),
+                              SizedBox(
+                                height: 4,
                               ),
-                              Container(
-                                margin: EdgeInsets.only(bottom: 5),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: txtNewPassword,
-                                        style: GoogleFonts.poppins(
-                                          textStyle: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          floatingLabelBehavior:
-                                              FloatingLabelBehavior.auto,
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.green,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade400,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          disabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade400,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          errorBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.redAccent,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade400,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          enabled: true,
-                                          hintText: 'Enter New Password',
-                                          hintStyle: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          errorStyle: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.redAccent[700],
-                                            ),
-                                          ),
-                                          fillColor: Colors.grey[200],
-                                          filled: true,
-                                        ),
-                                        validator: (value) {
-                                          if (value == null) {
-                                            return 'Please enter the password';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              CustomDropDown(
+                                status: editStatus,
+                                value: _selectedRegion,
+                                items: _region,
+                                title: "Region",
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedRegion = value.toString();
+                                    _regionId =
+                                        _regionsId[_region.indexOf(value)];
+                                    changeRegion();
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Please choose your region';
+                                  }
+                                  return null;
+                                },
                               ),
+                              SizedBox(
+                                height: 4,
+                              ),
+                              CustomDropDown(
+                                 status: editStatus,
+                                value: _selectedProvince,
+                                items: _province,
+                                title: "Province",
+                                onChanged: (value) {
+                                  setState(() {
+                                    print(_selectedProvince);
+                                    _selectedProvince = value.toString();
+                                    changeProvince();
+                                    print(value);
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Please choose your province';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(
+                                height: 4,
+                              ),
+                              CustomDropDown(
+                                 status: editStatus,
+                                value: _selectedMunicipality,
+                                items: _municipality,
+                                title: "Municipality",
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedMunicipality = value.toString();
+                                    getBarangay();
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Please choose your city';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(
+                                height: 4,
+                              ),
+                              CustomDropDown(
+                                 status: editStatus,
+                                value: _selectedBarangay,
+                                items: _barangay,
+                                title: "Barangay",
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedBarangay = value.toString();
+                                    //_brgyId = (_barangay.indexOf(value) + 1).toString();
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Please choose your barangay';
+                                  }
+                                  return null;
+                                },
+                              ),
+      
                               Container(
-                                margin: EdgeInsets.only(bottom: 5),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: txtConfirmPassword,
+                                // height:  150,
+                                //width: double.infinity,
+                                width: useMobileLayout ? 600 : 700,
+      
+                                //height: useMobileLayout ? 90 : 150,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.white,
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 30, horizontal: 15),
+                                child: Container(
+                                  child: SizedBox(
+                                    width: useMobileLayout ? 130 : 180,
+                                    height: 50,
+                                    child: ElevatedButton(
+                                      child: Text(
+                                        //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
+                                        "VOUCHER CODE",
                                         style: GoogleFonts.poppins(
                                           textStyle: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black,
+                                            color: Colors.white,
+                                            fontSize: useMobileLayout ? 14 : 25,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          floatingLabelBehavior:
-                                              FloatingLabelBehavior.auto,
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.green,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade400,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          disabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade400,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          errorBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.redAccent,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade400,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          enabled: true,
-                                          hintText: 'Enter Confirm Password',
-                                          hintStyle: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          errorStyle: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.redAccent[700],
-                                            ),
-                                          ),
-                                          fillColor: Colors.grey[200],
-                                          filled: true,
-                                        ),
-                                        validator: (value) {
-                                          if (value == null) {
-                                            return 'Please enter confirm password';
-                                          }
-                                          return null;
-                                        },
                                       ),
+                                      style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(50.0),
+                                        ),
+                                        primary: Color.fromARGB(
+                                            255, 55, 57, 175), // background
+                                        onPrimary: Colors.white, // foreground
+                                      ),
+                                      onPressed: () {
+                                        enterVoucherCode();
+                                      },
+                                      // color: Colors.white,
+                                      // textColor: Colors.black,
+                                      // splashColor: Colors.yellowAccent[800],
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                        buttons: [
-                          DialogButton(
-                            color: Color.fromARGB(255, 55, 57, 175),
-                            onPressed: () async {
-                              // Navigator.of(context)
-                              //     .pushReplacementNamed(Dashboard.routeName);
-
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(
-                              "Change Password",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16),
-                            ),
-                          )
-                        ]).show();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Color.fromARGB(255, 55, 57, 175), // background
-                    onPrimary: Colors.white, // foreground
-                    //                color: Colors.yellow,
-                    // textColor: Colors.black,
-                    // splashColor: Colors.yellowAccent[800],
+                        )),
+                      )
+                    ],
                   ),
-                  // color: Colors.green,
-                  // textColor: Colors.black,
-                  // splashColor: Colors.yellowAccent[800],
                 ),
-              ),
-              SizedBox(
-                width: 5,
-              ),
-              editStatus == false
-                  ? Expanded(
-                      child: ElevatedButton(
-                        child: Text(
-                          "EDIT PROFILE",
-                          style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            editStatus = true;
-                          });
-                          // _formKey1.currentState.validate();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary:
-                              Color.fromARGB(255, 55, 57, 175), // background
-                          onPrimary: Colors.white, // foreground
-                          //                color: Colors.yellow,
-                          // textColor: Colors.black,
-                          // splashColor: Colors.yellowAccent[800],
-                        ),
-                        // color: Colors.green,
-                        // textColor: Colors.black,
-                        // splashColor: Colors.yellowAccent[800],
-                      ),
-                    )
-                  : Expanded(
-                      child: ElevatedButton(
-                        child: Text(
-                          "UPDATE",
-                          style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                              color: Colors.yellowAccent,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        onPressed: () {
-                          // _formKey1.currentState.validate();
-                          proceed();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary:
-                              Color.fromARGB(255, 55, 57, 175), // background
-                          onPrimary: Colors.white, // foreground
-                          //                color: Colors.yellow,
-                          // textColor: Colors.black,
-                          // splashColor: Colors.yellowAccent[800],
+          bottomNavigationBar: Container(
+            padding: EdgeInsets.symmetric(horizontal: 5),
+            height: 50,
+            width: double.infinity,
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: ElevatedButton(
+                    child: Text(
+                      "CHANGE PASSWORD",
+                      style: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-            ],
+                    onPressed: () {
+                      //_formKey1.currentState!.validate();
+                      Alert(
+                          context: context,
+                          title: "",
+                          content: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 15),
+                            child: Column(
+                              children: <Widget>[
+                                // Text(
+                                //   'The OTP password was sent to the following recipient:',
+                                //   textAlign: TextAlign.center,
+                                //   style: GoogleFonts.poppins(
+                                //     color: Colors.black,
+                                //     fontSize: 16,
+                                //     fontWeight: FontWeight.w500,
+                                //   ),
+                                // ),
+                                // SizedBox(
+                                //   height: 10,
+                                // ),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: txtOldPassword,
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            floatingLabelBehavior:
+                                                FloatingLabelBehavior.auto,
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.green,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            disabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            errorBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.redAccent,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            enabled: true,
+                                            hintText: 'Enter Old Password',
+                                            hintStyle: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            errorStyle: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.redAccent[700],
+                                              ),
+                                            ),
+                                            fillColor: Colors.grey[200],
+                                            filled: true,
+                                          ),
+                                          validator: (value) {
+                                            if (value == null) {
+                                              return 'Please enter old password';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: txtNewPassword,
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            floatingLabelBehavior:
+                                                FloatingLabelBehavior.auto,
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.green,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            disabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            errorBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.redAccent,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            enabled: true,
+                                            hintText: 'Enter New Password',
+                                            hintStyle: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            errorStyle: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.redAccent[700],
+                                              ),
+                                            ),
+                                            fillColor: Colors.grey[200],
+                                            filled: true,
+                                          ),
+                                          validator: (value) {
+                                            if (value == null) {
+                                              return 'Please enter the password';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: txtConfirmPassword,
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            floatingLabelBehavior:
+                                                FloatingLabelBehavior.auto,
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.green,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            disabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            errorBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.redAccent,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            enabled: true,
+                                            hintText: 'Enter Confirm Password',
+                                            hintStyle: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            errorStyle: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.redAccent[700],
+                                              ),
+                                            ),
+                                            fillColor: Colors.grey[200],
+                                            filled: true,
+                                          ),
+                                          validator: (value) {
+                                            if (value == null) {
+                                              return 'Please enter confirm password';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          buttons: [
+                            DialogButton(
+                              color: Color.fromARGB(255, 55, 57, 175),
+                              onPressed: () async {
+                                // Navigator.of(context)
+                                //     .pushReplacementNamed(Dashboard.routeName);
+      
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                "Change Password",
+                                style:
+                                    TextStyle(color: Colors.white, fontSize: 16),
+                              ),
+                            )
+                          ]).show();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Color.fromARGB(255, 55, 57, 175), // background
+                      onPrimary: Colors.white, // foreground
+                      //                color: Colors.yellow,
+                      // textColor: Colors.black,
+                      // splashColor: Colors.yellowAccent[800],
+                    ),
+                    // color: Colors.green,
+                    // textColor: Colors.black,
+                    // splashColor: Colors.yellowAccent[800],
+                  ),
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                editStatus == false
+                    ? Expanded(
+                        child: ElevatedButton(
+                          child: Text(
+                            "EDIT PROFILE",
+                            style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              editStatus = true;
+                            });
+                            // _formKey1.currentState.validate();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary:
+                                Color.fromARGB(255, 55, 57, 175), // background
+                            onPrimary: Colors.white, // foreground
+                            //                color: Colors.yellow,
+                            // textColor: Colors.black,
+                            // splashColor: Colors.yellowAccent[800],
+                          ),
+                          // color: Colors.green,
+                          // textColor: Colors.black,
+                          // splashColor: Colors.yellowAccent[800],
+                        ),
+                      )
+                    : Expanded(
+                        child: ElevatedButton(
+                          child: Text(
+                            "UPDATE",
+                            style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                color: Colors.yellowAccent,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            // _formKey1.currentState.validate();
+                            proceed();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary:
+                                Color.fromARGB(255, 55, 57, 175), // background
+                            onPrimary: Colors.white, // foreground
+                            //                color: Colors.yellow,
+                            // textColor: Colors.black,
+                            // splashColor: Colors.yellowAccent[800],
+                          ),
+                        ),
+                      ),
+              ],
+            ),
           ),
         ),
       ),

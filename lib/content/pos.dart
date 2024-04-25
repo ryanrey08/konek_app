@@ -1,5 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:konek_app/config/httpexception.dart';
+import 'package:konek_app/content/provider/content.dart';
+import 'package:konek_app/content/provider/pos.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
 import '../content/dashboard.dart';
 
@@ -16,12 +25,16 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
 
   var subscription = {};
   bool isLoading = true;
+  bool isLoadingRequest = false;
+  var requestPaymentDataUrl = '';
 
-    @override
+  @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    final  Map<String, dynamic>subsData = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+
+    final Map<String, dynamic> subsData =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     setState(() {
       subscription = subsData['subscription'];
       isLoading = false;
@@ -33,6 +46,30 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _GoPrevPage(context);
+    // });
+    getProfile();
+  }
+
+  _GoPrevPage(BuildContext context) {
+    if (requestPaymentDataUrl != '') {
+      return Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Dashboard()),
+        (Route<dynamic> route) => false,
+      );
+    }
+  }
+
+  navigateToHomePage() {
+    if (requestPaymentDataUrl != '') {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Dashboard()),
+        (Route<dynamic> route) => false,
+      );
+    }
   }
 
   @override
@@ -42,6 +79,69 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
   }
 
   String paymentMethod = "GCASH";
+  String? email;
+  String? phone;
+
+  getProfile() async {
+    SharedPreferences sharedPreferences;
+
+    sharedPreferences = await SharedPreferences.getInstance();
+
+    final extractedUserData =
+        json.decode(sharedPreferences.getString('userData')!)
+            as Map<String, dynamic>;
+    final data = extractedUserData['data']['user'] as Map<String, dynamic>;
+
+    setState(() {
+      email = data['email'] == null ? '' : data['email'];
+      phone = data['mobile_no'] == null ? '' : data['mobile_no'];
+    });
+  }
+
+  void showError(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Color(0xff404747),
+      textColor: Colors.white,
+      fontSize: 13.0,
+    );
+  }
+
+  sendPaymentRequest() async {
+    setState(() {
+      isLoadingRequest = true;
+    });
+    try {
+      var subscriptionsData =
+          await Provider.of<POSProvider>(context, listen: false)
+              .sendPaymentRequest(
+                  email, phone, subscription['price'], subscription['id']);
+
+      setState(() {
+        requestPaymentDataUrl = subscriptionsData['url'];
+      });
+      await UrlLauncher.launch(requestPaymentDataUrl);
+  
+      Future.delayed(const Duration(milliseconds: 3000), () {
+           Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Dashboard()),
+        (Route<dynamic> route) => false,
+      );
+      });
+    } on HttpException catch (error) {
+      showError(error.toString());
+    } catch (error) {
+      showError('something went wrong');
+    }
+    setState(() {
+      // subscriptions = subscriptionsData;
+      isLoadingRequest = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,256 +149,272 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
     final bool useMobileLayout = shortestSide < 600.0;
     final Orientation orientation = MediaQuery.of(context).orientation;
 
-    return SafeArea(
-        child: Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 55, 57, 175),
-        leading: Builder(builder: (BuildContext context) {
-          return IconButton(
-              icon: Icon(Icons.keyboard_arrow_left, color: Colors.white),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, Dashboard.routeName);
-              } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
-        }),
-        automaticallyImplyLeading: false,
-        title: Text('POS',
-            style: GoogleFonts.poppins(
-              fontSize: useMobileLayout ? 16 : 18,
-              color: Colors.white
-            )),
-      ),
-      body: Container(
-        width: double.infinity,
-        child: Column(
-          children: <Widget>[
-            Card(
-              elevation: 4,
-              color: Colors.white.withOpacity(0.8),
-              margin: EdgeInsets.all(8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Container(
-                // height:  150,
-                width: double.infinity,
-
-                height: useMobileLayout ? 110 : 170,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Color.fromARGB(255, 55, 57, 175)),
-                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          SizedBox(height: 10),
-                          Text(
-                            '',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
-                              textStyle: TextStyle(
-                                fontSize: useMobileLayout ? 14 : 25,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          isLoading ? Text('') :  Text(
-                            subscription['duration'].toString() + " " + subscription['duration_unit'].toString(),
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
-                              textStyle: TextStyle(
-                                fontSize: useMobileLayout ? 18 : 40,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            '',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
-                              textStyle: TextStyle(
-                                fontSize: useMobileLayout ? 18 : 40,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      child: Column(children: [
-                        // Icon(
-                        //   Icons.wifi,
-                        //   size: 60,
-                        //   color: Colors.greenAccent,
-                        // ),
-                        Expanded(
-                          child: Container(
-                            child: Row(children: [
-                              SizedBox(height: 10),
-                              Text(
-                                '',
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.poppins(
-                                  textStyle: TextStyle(
-                                    fontSize: useMobileLayout ? 14 : 25,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              isLoading ? Text('') : Text(
-                                subscription['name'].toString() + " for P " + subscription['price'].toString(),
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.poppins(
-                                  textStyle: TextStyle(
-                                    fontSize: useMobileLayout ? 12 : 35,
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                '',
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.poppins(
-                                  textStyle: TextStyle(
-                                    fontSize: useMobileLayout ? 18 : 40,
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ]),
-                          ),
-                        )
-                      ]),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              elevation: 4,
-              color: Colors.white.withOpacity(0.8),
-              margin: EdgeInsets.all(8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Container(
-                // height:  150,
-                width: double.infinity,
-
-                //height: useMobileLayout ? 90 : 150,
-                decoration: BoxDecoration(
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: SafeArea(
+          child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Color.fromARGB(255, 55, 57, 175),
+          leading: Builder(builder: (BuildContext context) {
+            return IconButton(
+                icon: Icon(Icons.keyboard_arrow_left, color: Colors.white),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, Dashboard.routeName);
+                } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
+          }),
+          automaticallyImplyLeading: false,
+          title: Text('POS',
+              style: GoogleFonts.poppins(
+                  fontSize: useMobileLayout ? 16 : 18, color: Colors.white)),
+        ),
+        body: Container(
+          width: double.infinity,
+          child: Column(
+            children: <Widget>[
+              Card(
+                elevation: 4,
+                color: Colors.white.withOpacity(0.8),
+                margin: EdgeInsets.all(8),
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
                 ),
-                padding: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
                 child: Container(
-                  child: Column(
+                  // height:  150,
+                  width: double.infinity,
+
+                  height: useMobileLayout ? 110 : 170,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Color.fromARGB(255, 55, 57, 175)),
+                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                  child: Row(
                     children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                // SizedBox(height: 10),
-                                Radio(
-                                    value: "UNION BANK",
-                                    groupValue: paymentMethod,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        paymentMethod = value.toString();
-                                        print(paymentMethod);
-                                      });
-                                    }),
-                                SizedBox(
-                                  // width: useMobileLayout ? 130 : 180,
-                                  // height: 50,
-                                  child: Container(
-                                      width: 100,
-                                      height: 100,
-                                      child: const Image(
-                                        // image: NetworkImage(
-                                        //     'assets/images/novulutions.png'),
-                                        image: AssetImage(
-                                            'assets/images/unionbank.png'),
-                                      )),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            SizedBox(height: 10),
+                            Text(
+                              '',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                textStyle: TextStyle(
+                                  fontSize: useMobileLayout ? 14 : 25,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.white,
                                 ),
-                                Radio(
-                                    value: "GCASH",
-                                    groupValue: paymentMethod,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        paymentMethod = value.toString();
-                                        print(paymentMethod);
-                                      });
-                                    }),
-                                SizedBox(
-                                  child: Container(
-                                      width: 100,
-                                      height: 100,
-                                      child: const Image(
-                                        // image: NetworkImag
-                                        // e(
-                                        //     'assets/images/novulutions.png'),
-                                        image: AssetImage(
-                                            'assets/images/gcash.png'),
-                                      )),
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
+                            isLoading
+                                ? Text('')
+                                : Text(
+                                    subscription['duration'].toString() +
+                                        " " +
+                                        subscription['duration_unit']
+                                            .toString(),
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.poppins(
+                                      textStyle: TextStyle(
+                                        fontSize: useMobileLayout ? 18 : 40,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                            Text(
+                              '',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                textStyle: TextStyle(
+                                  fontSize: useMobileLayout ? 18 : 40,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        child: Column(children: [
+                          // Icon(
+                          //   Icons.wifi,
+                          //   size: 60,
+                          //   color: Colors.greenAccent,
+                          // ),
+                          Expanded(
+                            child: Container(
+                              child: Row(children: [
+                                SizedBox(height: 10),
+                                Text(
+                                  '',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      fontSize: useMobileLayout ? 14 : 25,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                isLoading
+                                    ? Text('')
+                                    : Text(
+                                        subscription['name'].toString() +
+                                            " for P " +
+                                            subscription['price'].toString(),
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                            fontSize: useMobileLayout ? 12 : 35,
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                Text(
+                                  '',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      fontSize: useMobileLayout ? 18 : 40,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ]),
+                            ),
+                          )
+                        ]),
+                      )
                     ],
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 5),
-        margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
-        height: 50,
-        width: double.infinity,
-        child: ElevatedButton(
-          child: Text(
-            "CHECKOUT",
-            style: GoogleFonts.poppins(
-              textStyle: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
+              Card(
+                elevation: 4,
+                color: Colors.white.withOpacity(0.8),
+                margin: EdgeInsets.all(8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Container(
+                  // height:  150,
+                  width: double.infinity,
+
+                  //height: useMobileLayout ? 90 : 150,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white,
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                  child: Container(
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Row(
+                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  // SizedBox(height: 10),
+                                  // Radio(
+                                  //     value: "UNION BANK",
+                                  //     groupValue: paymentMethod,
+                                  //     onChanged: (value) {
+                                  //       setState(() {
+                                  //         paymentMethod = value.toString();
+                                  //         print(paymentMethod);
+                                  //       });
+                                  //     }),
+                                  // SizedBox(
+                                  //   // width: useMobileLayout ? 130 : 180,
+                                  //   // height: 50,
+                                  //   child: Container(
+                                  //       width: 100,
+                                  //       height: 100,
+                                  //       child: const Image(
+                                  //         // image: NetworkImage(
+                                  //         //     'assets/images/novulutions.png'),
+                                  //         image: AssetImage(
+                                  //             'assets/images/unionbank.png'),
+                                  //       )),
+                                  // ),
+                                  Radio(
+                                      value: "GCASH",
+                                      groupValue: paymentMethod,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          paymentMethod = value.toString();
+                                          print(paymentMethod);
+                                        });
+                                      }),
+                                  SizedBox(
+                                    child: Container(
+                                        width: 100,
+                                        height: 100,
+                                        child: const Image(
+                                          // image: NetworkImag
+                                          // e(
+                                          //     'assets/images/novulutions.png'),
+                                          image: AssetImage(
+                                              'assets/images/gcash.png'),
+                                        )),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            primary: Color.fromARGB(255, 55, 57, 175), // background
-            onPrimary: Colors.white, // foreground
-            //                color: Colors.yellow,
-            // textColor: Colors.black,
-            // splashColor: Colors.yellowAccent[800],
-          ),
-          // color: Colors.green,
-          // textColor: Colors.black,
-          // splashColor: Colors.yellowAccent[800],
         ),
-      ),
-    ));
+        bottomNavigationBar: Container(
+          padding: EdgeInsets.symmetric(horizontal: 5),
+          margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
+          height: 50,
+          width: double.infinity,
+          child: isLoadingRequest
+              ? Center(child: CircularProgressIndicator())
+              : ElevatedButton(
+                  child: Text(
+                    "CHECKOUT",
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  onPressed: isLoadingRequest
+                      ? null
+                      : () {
+                          sendPaymentRequest();
+                        },
+                  style: ElevatedButton.styleFrom(
+                    primary: Color.fromARGB(255, 55, 57, 175), // background
+                    onPrimary: Colors.white, // foreground
+                    //                color: Colors.yellow,
+                    // textColor: Colors.black,
+                    // splashColor: Colors.yellowAccent[800],
+                  ),
+                  // color: Colors.green,
+                  // textColor: Colors.black,
+                  // splashColor: Colors.yellowAccent[800],
+                ),
+        ),
+      )),
+    );
   }
 }
