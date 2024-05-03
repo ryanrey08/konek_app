@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 //import 'package:konek_app/auth/providers/auth.dart';
 import 'package:konek_app/auth/screens/register.dart';
-import 'package:konek_app/config/httpexception.dart';
+// import 'package:konek_app/config/httpexception.dart';
 import 'package:konek_app/content/dashboard.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tap_debouncer/tap_debouncer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import '/config/HttpException.dart';
 import '../providers/auth.dart';
 
 class Login extends StatefulWidget {
@@ -57,7 +58,7 @@ class _LoginState extends State<Login> {
               // image: DecorationImage(
               //   image: AssetImage('images/connections-clipart-md.png'),
               //   fit: BoxFit.cover,
-      
+
               //   // colorFilter: ColorFilter.mode(
               //   //   Colors.black.withOpacity(0.2),
               //   //   BlendMode.dstATop,
@@ -114,7 +115,8 @@ class _LoginState extends State<Login> {
                                 key: _formKey,
                                 child: Center(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
                                       // SizedBox(height: 20),
@@ -127,7 +129,8 @@ class _LoginState extends State<Login> {
                                             textStyle: TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.w500,
-                                              fontSize: useMobileLayout ? 18 : 30,
+                                              fontSize:
+                                                  useMobileLayout ? 18 : 30,
                                             ),
                                           ),
                                         ),
@@ -203,8 +206,9 @@ class _LoginState extends State<Login> {
                                                 'Don\'t have any account?',
                                                 style: GoogleFonts.poppins(
                                                   textStyle: TextStyle(
-                                                    fontSize:
-                                                        useMobileLayout ? 13 : 18,
+                                                    fontSize: useMobileLayout
+                                                        ? 13
+                                                        : 18,
                                                     color: Colors.black,
                                                   ),
                                                 ),
@@ -215,8 +219,8 @@ class _LoginState extends State<Login> {
                                                 onPressed: () {
                                                   Navigator.of(context)
                                                       .pushReplacementNamed(
-                                                          AccountRegister
-                                                              .routeName);
+                                                    AccountRegister.routeName,
+                                                  );
                                                 },
                                                 child: Text(
                                                   'Register Here',
@@ -225,7 +229,8 @@ class _LoginState extends State<Login> {
                                                       fontSize: useMobileLayout
                                                           ? 13
                                                           : 18,
-                                                      fontWeight: FontWeight.w600,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                       color: Colors.amberAccent,
                                                     ),
                                                   ),
@@ -238,7 +243,7 @@ class _LoginState extends State<Login> {
                                       // Container(
                                       //   alignment: Alignment.bottomRight,
                                       //   child: Text(
-      
+
                                       //     'v.1-staging',
                                       //     style: GoogleFonts.poppins(
                                       //       textStyle: TextStyle(
@@ -526,7 +531,7 @@ class _LoginState extends State<Login> {
                       size: 50.0,
                     ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                  backgroundColor: Colors.blue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50.0),
                   ),
@@ -573,6 +578,9 @@ class _LoginState extends State<Login> {
         Navigator.of(context).pushReplacementNamed(Dashboard.routeName);
       }
     } on HttpException catch (error) {
+      if (error.toString() == 'The provided mobile number does not exist.') {
+        Navigator.of(context).pushReplacementNamed(AccountRegister.routeName, arguments: txtUsernameController.text);
+      }
       showError(error.toString());
     } catch (error) {
       showError('something went wrong');

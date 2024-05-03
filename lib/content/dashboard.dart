@@ -130,9 +130,15 @@ class _DashboardState extends State<Dashboard> {
     final sharedPreferences = await SharedPreferences.getInstance();
     final extractedUserData =
         json.decode(sharedPreferences.getString('userData')!) as Map;
-    fullName = extractedUserData['data']['user']['first_name'] +
+    if(extractedUserData['data']['user'] != null){
+          fullName = extractedUserData['data']['user']['first_name'] +
         " " +
         extractedUserData['data']['user']['last_name'];
+    }else{
+          fullName = extractedUserData['data']['first_name'] +
+        " " +
+        extractedUserData['data']['last_name'];
+    }
   }
 
   @override
@@ -194,7 +200,7 @@ class _DashboardState extends State<Dashboard> {
                           type: BottomNavigationBarType.fixed,
                           onTap: (index) {
                             setState(() {
-                              if (newVoucherData['voucher_code'] != '') {
+                              if (newVoucherData['status'] == 'completed') {
                                 if (index == 1) {
                                   _currentIndex = _currentIndex;
                                 } else {
@@ -235,7 +241,7 @@ class _DashboardState extends State<Dashboard> {
                                   size: 30,
                                   // color: Colors.white,
                                   color: !isLoading
-                                      ? (newVoucherData['voucher_code'] != ''
+                                      ? (newVoucherData['status'] == 'completed'
                                           ? Colors.redAccent
                                           : Colors.white)
                                       : Colors.white,

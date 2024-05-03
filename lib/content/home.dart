@@ -248,6 +248,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         voucherData = vouchData;
       });
+      await UrlLauncher.launch(voucherData['url']);
       assignData(vouchData);
 
       print(vouchData);
@@ -540,56 +541,56 @@ class _HomePageState extends State<HomePage> {
                                               ],
                                             ),
                                           ),
-                                          Expanded(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                SizedBox(height: 10),
-                                                SizedBox(
-                                                  height: 40,
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    (isLoading
-                                                        ? "13.26 GB"
-                                                        : ""),
-                                                    textAlign: TextAlign.center,
-                                                    style: GoogleFonts.poppins(
-                                                      textStyle: TextStyle(
-                                                        fontSize:
-                                                            useMobileLayout
-                                                                ? 16
-                                                                : 28,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    'Data Spent',
-                                                    textAlign: TextAlign.center,
-                                                    style: GoogleFonts.poppins(
-                                                      textStyle: TextStyle(
-                                                        fontSize:
-                                                            useMobileLayout
-                                                                ? 16
-                                                                : 28,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
+                                          // Expanded(
+                                          //   child: Column(
+                                          //     mainAxisAlignment:
+                                          //         MainAxisAlignment.start,
+                                          //     crossAxisAlignment:
+                                          //         CrossAxisAlignment.start,
+                                          //     children: <Widget>[
+                                          //       SizedBox(height: 10),
+                                          //       SizedBox(
+                                          //         height: 40,
+                                          //       ),
+                                          //       Expanded(
+                                          //         child: Text(
+                                          //           (isLoading
+                                          //               ? "13.26 GB"
+                                          //               : ""),
+                                          //           textAlign: TextAlign.center,
+                                          //           style: GoogleFonts.poppins(
+                                          //             textStyle: TextStyle(
+                                          //               fontSize:
+                                          //                   useMobileLayout
+                                          //                       ? 16
+                                          //                       : 28,
+                                          //               fontWeight:
+                                          //                   FontWeight.w800,
+                                          //               color: Colors.white,
+                                          //             ),
+                                          //           ),
+                                          //         ),
+                                          //       ),
+                                          //       Expanded(
+                                          //         child: Text(
+                                          //           'Data Spent',
+                                          //           textAlign: TextAlign.center,
+                                          //           style: GoogleFonts.poppins(
+                                          //             textStyle: TextStyle(
+                                          //               fontSize:
+                                          //                   useMobileLayout
+                                          //                       ? 16
+                                          //                       : 28,
+                                          //               fontWeight:
+                                          //                   FontWeight.w800,
+                                          //               color: Colors.white,
+                                          //             ),
+                                          //           ),
+                                          //         ),
+                                          //       ),
+                                          //     ],
+                                          //   ),
+                                          // ),
                                           Container(
                                             alignment: Alignment.centerLeft,
                                             child: Column(children: [

@@ -68,10 +68,11 @@ class Auth with ChangeNotifier {
             await SharedPreferences.getInstance();
         sharedPreferences.setString('userData', json.encode(jsonResponse));
       } else {
-        print(jsonResponse['message']);
-        throw HttpException(jsonResponse['data'].toString());
+        print("exp" + jsonResponse['message']);
+        throw HttpException(jsonResponse['data']['mobile_number'][0].toString());
       }
     } catch (error) {
+      print('error');
       print(error);
       // print(responseCode);
       throw (error);
@@ -148,5 +149,6 @@ class Auth with ChangeNotifier {
     Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('userData');
+    prefs.remove('swakPaymentRefNo');
   }
 }

@@ -123,7 +123,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
       setState(() {
         requestPaymentDataUrl = subscriptionsData['url'];
       });
-      await UrlLauncher.launch(requestPaymentDataUrl);
+      await UrlLauncher.launch("http://10.44.77.253:2060/ext_login?username=3MFREE&password=3MFREE&next_url=" + requestPaymentDataUrl);
   
       Future.delayed(const Duration(milliseconds: 3000), () {
            Navigator.pushAndRemoveUntil(

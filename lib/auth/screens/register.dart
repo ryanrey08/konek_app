@@ -133,12 +133,12 @@ class _AccountRegisterState extends State<AccountRegister> {
   final _form = GlobalKey<FormState>();
   bool isNotARobot = false;
 
- String _platformVersion = 'Unknown';
+  String _platformVersion = 'Unknown';
   String _serialNumber = "--";
 
   SimInfo simInfo = SimInfo([]);
 
-    String _deviceId = 'Unknown';
+  String _deviceId = 'Unknown';
   final _mobileDeviceIdentifierPlugin = MobileDeviceIdentifier();
 
   void initState() {
@@ -158,7 +158,21 @@ class _AccountRegisterState extends State<AccountRegister> {
     initDeviceId();
   }
 
-    Future<void> initDeviceId() async {
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+
+    String? subsData = ModalRoute.of(context)?.settings.arguments as String?;
+
+    if (subsData != null) {
+      setState(() {
+        txtContactNumber.text = subsData!;
+      });
+    }
+  }
+
+  Future<void> initDeviceId() async {
     String deviceId;
     try {
       deviceId = await _mobileDeviceIdentifierPlugin.getDeviceId() ??
@@ -178,16 +192,17 @@ class _AccountRegisterState extends State<AccountRegister> {
   Future<void> initPlatformState() async {
     try {
       simInfo = await SimNumber.getSimData();
-         for (var s in simInfo.cards) {
-      print('Serial number: ${s.phoneNumber}');
-    }
+      for (var s in simInfo.cards) {
+        print('Serial number: ${s.phoneNumber}');
+      }
       setState(() {});
     } on PlatformException {
       print("simInfo  : " + "2");
     }
     if (!mounted) return;
   }
-  getMyMac()async{
+
+  getMyMac() async {
     await initPlatformState();
   }
 
@@ -340,66 +355,67 @@ class _AccountRegisterState extends State<AccountRegister> {
     // continue accessing the position of the device.
     //return await Geolocator.getCurrentPosition();
     String? errorMessage;
-     try {
-    Position position = await Geolocator.getCurrentPosition();
-    print(position.latitude.toString());
-    print(position.longitude.toString());
+    try {
+      Position position = await Geolocator.getCurrentPosition();
+      print(position.latitude.toString());
+      print(position.longitude.toString());
 
-        Map<String, dynamic> user = {
-          'first_name': txtFirstName.text,
-          'middle_name': txtMiddleName.text,
-          'last_name': txtLastName.text,
-           'email': txtEmail.text,
-          'mobile_number': txtContactNumber.text,
-          'password': txtPassword.text,
-          'confirm_password': txtConfirmPassword.text,
-          'location': json.encode({'longitude': position.longitude.toString(), 'latitude': position.latitude.toString() }),
-          'mac_address': _deviceId
-        };
+      Map<String, dynamic> user = {
+        'first_name': txtFirstName.text,
+        'middle_name': txtMiddleName.text,
+        'last_name': txtLastName.text,
+        'email': txtEmail.text,
+        'mobile_number': txtContactNumber.text,
+        'password': txtPassword.text,
+        'confirm_password': txtConfirmPassword.text,
+        'location': json.encode({
+          'longitude': position.longitude.toString(),
+          'latitude': position.latitude.toString()
+        }),
+        'mac_address': _deviceId
+      };
 
-        await Provider.of<Auth>(context, listen: false).register(user);
-        final sharedPreferences = await SharedPreferences.getInstance();
+      await Provider.of<Auth>(context, listen: false).register(user);
+      final sharedPreferences = await SharedPreferences.getInstance();
 
-        if (sharedPreferences.containsKey('userData')) {
-          Navigator.of(context).pushReplacementNamed(Dashboard.routeName);
-          // Navigator.of(context).pushReplacementNamed(MainDashboard.routeName);
-          // Navigator.of(context).pushNamedAndRemoveUntil(Dashboard.routeName, (Route<dynamic> route) => false);
-        }
-      } on HttpException catch (error) {
-        errorMessage = 'Authentication failed';
-        if (error.toString().contains('something went wrong')) {
-          errorMessage = 'something went wrong';
-        }else{
-          errorMessage = error.toString();
-        }
-        setState(() {
-          _isLoading = false;
-        });
-        _showError(errorMessage);
-      } catch (error) {
-        print(error);
-        errorMessage = config.throwErrorAuth(error.toString());
-               setState(() {
-          _isLoading = false;
-        });
-        _showError(errorMessage);
+      if (sharedPreferences.containsKey('userData')) {
+        Navigator.of(context).pushReplacementNamed(Dashboard.routeName);
+        // Navigator.of(context).pushReplacementNamed(MainDashboard.routeName);
+        // Navigator.of(context).pushNamedAndRemoveUntil(Dashboard.routeName, (Route<dynamic> route) => false);
       }
+    } on HttpException catch (error) {
+      errorMessage = 'Authentication failed';
+      if (error.toString().contains('something went wrong')) {
+        errorMessage = 'something went wrong';
+      } else {
+        errorMessage = error.toString();
+      }
+      setState(() {
+        _isLoading = false;
+      });
+      _showError(errorMessage);
+    } catch (error) {
+      print(error);
+      errorMessage = config.throwErrorAuth(error.toString());
+      setState(() {
+        _isLoading = false;
+      });
+      _showError(errorMessage);
+    }
   }
 
   // getMyMac(){
   //   _getMacAddress();
   // }
-  
 
   // Future<void>  _getMacAddress() async {
   //   String mac = await GetMac.macAddress;
   //   print("here" + mac);
-    
-  //      setState(() { 
-  //     _deviceMAC = mac; 
-  //   }); 
-  // }
 
+  //      setState(() {
+  //     _deviceMAC = mac;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -489,7 +505,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                               alignment: Alignment.topRight,
                               // width: 250,
                               // height: 250,
-      
+
                               decoration: BoxDecoration(
                                 image: const DecorationImage(
                                   image:
@@ -526,11 +542,15 @@ class _AccountRegisterState extends State<AccountRegister> {
                                 if (value!.isEmpty) {
                                   return 'Please enter your First Name';
                                 }
-      
-                                if (!RegExp(r"^[\p{L} ,.'-]*$",caseSensitive: false, unicode: true, dotAll: true).hasMatch(value)) {
+
+                                if (!RegExp(r"^[\p{L} ,.'-]*$",
+                                        caseSensitive: false,
+                                        unicode: true,
+                                        dotAll: true)
+                                    .hasMatch(value)) {
                                   return 'Invalid Input';
                                 }
-      
+
                                 return null;
                               },
                             ),
@@ -543,14 +563,18 @@ class _AccountRegisterState extends State<AccountRegister> {
                               if (value!.isEmpty) {
                                 return 'Please enter your Middle Name';
                               }
-      
-                              if (!RegExp(r"^[\p{L} ,.'-]*$",caseSensitive: false, unicode: true, dotAll: true).hasMatch(value)) {
+
+                              if (!RegExp(r"^[\p{L} ,.'-]*$",
+                                      caseSensitive: false,
+                                      unicode: true,
+                                      dotAll: true)
+                                  .hasMatch(value)) {
                                 return 'Invalid Input';
                               }
                               return null;
                             }),
-      //                           customTextField('Middle Name', txtMiddleName,
-      //                               useMobileLayout, 'Please enter your Middle Name'),
+                            //                           customTextField('Middle Name', txtMiddleName,
+                            //                               useMobileLayout, 'Please enter your Middle Name'),
                             customTextField(
                                 TextInputType.text,
                                 'Last Name',
@@ -560,8 +584,12 @@ class _AccountRegisterState extends State<AccountRegister> {
                               if (value!.isEmpty) {
                                 return 'Please enter your Last Name';
                               }
-      
-                              if (!RegExp(r"^[\p{L} ,.'-]*$",caseSensitive: false, unicode: true, dotAll: true).hasMatch(value)) {
+
+                              if (!RegExp(r"^[\p{L} ,.'-]*$",
+                                      caseSensitive: false,
+                                      unicode: true,
+                                      dotAll: true)
+                                  .hasMatch(value)) {
                                 return 'Invalid Input';
                               }
                               return null;
@@ -578,7 +606,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                               if (value!.isEmpty) {
                                 return 'Please enter your Email Address';
                               }
-      
+
                               if (!RegExp(
                                       r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$')
                                   .hasMatch(value)) {
@@ -595,14 +623,15 @@ class _AccountRegisterState extends State<AccountRegister> {
                               if (value!.isEmpty) {
                                 return 'Please enter your Contact Number';
                               }
-      
-                              if (txtContactNumber.text.toString().length != 11) {
+
+                              if (txtContactNumber.text.toString().length !=
+                                  11) {
                                 return 'Invalid Number';
                               }
                               return null;
                             }),
-                            mypassword(
-                                '', Icons.password, txtPassword, useMobileLayout),
+                            mypassword('', Icons.password, txtPassword,
+                                useMobileLayout),
                             confirmpassword("", Icons.password,
                                 txtConfirmPassword, useMobileLayout),
                             Container(
@@ -621,7 +650,8 @@ class _AccountRegisterState extends State<AccountRegister> {
                                 Expanded(
                                     child: Text(
                                   "I agree the Terms and Conditions and Privacy Policy",
-                                  style: GoogleFonts.poppins(color: Colors.white),
+                                  style:
+                                      GoogleFonts.poppins(color: Colors.white),
                                 ))
                               ],
                             )),
@@ -638,7 +668,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                                       )
                                     : Container())
                                 : Container(),
-      
+
                             Card(
                               elevation: 5,
                               child: Container(
@@ -684,10 +714,10 @@ class _AccountRegisterState extends State<AccountRegister> {
                             SizedBox(
                               height: 10,
                             ),
-      //                           mypassword(
-      //                               "", Icons.lock, txtPassword, useMobileLayout),
-      //                           confirmpassword("", Icons.lock, txtConfirmPassword,
-      //                               useMobileLayout),
+                            //                           mypassword(
+                            //                               "", Icons.lock, txtPassword, useMobileLayout),
+                            //                           confirmpassword("", Icons.lock, txtConfirmPassword,
+                            //                               useMobileLayout),
                             // Proceed(proceed),
                             signUpButton(useMobileLayout),
                             SizedBox(
@@ -704,8 +734,9 @@ class _AccountRegisterState extends State<AccountRegister> {
                                       'Already have an account?',
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
-                                          fontSize:
-                                              useMobileLayout ? 16 : 18, // tablet
+                                          fontSize: useMobileLayout
+                                              ? 16
+                                              : 18, // tablet
                                           color: Colors.black,
                                         ),
                                       ),
@@ -714,12 +745,14 @@ class _AccountRegisterState extends State<AccountRegister> {
                                   Expanded(
                                     child: TextButton(
                                       onPressed: () => Navigator.of(context)
-                                          .pushReplacementNamed(Login.routeName),
+                                          .pushReplacementNamed(
+                                              Login.routeName),
                                       child: Text(
                                         'Login',
                                         style: GoogleFonts.poppins(
                                           textStyle: TextStyle(
-                                              fontSize: useMobileLayout ? 16 : 18,
+                                              fontSize:
+                                                  useMobileLayout ? 16 : 18,
                                               fontWeight: FontWeight.w600,
                                               color: Colors.amberAccent),
                                         ),
@@ -1156,7 +1189,6 @@ class _AccountRegisterState extends State<AccountRegister> {
                 _isLoading = true;
               });
 
-
               _determinePosition();
               // _getMacAddress();
 
@@ -1345,16 +1377,18 @@ class _AccountRegisterState extends State<AccountRegister> {
           }, // your tap handler moved here
           builder: (context, onTap) {
             return ElevatedButton(
-              child: _isLoading ? CircularProgressIndicator() : Text(
-                "SIGN UP",
-                style: GoogleFonts.poppins(
-                  textStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: useMobileLayout ? 16 : 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+              child: _isLoading
+                  ? CircularProgressIndicator()
+                  : Text(
+                      "SIGN UP",
+                      style: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                          color: Colors.black,
+                          fontSize: useMobileLayout ? 16 : 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
               style: ElevatedButton.styleFrom(
                 primary: Color.fromARGB(255, 255, 255, 0), // background
                 onPrimary: Colors.white, // foreground

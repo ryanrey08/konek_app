@@ -156,9 +156,15 @@ class POSProvider with ChangeNotifier {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var userInfo = json.decode(sharedPreferences.getString('userData')!)
         as Map<String, dynamic>;
-    var paymentData =
-        json.decode(sharedPreferences.getString('swakPaymentRefNo')!)
-            as Map<String, dynamic>;
+    var paymentData;
+    if (sharedPreferences.containsKey("swakPaymentRefNo")) {
+      paymentData =
+          json.decode(sharedPreferences.getString('swakPaymentRefNo')!)
+              as Map<String, dynamic>;
+    } else {
+      paymentData = {'reference_number': '00000'};
+    }
+    print(paymentData['reference_number']);
     var token = userInfo['data']['token'];
     var responseCode;
     try {
@@ -167,18 +173,40 @@ class POSProvider with ChangeNotifier {
               "payment-logs/" +
               paymentData['reference_number']),
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
-      //print(json.decode(response.body));
+      print(response.statusCode);
+      print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
-      print(jsonResponse);
       var responseData = {
-        "voucher_code": jsonResponse["data"]['subscription']['id'],
-        "duration": jsonResponse["data"]['subscription']['duration'],
+        "voucher_code": '',
+        "duration": '',
         "description": "",
         "amount": 0,
-        "claimed_date": jsonResponse["data"]['subscription']['start-date'],
-        "expire_date": jsonResponse["data"]['subscription']['end_date'],
-        "status": jsonResponse["data"]['payment_status']
+        "claimed_date": '',
+        "expire_date": '',
+        "status": ''
       };
+      if (response.statusCode == 200) {
+        responseData = {
+          "voucher_code": jsonResponse["data"]['subscription']['id'],
+          "duration": jsonResponse["data"]['subscription']['duration'],
+          "description": "",
+          "amount": 0,
+          "claimed_date": jsonResponse["data"]['subscription']['start_date'],
+          "expire_date": jsonResponse["data"]['subscription']['end_date'],
+          "status": jsonResponse["data"]['payment_status'],
+          "url": jsonResponse['redirect_url']
+        };
+      } else {
+        responseData = {
+          "voucher_code": '',
+          "duration": '',
+          "description": "",
+          "amount": 0,
+          "claimed_date": '',
+          "expire_date": '',
+          "status": ''
+        };
+      }
       notifyListeners();
       return responseData;
     } catch (error) {
