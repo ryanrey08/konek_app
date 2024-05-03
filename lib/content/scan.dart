@@ -29,7 +29,7 @@ class _ScanQRState extends State<ScanQR> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 250, // custom wrap size
       height: 250,
       child: ScanView(
@@ -38,7 +38,7 @@ class _ScanQRState extends State<ScanQR> {
         scanAreaScale: .7,
         scanLineColor: Colors.green.shade400,
         onCapture: (data) {
-          print("here" + data.toString());
+          print("here$data");
           Navigator.pop(context, data);
         },
       ),

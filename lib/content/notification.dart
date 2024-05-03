@@ -82,7 +82,7 @@ class _NotificationListState extends State<NotificationList> {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Color(0xff404747),
+      backgroundColor: const Color(0xff404747),
       textColor: Colors.white,
       fontSize: 13.0,
     );
@@ -95,14 +95,14 @@ class _NotificationListState extends State<NotificationList> {
     final Orientation orientation = MediaQuery.of(context).orientation;
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 55, 57, 175),
+          backgroundColor: const Color.fromARGB(255, 55, 57, 175),
           leading: Builder(builder: (BuildContext context) {
             return IconButton(
-                icon: Icon(Icons.keyboard_arrow_left, color: Colors.white),
+                icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, Dashboard.routeName);
                 } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);

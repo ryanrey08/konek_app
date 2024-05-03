@@ -46,6 +46,8 @@ const String CAPTCHA_SITE_KEY = "6LcSiSQdAAAAAOyoKM6G5CeLAPE-P5ApqwNMUQaV";
 
 class AccountRegister extends StatefulWidget {
   static const routeName = '/register';
+
+  const AccountRegister({super.key});
   @override
   _AccountRegisterState createState() => _AccountRegisterState();
 }
@@ -89,24 +91,24 @@ class _AccountRegisterState extends State<AccountRegister> {
   final spiritualBdate = FocusNode();
 
   var _selectedUserType;
-  var _userType = ['FARMER', 'SUPPLIER'];
+  final _userType = ['FARMER', 'SUPPLIER'];
 
-  List<dynamic> _region = [];
-  List<dynamic> _province = [];
-  List<dynamic> _municipality = [];
-  List<dynamic> _barangay = [];
+  final List<dynamic> _region = [];
+  final List<dynamic> _province = [];
+  final List<dynamic> _municipality = [];
+  final List<dynamic> _barangay = [];
 
-  List<dynamic> _regionsId = [];
-  List<dynamic> _tempMunicipalityKeys = [];
-  List<dynamic> _tempMunicipality = [];
-  var _tempRegion = {};
+  final List<dynamic> _regionsId = [];
+  final List<dynamic> _tempMunicipalityKeys = [];
+  final List<dynamic> _tempMunicipality = [];
+  final _tempRegion = {};
 
   var _jsonResult;
   String? _selectedRegion;
   String? _selectedProvince;
   String? _selectedMunicipality;
 
-  TextEditingController _numberController = TextEditingController();
+  final TextEditingController _numberController = TextEditingController();
   double appBarHeight = AppBar().preferredSize.height;
 
   var maskTextInputFormatter = MaskTextInputFormatter(
@@ -133,14 +135,15 @@ class _AccountRegisterState extends State<AccountRegister> {
   final _form = GlobalKey<FormState>();
   bool isNotARobot = false;
 
-  String _platformVersion = 'Unknown';
-  String _serialNumber = "--";
+  final String _platformVersion = 'Unknown';
+  final String _serialNumber = "--";
 
   SimInfo simInfo = SimInfo([]);
 
   String _deviceId = 'Unknown';
   final _mobileDeviceIdentifierPlugin = MobileDeviceIdentifier();
 
+  @override
   void initState() {
     super.initState();
 
@@ -167,7 +170,7 @@ class _AccountRegisterState extends State<AccountRegister> {
 
     if (subsData != null) {
       setState(() {
-        txtContactNumber.text = subsData!;
+        txtContactNumber.text = subsData;
       });
     }
   }
@@ -197,7 +200,7 @@ class _AccountRegisterState extends State<AccountRegister> {
       }
       setState(() {});
     } on PlatformException {
-      print("simInfo  : " + "2");
+      print("simInfo  : " "2");
     }
     if (!mounted) return;
   }
@@ -221,7 +224,7 @@ class _AccountRegisterState extends State<AccountRegister> {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Color(0xff404747),
+      backgroundColor: const Color(0xff404747),
       textColor: Colors.white,
       fontSize: 13.0,
     );
@@ -274,7 +277,7 @@ class _AccountRegisterState extends State<AccountRegister> {
     // print(errorMessage);
   }
 
-  String _token = 'Click the below button to generate token';
+  final String _token = 'Click the below button to generate token';
   bool badgeVisible = true;
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> _openReCaptcha() async {
@@ -425,8 +428,8 @@ class _AccountRegisterState extends State<AccountRegister> {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
     final bool useMobileLayout = shortestSide < 600.0;
     final Orientation orientation = MediaQuery.of(context).orientation;
-    bool _hidePassword = true;
-    bool _hideConfirmPassword = true;
+    bool hidePassword = true;
+    bool hideConfirmPassword = true;
 
     final format = DateFormat("MM/dd/yyyy");
     HCaptcha.init(siteKey: '6LcSiSQdAAAAAOyoKM6G5CeLAPE-P5ApqwNMUQaV');
@@ -434,11 +437,11 @@ class _AccountRegisterState extends State<AccountRegister> {
     //getToken();
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
       child: SafeArea(
         child: Scaffold(
           backgroundColor: const Color.fromARGB(255, 55, 57, 175),
-          body: Container(
+          body: SizedBox(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             // decoration: BoxDecoration(
@@ -489,14 +492,14 @@ class _AccountRegisterState extends State<AccountRegister> {
                       //     color: Colors.white.withOpacity(0.8)),
                       padding: EdgeInsets.symmetric(
                           horizontal: useMobileLayout ? 15 : 30),
-                      margin: EdgeInsets.only(left: 10, bottom: 10, right: 10),
+                      margin: const EdgeInsets.only(left: 10, bottom: 10, right: 10),
                       child: Form(
                         key: _formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                             Container(
@@ -506,14 +509,14 @@ class _AccountRegisterState extends State<AccountRegister> {
                               // width: 250,
                               // height: 250,
 
-                              decoration: BoxDecoration(
-                                image: const DecorationImage(
+                              decoration: const BoxDecoration(
+                                image: DecorationImage(
                                   image:
                                       AssetImage('assets/images/swak-img.png'),
                                 ),
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                             Text(
@@ -526,10 +529,10 @@ class _AccountRegisterState extends State<AccountRegister> {
                                 ),
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 15,
                             ),
                             customTextField(
@@ -671,7 +674,7 @@ class _AccountRegisterState extends State<AccountRegister> {
 
                             Card(
                               elevation: 5,
-                              child: Container(
+                              child: SizedBox(
                                 height: 100,
                                 child: Row(
                                   children: <Widget>[
@@ -680,10 +683,10 @@ class _AccountRegisterState extends State<AccountRegister> {
                                         onChanged: (bool? value) {
                                           _openReCaptcha();
                                         }),
-                                    Expanded(
+                                    const Expanded(
                                       child: Text("I'm not a robot"),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 5,
                                     ),
                                     Container(
@@ -711,7 +714,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                                       )
                                     : Container())
                                 : Container(),
-                            SizedBox(
+                            const SizedBox(
                               height: 10,
                             ),
                             //                           mypassword(
@@ -720,7 +723,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                             //                               useMobileLayout),
                             // Proceed(proceed),
                             signUpButton(useMobileLayout),
-                            SizedBox(
+                            const SizedBox(
                               height: 30,
                             ),
                             Container(
@@ -762,7 +765,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                                 ],
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 30,
                             )
                           ],
@@ -780,7 +783,7 @@ class _AccountRegisterState extends State<AccountRegister> {
   }
 
   UnderlineInputBorder _textFormBorder() {
-    return UnderlineInputBorder(
+    return const UnderlineInputBorder(
       borderSide: BorderSide(
         color: Color(0xff088181),
       ),
@@ -796,7 +799,7 @@ class _AccountRegisterState extends State<AccountRegister> {
       String validator,
       String? Function(String?)? validate) {
     return Container(
-      margin: EdgeInsets.only(bottom: 15),
+      margin: const EdgeInsets.only(bottom: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -813,11 +816,11 @@ class _AccountRegisterState extends State<AccountRegister> {
                 ),
               ),
               decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(50),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: Colors.green,
                     width: 1,
                   ),
@@ -838,7 +841,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                 ),
                 errorBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(50),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: Colors.redAccent,
                     width: 1,
                   ),
@@ -869,13 +872,13 @@ class _AccountRegisterState extends State<AccountRegister> {
                 suffixIcon: hintTextP == ""
                     ? IconButton(
                         icon: _hidePassword
-                            ? Icon(
+                            ? const Icon(
                                 Icons.visibility_off,
                                 color: Colors.grey,
                                 // size: useMobileLayout ? 15 : 18,
                                 size: 20,
                               )
-                            : Icon(
+                            : const Icon(
                                 Icons.visibility,
                                 color: Colors.grey,
                                 // size: useMobileLayout ? 15 : 18,
@@ -901,7 +904,7 @@ class _AccountRegisterState extends State<AccountRegister> {
   Container mypassword(String hintTextP, IconData preIcon,
       TextEditingController control, bool useMobileLayout) {
     return Container(
-      margin: EdgeInsets.only(bottom: 15),
+      margin: const EdgeInsets.only(bottom: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -912,17 +915,17 @@ class _AccountRegisterState extends State<AccountRegister> {
               controller: control,
               obscureText: hintTextP != "" ? false : _hidePassword,
               style: GoogleFonts.poppins(
-                textStyle: TextStyle(
+                textStyle: const TextStyle(
                   fontSize: 16,
                   color: Colors.black,
                 ),
               ),
               decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(50),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: Colors.green,
                     width: 1,
                   ),
@@ -943,7 +946,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                 ),
                 errorBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(50),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: Colors.redAccent,
                     width: 1,
                   ),
@@ -958,7 +961,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                 enabled: true,
                 hintText: "Password",
                 hintStyle: GoogleFonts.poppins(
-                  textStyle: TextStyle(
+                  textStyle: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
                   ),
@@ -984,13 +987,13 @@ class _AccountRegisterState extends State<AccountRegister> {
                 suffixIcon: hintTextP == ""
                     ? IconButton(
                         icon: _hidePassword
-                            ? Icon(
+                            ? const Icon(
                                 Icons.visibility_off,
                                 color: Colors.grey,
                                 // size: useMobileLayout ? 15 : 18,
                                 size: 20,
                               )
-                            : Icon(
+                            : const Icon(
                                 Icons.visibility,
                                 color: Colors.grey,
                                 // size: useMobileLayout ? 15 : 18,
@@ -1025,7 +1028,7 @@ class _AccountRegisterState extends State<AccountRegister> {
   Container confirmpassword(String hintTextP, IconData preIcon,
       TextEditingController control, bool useMobileLayout) {
     return Container(
-      margin: EdgeInsets.only(bottom: 15),
+      margin: const EdgeInsets.only(bottom: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -1035,17 +1038,17 @@ class _AccountRegisterState extends State<AccountRegister> {
               controller: control,
               obscureText: hintTextP != "" ? false : _hideConfirmPassword,
               style: GoogleFonts.poppins(
-                textStyle: TextStyle(
+                textStyle: const TextStyle(
                   fontSize: 16,
                   color: Colors.black,
                 ),
               ),
               decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(50),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: Colors.green,
                     width: 1,
                   ),
@@ -1066,7 +1069,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                 ),
                 errorBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(50),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: Colors.redAccent,
                     width: 1,
                   ),
@@ -1081,7 +1084,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                 enabled: true,
                 hintText: "Confirm Password",
                 hintStyle: GoogleFonts.poppins(
-                  textStyle: TextStyle(
+                  textStyle: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
                   ),
@@ -1107,13 +1110,13 @@ class _AccountRegisterState extends State<AccountRegister> {
                 suffixIcon: hintTextP == ""
                     ? IconButton(
                         icon: _hideConfirmPassword
-                            ? Icon(
+                            ? const Icon(
                                 Icons.visibility_off,
                                 color: Colors.grey,
                                 // size: useMobileLayout ? 15 : 18,
                                 size: 20,
                               )
-                            : Icon(
+                            : const Icon(
                                 Icons.visibility,
                                 color: Colors.grey,
                                 // size: useMobileLayout ? 15 : 18,
@@ -1164,7 +1167,7 @@ class _AccountRegisterState extends State<AccountRegister> {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Color(0xff404747),
+      backgroundColor: const Color(0xff404747),
       textColor: Colors.white,
       fontSize: 13.0,
     );
@@ -1377,6 +1380,17 @@ class _AccountRegisterState extends State<AccountRegister> {
           }, // your tap handler moved here
           builder: (context, onTap) {
             return ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: Color.fromARGB(255, 255, 255, 0), // foreground
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50.0),
+                ),
+              ),
+
+              // shape: RoundedRectangleBorder(
+              //   borderRadius: BorderRadius.circular(50.0),
+              // ),
+              onPressed: _isLoading ? null : onTap,
               child: _isLoading
                   ? CircularProgressIndicator()
                   : Text(
@@ -1389,18 +1403,6 @@ class _AccountRegisterState extends State<AccountRegister> {
                         ),
                       ),
                     ),
-              style: ElevatedButton.styleFrom(
-                primary: Color.fromARGB(255, 255, 255, 0), // background
-                onPrimary: Colors.white, // foreground
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50.0),
-                ),
-              ),
-
-              // shape: RoundedRectangleBorder(
-              //   borderRadius: BorderRadius.circular(50.0),
-              // ),
-              onPressed: _isLoading ? null : onTap,
               // color: Colors.green,
               // textColor: Colors.black,
               // splashColor: Colors.yellowAccent[800],

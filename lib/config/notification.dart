@@ -281,7 +281,7 @@ class NotificationController {
     if(interval < 1800){
           await myNotifyScheduleInHours(
         title: 'Data Expiry',
-        msg: 'Your promo ${description} is about to expire on ${expDate}',
+        msg: 'Your promo $description is about to expire on $expDate',
         heroThumbUrl:
             'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
         hoursFromNow: 5,
@@ -292,7 +292,7 @@ class NotificationController {
 
     await myNotifyScheduleInHours(
         title: 'Data Expiry',
-        msg: 'Your promo ${description} has been expired (Date: ${expDate})',
+        msg: 'Your promo $description has been expired (Date: $expDate)',
         heroThumbUrl:
             'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
         hoursFromNow: 5,

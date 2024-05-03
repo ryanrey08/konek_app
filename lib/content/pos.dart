@@ -56,7 +56,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
     if (requestPaymentDataUrl != '') {
       return Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => Dashboard()),
+        MaterialPageRoute(builder: (context) => const Dashboard()),
         (Route<dynamic> route) => false,
       );
     }
@@ -66,7 +66,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
     if (requestPaymentDataUrl != '') {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => Dashboard()),
+        MaterialPageRoute(builder: (context) => const Dashboard()),
         (Route<dynamic> route) => false,
       );
     }
@@ -93,8 +93,8 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
     final data = extractedUserData['data']['user'] as Map<String, dynamic>;
 
     setState(() {
-      email = data['email'] == null ? '' : data['email'];
-      phone = data['mobile_no'] == null ? '' : data['mobile_no'];
+      email = data['email'] ?? '';
+      phone = data['mobile_no'] ?? '';
     });
   }
 
@@ -104,7 +104,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Color(0xff404747),
+      backgroundColor: const Color(0xff404747),
       textColor: Colors.white,
       fontSize: 13.0,
     );
@@ -123,12 +123,12 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
       setState(() {
         requestPaymentDataUrl = subscriptionsData['url'];
       });
-      await UrlLauncher.launch("http://10.44.77.253:2060/ext_login?username=3MFREE&password=3MFREE&next_url=" + requestPaymentDataUrl);
+      await UrlLauncher.launch("http://10.44.77.253:2060/ext_login?username=3MFREE&password=3MFREE&next_url=$requestPaymentDataUrl");
   
       Future.delayed(const Duration(milliseconds: 3000), () {
            Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => Dashboard()),
+        MaterialPageRoute(builder: (context) => const Dashboard()),
         (Route<dynamic> route) => false,
       );
       });
@@ -150,15 +150,15 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
     final Orientation orientation = MediaQuery.of(context).orientation;
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
       child: SafeArea(
           child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 55, 57, 175),
+          backgroundColor: const Color.fromARGB(255, 55, 57, 175),
           leading: Builder(builder: (BuildContext context) {
             return IconButton(
-                icon: Icon(Icons.keyboard_arrow_left, color: Colors.white),
+                icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, Dashboard.routeName);
                 } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
@@ -168,14 +168,14 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
               style: GoogleFonts.poppins(
                   fontSize: useMobileLayout ? 16 : 18, color: Colors.white)),
         ),
-        body: Container(
+        body: SizedBox(
           width: double.infinity,
           child: Column(
             children: <Widget>[
               Card(
                 elevation: 4,
                 color: Colors.white.withOpacity(0.8),
-                margin: EdgeInsets.all(8),
+                margin: const EdgeInsets.all(8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -186,8 +186,8 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                   height: useMobileLayout ? 110 : 170,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      color: Color.fromARGB(255, 55, 57, 175)),
-                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                      color: const Color.fromARGB(255, 55, 57, 175)),
+                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
                   child: Row(
                     children: <Widget>[
                       Expanded(
@@ -195,7 +195,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             Text(
                               '',
                               textAlign: TextAlign.center,
@@ -208,12 +208,9 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                               ),
                             ),
                             isLoading
-                                ? Text('')
+                                ? const Text('')
                                 : Text(
-                                    subscription['duration'].toString() +
-                                        " " +
-                                        subscription['duration_unit']
-                                            .toString(),
+                                    "${subscription['duration']} ${subscription['duration_unit']}",
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.poppins(
                                       textStyle: TextStyle(
@@ -248,7 +245,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                           Expanded(
                             child: Container(
                               child: Row(children: [
-                                SizedBox(height: 10),
+                                const SizedBox(height: 10),
                                 Text(
                                   '',
                                   textAlign: TextAlign.center,
@@ -261,11 +258,9 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                                   ),
                                 ),
                                 isLoading
-                                    ? Text('')
+                                    ? const Text('')
                                     : Text(
-                                        subscription['name'].toString() +
-                                            " for P " +
-                                            subscription['price'].toString(),
+                                        "${subscription['name']} for P ${subscription['price']}",
                                         textAlign: TextAlign.center,
                                         style: GoogleFonts.poppins(
                                           textStyle: TextStyle(
@@ -298,7 +293,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
               Card(
                 elevation: 4,
                 color: Colors.white.withOpacity(0.8),
-                margin: EdgeInsets.all(8),
+                margin: const EdgeInsets.all(8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -311,7 +306,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.white,
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                  padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 15),
                   child: Container(
                     child: Column(
                       children: <Widget>[
@@ -355,7 +350,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                                         });
                                       }),
                                   SizedBox(
-                                    child: Container(
+                                    child: SizedBox(
                                         width: 100,
                                         height: 100,
                                         child: const Image(
@@ -380,13 +375,24 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
           ),
         ),
         bottomNavigationBar: Container(
-          padding: EdgeInsets.symmetric(horizontal: 5),
-          margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          margin: const EdgeInsets.fromLTRB(10, 0, 10, 15),
           height: 50,
           width: double.infinity,
           child: isLoadingRequest
-              ? Center(child: CircularProgressIndicator())
+              ? const Center(child: CircularProgressIndicator())
               : ElevatedButton(
+                  onPressed: isLoadingRequest
+                      ? null
+                      : () {
+                          sendPaymentRequest();
+                        },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, backgroundColor: Color.fromARGB(255, 55, 57, 175), // foreground
+                    //                color: Colors.yellow,
+                    // textColor: Colors.black,
+                    // splashColor: Colors.yellowAccent[800],
+                  ),
                   child: Text(
                     "CHECKOUT",
                     style: GoogleFonts.poppins(
@@ -396,18 +402,6 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
-                  onPressed: isLoadingRequest
-                      ? null
-                      : () {
-                          sendPaymentRequest();
-                        },
-                  style: ElevatedButton.styleFrom(
-                    primary: Color.fromARGB(255, 55, 57, 175), // background
-                    onPrimary: Colors.white, // foreground
-                    //                color: Colors.yellow,
-                    // textColor: Colors.black,
-                    // splashColor: Colors.yellowAccent[800],
                   ),
                   // color: Colors.green,
                   // textColor: Colors.black,

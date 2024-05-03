@@ -44,19 +44,19 @@ class Voucher with ChangeNotifier {
   //   }
   // }
 
-  Future<Map<String, dynamic>> registerVoucherCode(String voucher_code) async {
+  Future<Map<String, dynamic>> registerVoucherCode(String voucherCode) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var userInfo = json.decode(sharedPreferences.getString('userData')!)
         as Map<String, dynamic>;
     var token = userInfo['data']['token'];
-    Map data = {'voucher_code': voucher_code};
+    Map data = {'voucher_code': voucherCode};
     Map<String, dynamic> jsonResponse;
     var responseCode;
     try {
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       var response = await http.post(
-          Uri.parse(config.pre_url_voucher + "/apply-voucher"),
+          Uri.parse("${config.pre_url_voucher}/apply-voucher"),
           body: data,
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       var jsonResponse = json.decode(response.body);
@@ -94,7 +94,7 @@ class Voucher with ChangeNotifier {
     } catch (error) {
       print(error);
       // print(responseCode);
-      throw (error);
+      rethrow;
     }
   }
 
@@ -106,7 +106,7 @@ class Voucher with ChangeNotifier {
     var responseCode;
     try {
       var response = await http.get(
-          Uri.parse(config.pre_url_voucher + "/get-my-vouchers"),
+          Uri.parse("${config.pre_url_voucher}/get-my-vouchers"),
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
@@ -115,7 +115,7 @@ class Voucher with ChangeNotifier {
     } catch (error) {
       print(error);
       // print(responseCode);
-      throw (error);
+      rethrow;
     }
   }
 
@@ -138,7 +138,7 @@ class Voucher with ChangeNotifier {
 
     try {
       final response = await http.post(
-        Uri.parse(config.pre_url + "/register"),
+        Uri.parse("${config.pre_url}/register"),
         body: userInfo,
       );
 
@@ -166,7 +166,7 @@ class Voucher with ChangeNotifier {
 
       print(jsonResponse['message']);
     } catch (error) {
-      throw (error);
+      rethrow;
     }
 
     notifyListeners();

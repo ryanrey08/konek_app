@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class AppRetainWidget extends StatefulWidget {
-  AppRetainWidget({key, required this.child}) : super(key: key);
+  const AppRetainWidget({key, required this.child}) : super(key: key);
 
   final Widget child;
 
@@ -13,7 +13,7 @@ class AppRetainWidget extends StatefulWidget {
 }
 
 class _AppRetainWidgetState extends State<AppRetainWidget> {
-  final _channel = MethodChannel('com.example/app_retain');
+  final _channel = const MethodChannel('com.example/app_retain');
 
 //   @override
 // void initState() {

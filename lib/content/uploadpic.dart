@@ -76,7 +76,6 @@ class _UploadPictureState extends State<UploadPicture> {
   Future<void> _onImageButtonPressed(
     ImageSource source, {
     required BuildContext context,
-    bool isMultiImage = false,
     bool isMedia = false,
   }) async {
     if (context.mounted) {
@@ -137,7 +136,7 @@ class _UploadPictureState extends State<UploadPicture> {
               'Enter Voucher Code',
               // style: Theme.of(context).textTheme.titleLarge,
               style: GoogleFonts.poppins(
-                  color: Color.fromARGB(255, 55, 57, 175),
+                  color: const Color.fromARGB(255, 55, 57, 175),
                   fontWeight: FontWeight.bold),
             ),
             const SizedBox(
@@ -153,7 +152,7 @@ class _UploadPictureState extends State<UploadPicture> {
                   autofocus: true,
                   minLines: 1,
                   decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(10),
+                    contentPadding: const EdgeInsets.all(10),
                     border: InputBorder.none,
                     labelText: 'Voucher Code',
                     //prefixIcon: Icon(Icons.code),
@@ -185,7 +184,7 @@ class _UploadPictureState extends State<UploadPicture> {
             AnimatedButton(
               isFixedHeight: false,
               text: 'OK',
-              color: Color.fromARGB(255, 55, 57, 175),
+              color: const Color.fromARGB(255, 55, 57, 175),
               pressEvent: () {
                 //dialog.dismiss();
                 final isValid = _formKey.currentState!.validate();
@@ -232,7 +231,7 @@ class _UploadPictureState extends State<UploadPicture> {
         NotificationController.scheduleNewNotification(vouchData['description'], vouchData['expire_date']);
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => Dashboard(),
+            builder: (context) => const Dashboard(),
           ),
         );
       }
@@ -266,7 +265,7 @@ class _UploadPictureState extends State<UploadPicture> {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Color(0xff404747),
+      backgroundColor: const Color(0xff404747),
       textColor: Colors.white,
       fontSize: 13.0,
     );
@@ -287,7 +286,7 @@ class _UploadPictureState extends State<UploadPicture> {
     }
     if (_mediaFileList != null) {
       return Container(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Semantics(
           label: 'image_picker_example_picked_images',
           child: ListView.builder(
@@ -325,7 +324,7 @@ class _UploadPictureState extends State<UploadPicture> {
         textAlign: TextAlign.center,
         style: GoogleFonts.poppins(
             fontSize: 20,
-            color: Color.fromARGB(255, 55, 57, 175),
+            color: const Color.fromARGB(255, 55, 57, 175),
             fontWeight: FontWeight.bold),
       );
     } else {
@@ -335,7 +334,7 @@ class _UploadPictureState extends State<UploadPicture> {
           textAlign: TextAlign.center,
           style: GoogleFonts.poppins(
               fontSize: 20,
-              color: Color.fromARGB(255, 55, 57, 175),
+              color: const Color.fromARGB(255, 55, 57, 175),
               fontWeight: FontWeight.bold),
         );
       }
@@ -344,7 +343,7 @@ class _UploadPictureState extends State<UploadPicture> {
         textAlign: TextAlign.center,
         style: GoogleFonts.poppins(
             fontSize: 20,
-            color: Color.fromARGB(255, 55, 57, 175),
+            color: const Color.fromARGB(255, 55, 57, 175),
             fontWeight: FontWeight.bold),
       );
     }
@@ -394,7 +393,7 @@ class _UploadPictureState extends State<UploadPicture> {
                         textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                             fontSize: 20,
-                            color: Color.fromARGB(255, 55, 57, 175),
+                            color: const Color.fromARGB(255, 55, 57, 175),
                             fontWeight: FontWeight.bold),
                       );
                     case ConnectionState.done:
@@ -410,7 +409,7 @@ class _UploadPictureState extends State<UploadPicture> {
                           textAlign: TextAlign.center,
                           style: GoogleFonts.poppins(
                               fontSize: 20,
-                              color: Color.fromARGB(255, 55, 57, 175),
+                              color: const Color.fromARGB(255, 55, 57, 175),
                               fontWeight: FontWeight.bold),
                         );
                       } else {
@@ -419,7 +418,7 @@ class _UploadPictureState extends State<UploadPicture> {
                           textAlign: TextAlign.center,
                           style: GoogleFonts.poppins(
                               fontSize: 20,
-                              color: Color.fromARGB(255, 55, 57, 175),
+                              color: const Color.fromARGB(255, 55, 57, 175),
                               fontWeight: FontWeight.bold),
                         );
                       }
@@ -437,7 +436,7 @@ class _UploadPictureState extends State<UploadPicture> {
               Padding(
                 padding: const EdgeInsets.only(left: 25.0),
                 child: FloatingActionButton(
-                  backgroundColor: Color.fromARGB(255, 55, 57, 175),
+                  backgroundColor: const Color.fromARGB(255, 55, 57, 175),
                   onPressed: () {
                     isVideo = false;
                     _onImageButtonPressed(ImageSource.gallery,
@@ -452,7 +451,7 @@ class _UploadPictureState extends State<UploadPicture> {
                 Padding(
                   padding: const EdgeInsets.only(left: 16.0),
                   child: FloatingActionButton(
-                    backgroundColor: Color.fromARGB(255, 55, 57, 175),
+                    backgroundColor: const Color.fromARGB(255, 55, 57, 175),
                     onPressed: () {
                       isVideo = false;
                       _onImageButtonPressed(ImageSource.camera,
@@ -466,7 +465,7 @@ class _UploadPictureState extends State<UploadPicture> {
               Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: FloatingActionButton(
-                  backgroundColor: Color.fromARGB(255, 55, 57, 175),
+                  backgroundColor: const Color.fromARGB(255, 55, 57, 175),
                   onPressed: () async {
                     final result = await Navigator.push(
                       context,
@@ -488,7 +487,7 @@ class _UploadPictureState extends State<UploadPicture> {
               Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: FloatingActionButton(
-                  backgroundColor: Color.fromARGB(255, 55, 57, 175),
+                  backgroundColor: const Color.fromARGB(255, 55, 57, 175),
                   onPressed: () async {
                     enterVoucherCode();
                   },
@@ -499,12 +498,12 @@ class _UploadPictureState extends State<UploadPicture> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Center(
             child: Container(
-              margin: EdgeInsets.only(left: 35),
+              margin: const EdgeInsets.only(left: 35),
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -523,10 +522,10 @@ class _UploadPictureState extends State<UploadPicture> {
               ),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Center(
             child: Container(
-              margin: EdgeInsets.only(left: 35),
+              margin: const EdgeInsets.only(left: 35),
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -538,6 +537,19 @@ class _UploadPictureState extends State<UploadPicture> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50.0),
+                    ),
+                    backgroundColor: const Color.fromARGB(255, 55, 57, 175), // foreground
+                  ),
+                  onPressed: qrCode.toString() == '' || qrCode == "Invalid Code"
+                      ? null
+                      : () {
+                          // Navigator.pushReplacementNamed(
+                          //     context, POS.routeName);
+                          submitVoucherCode();
+                        },
                   child: Text(
                     //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
                     "SUBMIT",
@@ -549,20 +561,6 @@ class _UploadPictureState extends State<UploadPicture> {
                       ),
                     ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50.0),
-                    ),
-                    primary: Color.fromARGB(255, 55, 57, 175), // background
-                    onPrimary: Colors.white, // foreground
-                  ),
-                  onPressed: qrCode.toString() == '' || qrCode == "Invalid Code"
-                      ? null
-                      : () {
-                          // Navigator.pushReplacementNamed(
-                          //     context, POS.routeName);
-                          submitVoucherCode();
-                        },
                   // color: Colors.white,
                   // textColor: Colors.black,
                   // splashColor: Colors.yellowAccent[800],

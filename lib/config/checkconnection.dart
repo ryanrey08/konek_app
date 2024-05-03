@@ -209,8 +209,9 @@ class MyConnectivity with ChangeNotifier {
       final result = await InternetAddress.lookup('example.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         isOnline = true;
-      } else
+      } else {
         isOnline = false;
+      }
     } on SocketException catch (_) {
       isOnline = false;
     }

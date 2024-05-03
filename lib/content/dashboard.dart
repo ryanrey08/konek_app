@@ -150,7 +150,7 @@ class _DashboardState extends State<Dashboard> {
     var height = MediaQuery.of(context).size.height;
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
       child: SafeArea(
         child: Scaffold(
           backgroundColor: Colors.white,
@@ -164,11 +164,11 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
             ),
-            iconTheme: IconThemeData(color: Colors.white),
-            backgroundColor: Color.fromARGB(255, 55, 57, 175),
+            iconTheme: const IconThemeData(color: Colors.white),
+            backgroundColor: const Color.fromARGB(255, 55, 57, 175),
             actions: <Widget>[
               Padding(
-                  padding: EdgeInsets.only(right: 20.0),
+                  padding: const EdgeInsets.only(right: 20.0),
                   child: GestureDetector(
                     onTap: () async {
                       // await Provider.of<Auth>(context, listen: false).logout();
@@ -176,7 +176,7 @@ class _DashboardState extends State<Dashboard> {
                       Navigator.of(context)
                           .pushReplacementNamed(NotificationList.routeName);
                     },
-                    child: Icon(
+                    child: const Icon(
                       Icons.notifications,
                       size: 26.0,
                     ),
@@ -189,7 +189,7 @@ class _DashboardState extends State<Dashboard> {
               ? BottomAppBar(
                 height: 70,
                 padding: EdgeInsets.zero,
-                color: Color.fromARGB(255, 55, 57, 175),
+                color: const Color.fromARGB(255, 55, 57, 175),
                   child: PreferenceBuilder<String>(
                       preference: globalVoucherData,
                       builder: (context, vouchData) {
@@ -214,11 +214,11 @@ class _DashboardState extends State<Dashboard> {
                               print(index.toString());
                             });
                           },
-                          backgroundColor: Color.fromARGB(255, 55, 57, 175),
+                          backgroundColor: const Color.fromARGB(255, 55, 57, 175),
                           currentIndex: 0,
                           items: [
                             BottomNavigationBarItem(
-                                icon: new Icon(
+                                icon: const Icon(
                                   Icons.home,
                                   size: 20,
                                   color: Colors.white,
@@ -236,7 +236,7 @@ class _DashboardState extends State<Dashboard> {
                                 // backgroundColor: Colors.green[50],
                                 ),
                             BottomNavigationBarItem(
-                                icon: new Icon(
+                                icon: Icon(
                                   Icons.qr_code,
                                   size: 30,
                                   // color: Colors.white,
@@ -250,7 +250,7 @@ class _DashboardState extends State<Dashboard> {
                                 // backgroundColor: Colors.green[50],
                                 ),
                             BottomNavigationBarItem(
-                                icon: new Icon(
+                                icon: const Icon(
                                   Icons.list,
                                   size: 20,
                                   color: Colors.white,
@@ -333,7 +333,7 @@ class _DashboardState extends State<Dashboard> {
                         // );
                       }),
                 )
-              : Container(child: Center(child: CircularProgressIndicator())),
+              : Container(child: const Center(child: CircularProgressIndicator())),
       
           drawer: Container(
             color: Colors.white,
@@ -350,12 +350,12 @@ class _DashboardState extends State<Dashboard> {
                     Flexible(
                       child: ListView(
                         children: <Widget>[
-                          Container(
+                          SizedBox(
                             height: 180,
                             child: Theme(
                               data: ThemeData(dividerColor: Colors.transparent),
                               child: DrawerHeader(
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                     color: Color.fromARGB(255, 55, 57, 175)),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -364,7 +364,7 @@ class _DashboardState extends State<Dashboard> {
                                     Container(
                                       height: 90,
                                       width: 180,
-                                      decoration: BoxDecoration(
+                                      decoration: const BoxDecoration(
                                         image: DecorationImage(
                                           image: AssetImage(
                                               'assets/images/swak-img.png'),
@@ -376,7 +376,7 @@ class _DashboardState extends State<Dashboard> {
                                     Text(
                                       fullName.toString(),
                                       style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
+                                        textStyle: const TextStyle(
                                           fontSize: 14,
                                           color: Colors.white,
                                           fontWeight: FontWeight.w600,
@@ -409,7 +409,7 @@ class _DashboardState extends State<Dashboard> {
                               borderRadius: BorderRadius.circular(10),
                               color: Colors.white,
                             ),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 15, vertical: 10),
                             child: Wrap(
                               children: <Widget>[
@@ -476,10 +476,10 @@ class _DashboardState extends State<Dashboard> {
                                 //     //     TransactionPage.routeName);
                                 //   },
                                 // ),
-                                Divider(),
+                                const Divider(),
       
                                 Container(
-                                  margin: EdgeInsets.symmetric(
+                                  margin: const EdgeInsets.symmetric(
                                       horizontal: 10, vertical: 10),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
@@ -522,7 +522,7 @@ class _DashboardState extends State<Dashboard> {
                       title: Text(
                         "",
                         style: GoogleFonts.poppins(
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                             fontSize: 12,
                             color: Colors.black,
                           ),
@@ -531,7 +531,7 @@ class _DashboardState extends State<Dashboard> {
                       trailing: Text(
                         "v4.1",
                         style: GoogleFonts.poppins(
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                             fontSize: 10,
                             color: Colors.black,
                           ),

@@ -52,15 +52,15 @@ class Auth with ChangeNotifier {
   //   }
   // }
 
-  Future<void> login(String contact_number, String password) async {
-    Map data = {'mobile_number': contact_number, 'password': password};
+  Future<void> login(String contactNumber, String password) async {
+    Map data = {'mobile_number': contactNumber, 'password': password};
     Map<String, dynamic> jsonResponse;
     var responseCode;
     try {
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       var response =
-          await http.post(Uri.parse(config.pre_url + "/login-via-mobile"), body: data);
+          await http.post(Uri.parse("${config.pre_url}/login-via-mobile"), body: data);
       var jsonResponse = json.decode(response.body);
       print(jsonResponse);
       if (jsonResponse['success'] == true) {
@@ -75,7 +75,7 @@ class Auth with ChangeNotifier {
       print('error');
       print(error);
       // print(responseCode);
-      throw (error);
+      rethrow;
     }
   }
 
@@ -100,7 +100,7 @@ class Auth with ChangeNotifier {
 
     try {
       final response = await http.post(
-       Uri.parse(config.pre_url + "/register"),
+       Uri.parse("${config.pre_url}/register"),
         body: userInfo,
       );
 
@@ -140,7 +140,7 @@ class Auth with ChangeNotifier {
 
       print(jsonResponse['message']);
     } catch (error) {
-      throw (error);
+      rethrow;
     }
 
     notifyListeners();

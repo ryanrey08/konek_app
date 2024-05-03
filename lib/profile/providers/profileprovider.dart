@@ -11,7 +11,7 @@ import '../../../Config/Config.dart' as config;
 // import '../../Config/HttpException.
 
 class ProfileProvider with ChangeNotifier {
-  String _token;
+  final String _token;
 
   ProfileProvider(this._token);
 
@@ -48,7 +48,7 @@ class ProfileProvider with ChangeNotifier {
       print(error);
       print('error here update profile');
       // print(responseCode);
-      throw (error);
+      rethrow;
     }
   }
 
