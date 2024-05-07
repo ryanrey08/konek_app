@@ -59,7 +59,7 @@ class _DashboardState extends State<Dashboard> {
     //assignData();
     showLoading();
     getStreamData();
-    NotificationController.startListeningNotificationEvents();
+    // NotificationController.startListeningNotificationEvents();
     //getVoucherData();
   }
 

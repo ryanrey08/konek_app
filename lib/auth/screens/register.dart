@@ -17,12 +17,10 @@ import 'package:grecaptcha/grecaptcha.dart';
 import 'package:grecaptcha/grecaptcha_platform_interface.dart';
 import 'package:hcaptcha/hcaptcha.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:mac_address/mac_address.dart';
+// import 'package:mac_address/mac_address.dart';
 import 'package:string_validator/string_validator.dart';
 import 'package:flutter_device_identifier/flutter_device_identifier.dart';
 import 'package:flutter/services.dart';
-import 'package:simnumber/siminfo.dart';
-import 'package:simnumber/sim_number.dart';
 import 'package:mobile_device_identifier/mobile_device_identifier.dart';
 // import 'package:loader_overlay/loader_overlay.dart';
 
@@ -136,7 +134,6 @@ class _AccountRegisterState extends State<AccountRegister> {
   String _platformVersion = 'Unknown';
   String _serialNumber = "--";
 
-  SimInfo simInfo = SimInfo([]);
 
   String _deviceId = 'Unknown';
   final _mobileDeviceIdentifierPlugin = MobileDeviceIdentifier();
@@ -189,22 +186,22 @@ class _AccountRegisterState extends State<AccountRegister> {
     });
   }
 
-  Future<void> initPlatformState() async {
-    try {
-      simInfo = await SimNumber.getSimData();
-      for (var s in simInfo.cards) {
-        print('Serial number: ${s.phoneNumber}');
-      }
-      setState(() {});
-    } on PlatformException {
-      print("simInfo  : " + "2");
-    }
-    if (!mounted) return;
-  }
+  // Future<void> initPlatformState() async {
+  //   try {
+  //     simInfo = await SimNumber.getSimData();
+  //     for (var s in simInfo.cards) {
+  //       print('Serial number: ${s.phoneNumber}');
+  //     }
+  //     setState(() {});
+  //   } on PlatformException {
+  //     print("simInfo  : " + "2");
+  //   }
+  //   if (!mounted) return;
+  // }
 
-  getMyMac() async {
-    await initPlatformState();
-  }
+  // getMyMac() async {
+  //   await initPlatformState();
+  // }
 
   Future<void> register() async {
     final isValid = _form.currentState!.validate();

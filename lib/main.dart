@@ -20,8 +20,8 @@ import 'content/pos.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NotificationController.initializeLocalNotifications();
-  await NotificationController.initializeIsolateReceivePort();
+  // await NotificationController.initializeLocalNotifications();
+  // await NotificationController.initializeIsolateReceivePort();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
     runApp(MyApp());
