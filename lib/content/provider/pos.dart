@@ -214,4 +214,26 @@ class POSProvider with ChangeNotifier {
       rethrow;
     }
   }
+
+    Future<Map<String, dynamic>> getAllPaymentStatus() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userInfo = json.decode(sharedPreferences.getString('userData')!)
+        as Map<String, dynamic>;
+    var token = userInfo['data']['token'];
+    var responseCode;
+    try {
+      var response = await http.get(
+          Uri.parse("${config.hit_pay}payment-logs/"),
+          headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
+      print(response.statusCode);
+      print(json.decode(response.body));
+      var jsonResponse = json.decode(response.body);
+      notifyListeners();
+      return jsonResponse;
+    } catch (error) {
+      print(error);
+      // print(responseCode);
+      rethrow;
+    }
+  }
 }

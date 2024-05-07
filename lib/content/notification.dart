@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:konek_app/content/dashboard.dart';
+import 'package:konek_app/content/provider/pos.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -62,8 +63,17 @@ class _NotificationListState extends State<NotificationList> {
     // });
 
     try {
+            setState(() {
+        isLoading = false;
+      });
       //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
-      voucherData = await Provider.of<Voucher>(context, listen: false).getMyVoucher();
+            var voucher = await Provider.of<POSProvider>(context, listen: false)
+          .getAllPaymentStatus();
+      print(voucher);
+      setState(() {
+        voucherData = voucher['data'];
+        isLoading = true;
+      });
 
     } on HttpException catch (error) {
       print(error);
@@ -119,17 +129,45 @@ class _NotificationListState extends State<NotificationList> {
           color: Colors.white,
           backgroundColor: Colors.blue,
           strokeWidth: 4.0,
-          onRefresh: getNotification,
+          onRefresh: getVoucherData,
           child: ListView.builder(
-            itemCount: notificationData.length,
+            itemCount: voucherData.length,
             itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: Text(voucherData[index]['description']),
-                subtitle: Text(voucherData[index]['claimed_date'] + " - " + (voucherData[index]['expire_date'])),
-              );
+                   return Column(
+                    children: <Widget>[
+                      ListTile(
+                        title: Text(
+                          voucherData[index]['subscription']['duration'] +
+                              " " +
+                              voucherData[index]['subscription']
+                                  ['duration_unit'] +
+                              "/s Unlimited Data",
+                          style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        // subtitle: Text(voucherData[index]['created_at'] + " - " + (voucherData[index]['expire_date'])),
+                        subtitle: Text(
+                          voucherData[index]['created_at'],
+                          style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Divider(), //
+                    ],
+                  );
             },
           ),
-        ) : Container(),
+        ) : Container(child: Center(child: CircularProgressIndicator())),
       ),
     );
   }

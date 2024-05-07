@@ -250,7 +250,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         voucherData = vouchData;
       });
-      await UrlLauncher.launch(voucherData['url']);
+      // await UrlLauncher.launch(voucherData['url']);
       assignData(vouchData);
 
       print(vouchData);
