@@ -2,13 +2,16 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:konek_app/config/httpexception.dart';
+import 'package:konek_app/config/notification.dart';
 import 'package:konek_app/content/provider/content.dart';
 import 'package:konek_app/content/provider/pos.dart';
 import 'package:konek_app/content/provider/voucher.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 // import 'package:flutter_slidable/flutter_slidable.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 //Widget
@@ -244,17 +247,22 @@ class _HomePageState extends State<HomePage> {
 
     try {
       //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
-      var vouchData =
-          await Provider.of<POSProvider>(context, listen: false).getMyPaymentStatus();
+      var vouchData = await Provider.of<POSProvider>(context, listen: false)
+          .getMyPaymentStatus();
 
       setState(() {
         voucherData = vouchData;
       });
       // await UrlLauncher.launch(voucherData['url']);
+      if (await Permission.notification.request().isGranted) {
+        if (vouchData['status'] == 'completed') {
+          Future.delayed(const Duration(milliseconds: 3000), () {
+            NotificationController.scheduleNewNotification(
+                vouchData['description'], vouchData['expire_date']);
+          });
+        }
+      }
       assignData(vouchData);
-
-      print(vouchData);
-
     } on HttpException catch (error) {
       print(error);
       showError(error.toString());
@@ -377,6 +385,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
     final bool useMobileLayout = shortestSide < 600.0;
@@ -467,8 +480,8 @@ class _HomePageState extends State<HomePage> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(10),
-                                          color:
-                                              const Color.fromARGB(255, 55, 57, 175)),
+                                          color: const Color.fromARGB(
+                                              255, 55, 57, 175)),
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 5, horizontal: 15),
                                       child: Row(
@@ -500,15 +513,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                                 Expanded(
                                                   child: Text(
-                                                    "${isLoading
-                                                            ? (newVoucherData[
-                                                                        'status'] ==
-                                                                    'completed'
-                                                                ? newVoucherData[
-                                                                        "duration"]
-                                                                    .toString()
-                                                                : "0")
-                                                            : "0"} Day/s",
+                                                    "${isLoading ? (newVoucherData['status'] == 'completed' ? newVoucherData["duration"].toString() : "0") : "0"} Day/s",
                                                     textAlign: TextAlign.center,
                                                     style: GoogleFonts.poppins(
                                                       textStyle: TextStyle(
@@ -524,21 +529,26 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                 ),
                                                 Expanded(
-                                                  child: Text(
-                                                    'Remaining',
-                                                    textAlign: TextAlign.center,
-                                                    style: GoogleFonts.poppins(
-                                                      textStyle: TextStyle(
-                                                        fontSize:
-                                                            useMobileLayout
-                                                                ? 16
-                                                                : 28,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        color: Colors.white,
+                                                  child: AutoSizeText(
+                                                      'Remaining',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        textStyle: TextStyle(
+                                                          fontSize:
+                                                              useMobileLayout
+                                                                  ? 16
+                                                                  : 28,
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                          color: Colors.white,
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ),
+                                                      minFontSize: 12,
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow
+                                                          .ellipsis),
                                                 ),
                                               ],
                                             ),
@@ -612,38 +622,46 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                               Container(
                                                 child: Row(children: [
-                                                  Text(
-                                                    "Status: ",
-                                                    style: GoogleFonts.poppins(
+                                                  AutoSizeText("Status: ",
+                                                      style: GoogleFonts.poppins(
+                                                          fontSize:
+                                                              useMobileLayout
+                                                                  ? 16
+                                                                  : 28,
+                                                          color: Colors.white),
+                                                      minFontSize: 12,
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow
+                                                          .ellipsis),
+                                                  AutoSizeText(
+                                                      isLoading
+                                                          ? (newVoucherData[
+                                                                      'status'] ==
+                                                                  'completed'
+                                                              ? "Online"
+                                                              : "Offline")
+                                                          : 'Offline',
+                                                      style:
+                                                          GoogleFonts.poppins(
                                                         fontSize:
                                                             useMobileLayout
                                                                 ? 16
                                                                 : 28,
-                                                        color: Colors.white),
-                                                  ),
-                                                  Text(
-                                                    isLoading
-                                                        ? (newVoucherData[
-                                                                    'status'] ==
-                                                                'completed'
-                                                            ? "Online"
-                                                            : "Offline")
-                                                        : 'Offline',
-                                                    style: GoogleFonts.poppins(
-                                                      fontSize: useMobileLayout
-                                                          ? 16
-                                                          : 28,
-                                                      color: isLoading
-                                                          ? (newVoucherData[
-                                                                      'status'] ==
-                                                                  'completed'
-                                                              ? Colors
-                                                                  .greenAccent
-                                                              : Colors
-                                                                  .redAccent)
-                                                          : Colors.greenAccent,
-                                                    ),
-                                                  )
+                                                        color: isLoading
+                                                            ? (newVoucherData[
+                                                                        'status'] ==
+                                                                    'completed'
+                                                                ? Colors
+                                                                    .greenAccent
+                                                                : Colors
+                                                                    .redAccent)
+                                                            : Colors
+                                                                .greenAccent,
+                                                      ),
+                                                      minFontSize: 12,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis)
                                                 ]),
                                               ),
                                             ]),
@@ -723,13 +741,16 @@ class _HomePageState extends State<HomePage> {
                                                                       ElevatedButton(
                                                                     style: ElevatedButton
                                                                         .styleFrom(
-                                                                      foregroundColor: Colors
-                                                                              .white, shape:
+                                                                      foregroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      shape:
                                                                           RoundedRectangleBorder(
                                                                         borderRadius:
                                                                             BorderRadius.circular(50.0),
                                                                       ),
-                                                                      backgroundColor: const Color.fromARGB(
+                                                                      backgroundColor: const Color
+                                                                          .fromARGB(
                                                                           255,
                                                                           55,
                                                                           57,
@@ -1163,11 +1184,6 @@ class _HomePageState extends State<HomePage> {
 
     print(extractedUserData['personCode']);
     return extractedUserData['personCode'];
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }
 

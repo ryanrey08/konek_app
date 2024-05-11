@@ -22,7 +22,7 @@ class NotificationController {
   static Future<void> initializeLocalNotifications() async {
     await AwesomeNotifications().initialize(
         // null,
-        'resource://drawable/launch_background',
+        'resource://drawable/swak_img',
         [
           NotificationChannel(
               channelKey: 'alerts',
@@ -105,6 +105,8 @@ class NotificationController {
     } else {
       pref.setString('showFirst', 'true');
     }
+
+    preferences.setString('notifData', '1');
   }
 
   ///  *********************************************
@@ -269,26 +271,27 @@ class NotificationController {
   }
 
   static Future<void> scheduleNewNotification(
-      String description, String expDate) async {
+    String description, String expDate) async {
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
     if (!isAllowed) isAllowed = await displayNotificationRationale();
     if (!isAllowed) return;
 
     var nowDate = DateTime.now();
-    var toDate = DateTime.parse(expDate);
+    // var toDate = DateTime.parse(expDate);
+     var toDate = nowDate.add(Duration(minutes: 1));
     int interval = toDate.difference(nowDate).inSeconds;
 
-    if(interval < 1800){
-          await myNotifyScheduleInHours(
-        title: 'Data Expiry',
-        msg: 'Your promo $description is about to expire on $expDate',
-        heroThumbUrl:
-            'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
-        hoursFromNow: 5,
-        username: 'test user',
-        interval: (interval - 1800),
-        repeatNotif: false);
-    }
+    // if(interval < 1800){
+    //       await myNotifyScheduleInHours(
+    //     title: 'Data Expiry',
+    //     msg: 'Your promo $description is about to expire on $expDate',
+    //     heroThumbUrl:
+    //         'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
+    //     hoursFromNow: 5,
+    //     username: 'test user',
+    //     interval: (interval - 1800),
+    //     repeatNotif: false);
+    // }
 
     await myNotifyScheduleInHours(
         title: 'Data Expiry',
@@ -337,13 +340,14 @@ Future<void> myNotifyScheduleInHours({
       channelKey: 'basic_channel',
       title: title,
       body: msg,
-      bigPicture: null,
+      bigPicture: 'asset://assets/images/swak-img.png',
       notificationLayout: NotificationLayout.BigPicture,
       //actionType : ActionType.DismissAction,
       color: Colors.transparent,
       backgroundColor: Colors.transparent,
       largeIcon: 'asset://assets/images/swak-img.png',
       // icon: 'asset://assets/images/novulutions.png',
+      icon: 'resource://drawable/swak_img',
       // customSound: 'resource://raw/notif',
       payload: {'actPag': 'myAct', 'actType': 'food', 'username': username},
     ),

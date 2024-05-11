@@ -562,20 +562,25 @@ class _AccountRegisterState extends State<AccountRegister> {
                                 'Middle Name',
                                 txtMiddleName,
                                 useMobileLayout,
-                                'Please enter your Middle Name', (value) {
-                              if (value!.isEmpty) {
-                                return 'Please enter your Middle Name';
-                              }
+                                'Please enter your Middle Name', 
+                                (value){
+                                  return null;
+                                }
+                            //     (value) {
+                            //   if (value!.isEmpty) {
+                            //     return 'Please enter your Middle Name';
+                            //   }
 
-                              if (!RegExp(r"^[\p{L} ,.'-]*$",
-                                      caseSensitive: false,
-                                      unicode: true,
-                                      dotAll: true)
-                                  .hasMatch(value)) {
-                                return 'Invalid Input';
-                              }
-                              return null;
-                            }),
+                            //   if (!RegExp(r"^[\p{L} ,.'-]*$",
+                            //           caseSensitive: false,
+                            //           unicode: true,
+                            //           dotAll: true)
+                            //       .hasMatch(value)) {
+                            //     return 'Invalid Input';
+                            //   }
+                            //   return null;
+                            // }
+                            ),
                             //                           customTextField('Middle Name', txtMiddleName,
                             //                               useMobileLayout, 'Please enter your Middle Name'),
                             customTextField(
@@ -633,10 +638,10 @@ class _AccountRegisterState extends State<AccountRegister> {
                               }
                               return null;
                             }),
-                            mypassword('', Icons.password, txtPassword,
-                                useMobileLayout),
-                            confirmpassword("", Icons.password,
-                                txtConfirmPassword, useMobileLayout),
+                            // mypassword('', Icons.password, txtPassword,
+                            //     useMobileLayout),
+                            // confirmpassword("", Icons.password,
+                            //     txtConfirmPassword, useMobileLayout),
                             Container(
                                 child: Row(
                               children: [

@@ -123,14 +123,33 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
       setState(() {
         requestPaymentDataUrl = subscriptionsData['url'];
       });
-      await UrlLauncher.launch("http://10.44.77.253:2060/ext_login?username=3MFREE&password=3MFREE&next_url=$requestPaymentDataUrl");
-  
+      // await UrlLauncher.launch("http://10.44.77.253:2060/ext_login?username=3MFREE&password=3MFREE&next_url=$requestPaymentDataUrl");
+      await UrlLauncher.launch(requestPaymentDataUrl);
+      var vouchData;
+
+        try {
+          //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
+          vouchData = await Provider.of<POSProvider>(context, listen: false)
+              .getMyPaymentStatus();
+           SharedPreferences prefs = await SharedPreferences.getInstance();
+           if(vouchData['status'] == 'complete'){
+            prefs.setString('swakUrl', vouchData['url']);
+           }
+        } on HttpException catch (error) {
+          print(error);
+          showError(error.toString());
+        } catch (error) {
+          showError(error.toString());
+        }
+
       Future.delayed(const Duration(milliseconds: 3000), () {
-           Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const Dashboard()),
-        (Route<dynamic> route) => false,
-      );
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const Dashboard()),
+          (Route<dynamic> route) => false,
+        );
+        // Navigator.pushReplacementNamed(context, Dashboard.routeName,
+        //     arguments: vouchData['url']);
       });
     } on HttpException catch (error) {
       showError(error.toString());
@@ -158,7 +177,8 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
           backgroundColor: const Color.fromARGB(255, 55, 57, 175),
           leading: Builder(builder: (BuildContext context) {
             return IconButton(
-                icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
+                icon:
+                    const Icon(Icons.keyboard_arrow_left, color: Colors.white),
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, Dashboard.routeName);
                 } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
@@ -187,7 +207,8 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: const Color.fromARGB(255, 55, 57, 175)),
-                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
                   child: Row(
                     children: <Widget>[
                       Expanded(
@@ -306,7 +327,8 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.white,
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 30, horizontal: 15),
                   child: Container(
                     child: Column(
                       children: <Widget>[
@@ -388,7 +410,9 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                           sendPaymentRequest();
                         },
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, backgroundColor: Color.fromARGB(255, 55, 57, 175), // foreground
+                    foregroundColor: Colors.white,
+                    backgroundColor:
+                        Color.fromARGB(255, 55, 57, 175), // foreground
                     //                color: Colors.yellow,
                     // textColor: Colors.black,
                     // splashColor: Colors.yellowAccent[800],

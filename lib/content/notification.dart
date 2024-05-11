@@ -34,7 +34,7 @@ class _NotificationListState extends State<NotificationList> {
   void initState() {
     super.initState();
     getVoucherData();
-    getNotification();
+    // getNotification();
   }
 
     Future<void> getNotification() async {
@@ -81,9 +81,9 @@ class _NotificationListState extends State<NotificationList> {
     } catch (error) {
       showError(error.toString());
     }
-    setState(() {
-      isLoading = true;
-    });
+    // setState(() {
+    //   isLoading = true;
+    // });
   }
 
   void showError(String message) {

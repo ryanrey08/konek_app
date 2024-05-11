@@ -72,7 +72,7 @@ class CustomFormField extends StatelessWidget {
       child: TextFormField(
         enabled: status,
 
-        style: GoogleFonts.poppins(fontSize: useMobileLayout ? 16 : 18),
+        style: GoogleFonts.poppins(fontSize: useMobileLayout ? 16 : 18, color: status ? Colors.black : Colors.grey),
         // decoration: InputDecoration(
         //   border: OutlineInputBorder(),
         //   labelText: label,
@@ -83,6 +83,7 @@ class CustomFormField extends StatelessWidget {
           // OutlineInputBorder
           // UnderlineInputBorder
           focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(50),
             borderSide: BorderSide(
               color: Colors.grey.shade400,
               width: 1,
@@ -375,10 +376,13 @@ class CustomDropDown extends StatefulWidget {
 class _CustomDropDownState extends State<CustomDropDown> {
   @override
   Widget build(BuildContext context) {
+    var brightness = MediaQuery.of(context).platformBrightness;
+    bool isDarkMode = brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       child: DropdownButtonFormField(
         value: widget.value,
+        dropdownColor: Colors.white,
         items: widget.items
             .map((text) => DropdownMenuItem(
                   value: text,
@@ -386,7 +390,7 @@ class _CustomDropDownState extends State<CustomDropDown> {
                 ))
             .toList(),
         style: GoogleFonts.poppins(
-          textStyle: const TextStyle(
+          textStyle: TextStyle(
             fontSize: 16,
             color: Colors.black,
           ),
@@ -399,28 +403,28 @@ class _CustomDropDownState extends State<CustomDropDown> {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
             borderSide: BorderSide(
-              color: widget.value != null ? Colors.green : Colors.grey.shade400,
+              color: widget.value != null ? Colors.black : Colors.grey.shade400,
               width: 1,
             ),
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
             borderSide: BorderSide(
-              color: widget.value != null ? Colors.green : Colors.grey.shade400,
+              color: widget.value != null ? Colors.grey.shade400 : Colors.grey.shade400,
               width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
             borderSide: BorderSide(
-              color: widget.value != null ? Colors.green : Colors.grey.shade400,
+              color: widget.value != null ? Colors.grey.shade400 : Colors.grey.shade400,
               width: 1,
             ),
           ),
           disabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
             borderSide: BorderSide(
-              color: widget.value != null ? Colors.green : Colors.grey.shade400,
+              color: widget.value != null ? Colors.grey.shade400 : Colors.grey.shade400,
               width: 1,
             ),
           ),
