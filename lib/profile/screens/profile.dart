@@ -24,6 +24,8 @@ import 'package:flutter/services.dart';
 
 class MyProfile extends StatefulWidget {
   static const routeName = '/myprofile';
+
+  const MyProfile({super.key});
   @override
   _MyProfileState createState() => _MyProfileState();
 }
@@ -36,10 +38,10 @@ class _MyProfileState extends State<MyProfile> {
   Uint8List? signature;
 
   var _selectedCivilStatus;
-  var _civilStatus = ["single", "married", "widowed", "divorced"];
+  final _civilStatus = ["single", "married", "widowed", "divorced"];
 
   var _selectedSex;
-  var _sex = ["male", "female"];
+  final _sex = ["male", "female"];
 
   final _formKey1 = GlobalKey<FormState>();
   final _formKey2 = GlobalKey<FormState>();
@@ -330,15 +332,15 @@ class _MyProfileState extends State<MyProfile> {
   final educationalFocus = FocusNode();
   final degreeFocus = FocusNode();
 
-  bool _isInit = false;
+  final bool _isInit = false;
   var businessApplication;
 
-  bool _isKeptOn = false;
-  double _brightness = 1.0;
-  static int _currentPage = 0;
-  int _currentIndex = 0;
+  final bool _isKeptOn = false;
+  final double _brightness = 1.0;
+  static final int _currentPage = 0;
+  final int _currentIndex = 0;
 
-  PageController _controller = PageController(
+  final PageController _controller = PageController(
     initialPage: _currentPage,
   );
 
@@ -378,19 +380,17 @@ class _MyProfileState extends State<MyProfile> {
   String getImageName(filePath, ext) {
     var fileName = (filePath.path).split('/').last;
     if (fileName.contains('pdf')) {
-      return txtFirstName.text.replaceAll(' ', '') +
+      return "${txtFirstName.text.replaceAll(' ', '') +
           "_" +
           txtLastName.text.replaceAll(' ', '') +
           "_" +
-          ext +
-          ".pdf";
+          ext}.pdf";
     } else {
-      return txtFirstName.text.replaceAll(' ', '') +
+      return "${txtFirstName.text.replaceAll(' ', '') +
           "_" +
           txtLastName.text.replaceAll(' ', '') +
           "_" +
-          ext +
-          ".png";
+          ext}.png";
     }
   }
 
@@ -467,8 +467,8 @@ class _MyProfileState extends State<MyProfile> {
             Navigator.pushReplacementNamed(context, Dashboard.routeName);
           },
           context: context,
-          animType: AnimType.SCALE,
-          dialogType: DialogType.SUCCES,
+          animType: AnimType.scale,
+          dialogType: DialogType.success,
           title: "Update farmer profile",
           desc: "Successfully Updated",
           btnOkOnPress: () {
@@ -503,13 +503,14 @@ class _MyProfileState extends State<MyProfile> {
         json.decode(sharedPreferences.getString('userData')!)
             as Map<String, dynamic>;
     final data = extractedUserData['data']['user'] as Map<String, dynamic>;
+    print(data);
 
     setState(() {
-              txtFirstName.text = data['first_name'] == null ? '' : data['first_name'];
-    txtMiddleName.text = data['middle_name'] == null ? '' : data['middle_name'];
-    txtLastName.text = data['last_name'] == null ? '' : data['last_name'];
-    txtEmailAddress.text = data['email'] == null ? '' : data['email'];
-    txtPhoneNumber.text = data['mobile_no'] == null ? '' : data['mobile_no'];
+              txtFirstName.text = data['first_name'] ?? '';
+    txtMiddleName.text = data['middle_name'] ?? '';
+    txtLastName.text = data['last_name'] ?? '';
+    txtEmailAddress.text = data['email'] ?? '';
+    txtPhoneNumber.text = data['mobile_no'] ?? '';
     });
 
   }
@@ -547,7 +548,7 @@ class _MyProfileState extends State<MyProfile> {
               'Enter Voucher Code',
               // style: Theme.of(context).textTheme.titleLarge,
               style: GoogleFonts.poppins(
-                  color: Color.fromARGB(255, 55, 57, 175),
+                  color: const Color.fromARGB(255, 55, 57, 175),
                   fontWeight: FontWeight.bold),
             ),
             const SizedBox(
@@ -576,7 +577,7 @@ class _MyProfileState extends State<MyProfile> {
             AnimatedButton(
               isFixedHeight: false,
               text: 'OK',
-              color: Color.fromARGB(255, 55, 57, 175),
+              color: const Color.fromARGB(255, 55, 57, 175),
               pressEvent: () {
                 dialog.dismiss();
               },
@@ -606,15 +607,15 @@ class _MyProfileState extends State<MyProfile> {
     final Orientation orientation = MediaQuery.of(context).orientation;
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
       child: SafeArea(
         child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            backgroundColor: Color.fromARGB(255, 55, 57, 175),
+            backgroundColor: const Color.fromARGB(255, 55, 57, 175),
             leading: Builder(builder: (BuildContext context) {
               return IconButton(
-                  icon: Icon(Icons.keyboard_arrow_left, color: Colors.white),
+                  icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
                   onPressed: () {
                     Navigator.pushReplacementNamed(context, Dashboard.routeName);
                   } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
@@ -627,7 +628,7 @@ class _MyProfileState extends State<MyProfile> {
                 )),
           ),
           body: isLoading
-              ? Container(child: Text("Loading..."))
+              ? Container(child: const Text("Loading..."))
               : Form(
                   key: _formKey1,
                   child: Column(
@@ -637,7 +638,7 @@ class _MyProfileState extends State<MyProfile> {
                             child: Container(
                           color: Colors.white,
                           padding:
-                              EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                              const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                           child: Column(
                             children: <Widget>[
                               // CustomFormField(
@@ -671,7 +672,7 @@ class _MyProfileState extends State<MyProfile> {
                                 },
                                 initialValue: '',
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               CustomFormField(
                                 status: editStatus,
                                 label: 'Middlename (optional)',
@@ -684,7 +685,7 @@ class _MyProfileState extends State<MyProfile> {
                                   FocusScope.of(context).requestFocus(lNameFocus);
                                 },
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               CustomFormField(
                                 status: editStatus,
                                 label: 'Lastname',
@@ -701,7 +702,7 @@ class _MyProfileState extends State<MyProfile> {
                                 },
                                 initialValue: '',
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               CustomFormField(
                                 status: editStatus,
                                 label: 'Email Address',
@@ -717,7 +718,7 @@ class _MyProfileState extends State<MyProfile> {
                                 },
                                 initialValue: '',
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               CustomFormField(
                                 status: editStatus,
                                 label: 'Mobile Number',
@@ -734,7 +735,7 @@ class _MyProfileState extends State<MyProfile> {
                                 },
                                 initialValue: '',
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               CustomFormField(
                                 status: editStatus,
                                 label: 'Address',
@@ -750,7 +751,7 @@ class _MyProfileState extends State<MyProfile> {
                                 },
                                 initialValue: '',
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               // CustomFormField(
                               //   status: editStatus,
                               //   label: 'City',
@@ -785,7 +786,7 @@ class _MyProfileState extends State<MyProfile> {
                               //   },
                               //   initialValue: '',
                               // ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 4,
                               ),
                               CustomDropDown(
@@ -800,6 +801,7 @@ class _MyProfileState extends State<MyProfile> {
                                         _regionsId[_region.indexOf(value)];
                                     changeRegion();
                                   });
+                                  return null;
                                 },
                                 validator: (value) {
                                   if (value == null) {
@@ -808,7 +810,7 @@ class _MyProfileState extends State<MyProfile> {
                                   return null;
                                 },
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 4,
                               ),
                               CustomDropDown(
@@ -823,6 +825,7 @@ class _MyProfileState extends State<MyProfile> {
                                     changeProvince();
                                     print(value);
                                   });
+                                  return null;
                                 },
                                 validator: (value) {
                                   if (value == null) {
@@ -831,7 +834,7 @@ class _MyProfileState extends State<MyProfile> {
                                   return null;
                                 },
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 4,
                               ),
                               CustomDropDown(
@@ -844,6 +847,7 @@ class _MyProfileState extends State<MyProfile> {
                                     _selectedMunicipality = value.toString();
                                     getBarangay();
                                   });
+                                  return null;
                                 },
                                 validator: (value) {
                                   if (value == null) {
@@ -852,7 +856,7 @@ class _MyProfileState extends State<MyProfile> {
                                   return null;
                                 },
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 4,
                               ),
                               CustomDropDown(
@@ -865,6 +869,7 @@ class _MyProfileState extends State<MyProfile> {
                                     _selectedBarangay = value.toString();
                                     //_brgyId = (_barangay.indexOf(value) + 1).toString();
                                   });
+                                  return null;
                                 },
                                 validator: (value) {
                                   if (value == null) {
@@ -884,13 +889,24 @@ class _MyProfileState extends State<MyProfile> {
                                   borderRadius: BorderRadius.circular(10),
                                   color: Colors.white,
                                 ),
-                                padding: EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                     vertical: 30, horizontal: 15),
                                 child: Container(
                                   child: SizedBox(
                                     width: useMobileLayout ? 130 : 180,
                                     height: 50,
                                     child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        foregroundColor: Colors.white, shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(50.0),
+                                        ),
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 55, 57, 175), // foreground
+                                      ),
+                                      onPressed: () {
+                                        enterVoucherCode();
+                                      },
                                       child: Text(
                                         //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
                                         "VOUCHER CODE",
@@ -902,18 +918,6 @@ class _MyProfileState extends State<MyProfile> {
                                           ),
                                         ),
                                       ),
-                                      style: ElevatedButton.styleFrom(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(50.0),
-                                        ),
-                                        primary: Color.fromARGB(
-                                            255, 55, 57, 175), // background
-                                        onPrimary: Colors.white, // foreground
-                                      ),
-                                      onPressed: () {
-                                        enterVoucherCode();
-                                      },
                                       // color: Colors.white,
                                       // textColor: Colors.black,
                                       // splashColor: Colors.yellowAccent[800],
@@ -929,346 +933,29 @@ class _MyProfileState extends State<MyProfile> {
                   ),
                 ),
           bottomNavigationBar: Container(
-            padding: EdgeInsets.symmetric(horizontal: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 5),
             height: 50,
             width: double.infinity,
             child: Row(
               children: <Widget>[
-                Expanded(
-                  child: ElevatedButton(
-                    child: Text(
-                      "CHANGE PASSWORD",
-                      style: GoogleFonts.poppins(
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                      //_formKey1.currentState!.validate();
-                      Alert(
-                          context: context,
-                          title: "",
-                          content: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 15),
-                            child: Column(
-                              children: <Widget>[
-                                // Text(
-                                //   'The OTP password was sent to the following recipient:',
-                                //   textAlign: TextAlign.center,
-                                //   style: GoogleFonts.poppins(
-                                //     color: Colors.black,
-                                //     fontSize: 16,
-                                //     fontWeight: FontWeight.w500,
-                                //   ),
-                                // ),
-                                // SizedBox(
-                                //   height: 10,
-                                // ),
-                                Container(
-                                  margin: EdgeInsets.only(bottom: 5),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: TextFormField(
-                                          controller: txtOldPassword,
-                                          style: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          decoration: InputDecoration(
-                                            contentPadding: EdgeInsets.symmetric(
-                                                horizontal: 20),
-                                            floatingLabelBehavior:
-                                                FloatingLabelBehavior.auto,
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.green,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            disabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            errorBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.redAccent,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            enabled: true,
-                                            hintText: 'Enter Old Password',
-                                            hintStyle: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                            errorStyle: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.redAccent[700],
-                                              ),
-                                            ),
-                                            fillColor: Colors.grey[200],
-                                            filled: true,
-                                          ),
-                                          validator: (value) {
-                                            if (value == null) {
-                                              return 'Please enter old password';
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(bottom: 5),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: TextFormField(
-                                          controller: txtNewPassword,
-                                          style: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          decoration: InputDecoration(
-                                            contentPadding: EdgeInsets.symmetric(
-                                                horizontal: 20),
-                                            floatingLabelBehavior:
-                                                FloatingLabelBehavior.auto,
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.green,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            disabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            errorBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.redAccent,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            enabled: true,
-                                            hintText: 'Enter New Password',
-                                            hintStyle: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                            errorStyle: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.redAccent[700],
-                                              ),
-                                            ),
-                                            fillColor: Colors.grey[200],
-                                            filled: true,
-                                          ),
-                                          validator: (value) {
-                                            if (value == null) {
-                                              return 'Please enter the password';
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(bottom: 5),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: TextFormField(
-                                          controller: txtConfirmPassword,
-                                          style: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          decoration: InputDecoration(
-                                            contentPadding: EdgeInsets.symmetric(
-                                                horizontal: 20),
-                                            floatingLabelBehavior:
-                                                FloatingLabelBehavior.auto,
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.green,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            disabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            errorBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.redAccent,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            enabled: true,
-                                            hintText: 'Enter Confirm Password',
-                                            hintStyle: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                            errorStyle: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.redAccent[700],
-                                              ),
-                                            ),
-                                            fillColor: Colors.grey[200],
-                                            filled: true,
-                                          ),
-                                          validator: (value) {
-                                            if (value == null) {
-                                              return 'Please enter confirm password';
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          buttons: [
-                            DialogButton(
-                              color: Color.fromARGB(255, 55, 57, 175),
-                              onPressed: () async {
-                                // Navigator.of(context)
-                                //     .pushReplacementNamed(Dashboard.routeName);
-      
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(
-                                "Change Password",
-                                style:
-                                    TextStyle(color: Colors.white, fontSize: 16),
-                              ),
-                            )
-                          ]).show();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Color.fromARGB(255, 55, 57, 175), // background
-                      onPrimary: Colors.white, // foreground
-                      //                color: Colors.yellow,
-                      // textColor: Colors.black,
-                      // splashColor: Colors.yellowAccent[800],
-                    ),
-                    // color: Colors.green,
-                    // textColor: Colors.black,
-                    // splashColor: Colors.yellowAccent[800],
-                  ),
-                ),
-                SizedBox(
+                const SizedBox(
                   width: 5,
                 ),
                 editStatus == false
                     ? Expanded(
                         child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              editStatus = true;
+                            });
+                            // _formKey1.currentState.validate();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white, backgroundColor: Color.fromARGB(255, 55, 57, 175), // foreground
+                            //                color: Colors.yellow,
+                            // textColor: Colors.black,
+                            // splashColor: Colors.yellowAccent[800],
+                          ),
                           child: Text(
                             "EDIT PROFILE",
                             style: GoogleFonts.poppins(
@@ -1279,20 +966,6 @@ class _MyProfileState extends State<MyProfile> {
                               ),
                             ),
                           ),
-                          onPressed: () {
-                            setState(() {
-                              editStatus = true;
-                            });
-                            // _formKey1.currentState.validate();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary:
-                                Color.fromARGB(255, 55, 57, 175), // background
-                            onPrimary: Colors.white, // foreground
-                            //                color: Colors.yellow,
-                            // textColor: Colors.black,
-                            // splashColor: Colors.yellowAccent[800],
-                          ),
                           // color: Colors.green,
                           // textColor: Colors.black,
                           // splashColor: Colors.yellowAccent[800],
@@ -1300,6 +973,16 @@ class _MyProfileState extends State<MyProfile> {
                       )
                     : Expanded(
                         child: ElevatedButton(
+                          onPressed: () {
+                            // _formKey1.currentState.validate();
+                            proceed();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white, backgroundColor: Color.fromARGB(255, 55, 57, 175), // foreground
+                            //                color: Colors.yellow,
+                            // textColor: Colors.black,
+                            // splashColor: Colors.yellowAccent[800],
+                          ),
                           child: Text(
                             "UPDATE",
                             style: GoogleFonts.poppins(
@@ -1309,18 +992,6 @@ class _MyProfileState extends State<MyProfile> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
-                          onPressed: () {
-                            // _formKey1.currentState.validate();
-                            proceed();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary:
-                                Color.fromARGB(255, 55, 57, 175), // background
-                            onPrimary: Colors.white, // foreground
-                            //                color: Colors.yellow,
-                            // textColor: Colors.black,
-                            // splashColor: Colors.yellowAccent[800],
                           ),
                         ),
                       ),
@@ -1340,8 +1011,8 @@ class _MyProfileState extends State<MyProfile> {
               //Navigator.of(context).pop();
             },
             context: context,
-            animType: AnimType.SCALE,
-            dialogType: DialogType.WARNING,
+            animType: AnimType.scale,
+            dialogType: DialogType.warning,
             title: "Warning",
             desc: "Update Profile?",
             btnOkOnPress: () {
@@ -1366,7 +1037,7 @@ class _MyProfileState extends State<MyProfile> {
         Navigator.of(context).pop();
       },
       context: context,
-      animType: AnimType.SCALE,
+      animType: AnimType.scale,
       dialogType: dialogType,
       title: title,
       desc: message,
@@ -1390,23 +1061,23 @@ class _MyProfileState extends State<MyProfile> {
       String? Function(Object?) onChanged,
       String? Function(Object?) validator) {
     return Container(
-      margin: EdgeInsets.only(bottom: 15),
+      margin: const EdgeInsets.only(bottom: 15),
       child: DropdownButtonFormField(
         value: value,
         items: items
             .map((text) => DropdownMenuItem(
-                  child: Text('$text'),
                   value: text,
+                  child: Text('$text'),
                 ))
             .toList(),
         style: GoogleFonts.poppins(
-          textStyle: TextStyle(
+          textStyle: const TextStyle(
             fontSize: 16,
             color: Colors.black,
           ),
         ),
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.symmetric(horizontal: 20),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           floatingLabelBehavior: FloatingLabelBehavior.always,
           // OutlineInputBorder
           // UnderlineInputBorder
@@ -1440,7 +1111,7 @@ class _MyProfileState extends State<MyProfile> {
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: Colors.redAccent,
               width: 1,
             ),
@@ -1454,7 +1125,7 @@ class _MyProfileState extends State<MyProfile> {
           labelText: value != null ? title : null,
           labelStyle: value != null
               ? GoogleFonts.poppins(
-                  textStyle: TextStyle(
+                  textStyle: const TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
                   ),
@@ -1463,7 +1134,7 @@ class _MyProfileState extends State<MyProfile> {
           hintText: value == null ? title : null,
           hintStyle: value == null
               ? GoogleFonts.poppins(
-                  textStyle: TextStyle(
+                  textStyle: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
                   ),

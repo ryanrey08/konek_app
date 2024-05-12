@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:konek_app/content/dashboard.dart';
+import 'package:konek_app/content/provider/pos.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../config/httpexception.dart';
@@ -22,12 +23,11 @@ class _TransactionState extends State<Transaction> {
   bool isLoading = false;
   var voucherData;
 
-    @override
+  @override
   void initState() {
     super.initState();
     getVoucherData();
   }
-
 
   Future<void> getVoucherData() async {
     var errorMessage;
@@ -36,9 +36,17 @@ class _TransactionState extends State<Transaction> {
     // });
 
     try {
+      setState(() {
+        isLoading = false;
+      });
       //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
-      voucherData = await Provider.of<Voucher>(context, listen: false).getMyVoucher();
-
+      var voucher = await Provider.of<POSProvider>(context, listen: false)
+          .getAllPaymentStatus();
+      print(voucher);
+      setState(() {
+        voucherData = voucher['data'];
+        isLoading = true;
+      });
     } on HttpException catch (error) {
       print(error);
       showError(error.toString());
@@ -56,7 +64,7 @@ class _TransactionState extends State<Transaction> {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Color(0xff404747),
+      backgroundColor: const Color(0xff404747),
       textColor: Colors.white,
       fontSize: 13.0,
     );
@@ -85,22 +93,52 @@ class _TransactionState extends State<Transaction> {
       //         fontSize: useMobileLayout ? 16 : 18,
       //       )),
       // ),
-      body: isLoading ? RefreshIndicator(
-        key: _refreshIndicatorKey,
-        color: Colors.white,
-        backgroundColor: Colors.blue,
-        strokeWidth: 4.0,
-        onRefresh: getVoucherData,
-        child: ListView.builder(
-          itemCount: voucherData.length,
-          itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-              title: Text(voucherData[index]['description']),
-              subtitle: Text(voucherData[index]['claimed_date'] + " - " + (voucherData[index]['expire_date'])),
-            );
-          },
-        ),
-      ) : Container(),
+      body: isLoading
+          ? RefreshIndicator(
+              key: _refreshIndicatorKey,
+              color: Colors.white,
+              backgroundColor: Colors.blue,
+              strokeWidth: 4.0,
+              onRefresh: getVoucherData,
+              child: ListView.builder(
+                itemCount: voucherData.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Column(
+                    children: <Widget>[
+                      ListTile(
+                        title: Text(
+                          voucherData[index]['subscription']['duration'] +
+                              " " +
+                              voucherData[index]['subscription']
+                                  ['duration_unit'] +
+                              "/s Unlimited Data",
+                          style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        // subtitle: Text(voucherData[index]['created_at'] + " - " + (voucherData[index]['expire_date'])),
+                        subtitle: Text(
+                          voucherData[index]['created_at'],
+                          style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Divider(), //
+                    ],
+                  );
+                },
+              ),
+            )
+          : Container(child: Center(child: CircularProgressIndicator())),
     );
   }
 }

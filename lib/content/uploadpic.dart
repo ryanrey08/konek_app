@@ -229,7 +229,7 @@ class _UploadPictureState extends State<UploadPicture> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       if (vouchData['voucher_code'] != '') {
         // var data = json.decode(prefs.getString('voucherData')!) as Map<String, dynamic>;
-        // NotificationController.scheduleNewNotification(vouchData['description'], vouchData['expire_date']);
+        NotificationController.scheduleNewNotification(vouchData['description'], vouchData['expire_date']);
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => Dashboard(),
@@ -480,7 +480,7 @@ class _UploadPictureState extends State<UploadPicture> {
 
                     print(result);
                   },
-                  heroTag: 'image0',
+                  heroTag: 'image3',
                   tooltip: 'Scan QR Code',
                   child: const Icon(Icons.qr_code),
                 ),
@@ -492,7 +492,7 @@ class _UploadPictureState extends State<UploadPicture> {
                   onPressed: () async {
                     enterVoucherCode();
                   },
-                  heroTag: 'image0',
+                  heroTag: 'image4',
                   tooltip: 'Enter Voucher Code',
                   child: const Icon(Icons.input),
                 ),

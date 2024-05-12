@@ -14,7 +14,7 @@ import '../../config/config.dart' as config;
 // import '../../Config/HttpException.dart';
 
 class POSProvider with ChangeNotifier {
-  String? _token;
+  final String? _token;
 
   POSProvider(this._token);
   // Future<void> login(String contact_number, String password) async {
@@ -44,19 +44,19 @@ class POSProvider with ChangeNotifier {
   //   }
   // }
 
-  Future<Map<String, dynamic>> registerVoucherCode(String voucher_code) async {
+  Future<Map<String, dynamic>> registerVoucherCode(String voucherCode) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var userInfo = json.decode(sharedPreferences.getString('userData')!)
         as Map<String, dynamic>;
     var token = userInfo['data']['token'];
-    Map data = {'voucher_code': voucher_code};
+    Map data = {'voucher_code': voucherCode};
     Map<String, dynamic> jsonResponse;
     var responseCode;
     try {
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       var response = await http.post(
-          Uri.parse(config.pre_url_voucher + "/apply-voucher"),
+          Uri.parse("${config.pre_url_voucher}/apply-voucher"),
           body: data,
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       var jsonResponse = json.decode(response.body);
@@ -93,7 +93,7 @@ class POSProvider with ChangeNotifier {
     } catch (error) {
       print(error);
       // print(responseCode);
-      throw (error);
+      rethrow;
     }
   }
 
@@ -105,7 +105,7 @@ class POSProvider with ChangeNotifier {
     var responseCode;
     try {
       var response = await http.get(
-          Uri.parse(config.pre_url_voucher + "/get-my-vouchers"),
+          Uri.parse("${config.pre_url_voucher}/get-my-vouchers"),
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       //print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
@@ -114,17 +114,17 @@ class POSProvider with ChangeNotifier {
     } catch (error) {
       print(error);
       // print(responseCode);
-      throw (error);
+      rethrow;
     }
   }
 
   Future<dynamic> sendPaymentRequest(
-      email, phone, amount, subscription_plan_id) async {
+      email, phone, amount, subscriptionPlanId) async {
     Map data = {
       'email': email,
       'phone': phone,
       'amount': amount,
-      'subscription_plan_id': subscription_plan_id.toString(),
+      'subscription_plan_id': subscriptionPlanId.toString(),
       'purpose': ''
     };
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -134,7 +134,7 @@ class POSProvider with ChangeNotifier {
     var responseCode;
     try {
       var response = await http.post(
-          Uri.parse(config.hit_pay + "send-payment-request"),
+          Uri.parse("${config.hit_pay}send-payment-request"),
           body: data,
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       print(json.decode(response.body));
@@ -148,7 +148,7 @@ class POSProvider with ChangeNotifier {
     } catch (error) {
       print(error);
       // print(responseCode);
-      throw (error);
+      rethrow;
     }
   }
 
@@ -156,7 +156,7 @@ class POSProvider with ChangeNotifier {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var userInfo = json.decode(sharedPreferences.getString('userData')!)
         as Map<String, dynamic>;
-    var paymentData;
+    Map<String, dynamic> paymentData;
     if (sharedPreferences.containsKey("swakPaymentRefNo")) {
       paymentData =
           json.decode(sharedPreferences.getString('swakPaymentRefNo')!)
@@ -169,8 +169,7 @@ class POSProvider with ChangeNotifier {
     var responseCode;
     try {
       var response = await http.get(
-          Uri.parse(config.hit_pay +
-              "payment-logs/" +
+          Uri.parse("${config.hit_pay}payment-logs/" +
               paymentData['reference_number']),
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       print(response.statusCode);
@@ -194,7 +193,7 @@ class POSProvider with ChangeNotifier {
           "claimed_date": jsonResponse["data"]['subscription']['start_date'],
           "expire_date": jsonResponse["data"]['subscription']['end_date'],
           "status": jsonResponse["data"]['payment_status'],
-          "url": jsonResponse['redirect_url']
+          "url": jsonResponse['redirect_url'] == null ? '' : jsonResponse['redirect_url']
         };
       } else {
         responseData = {
@@ -212,7 +211,29 @@ class POSProvider with ChangeNotifier {
     } catch (error) {
       print(error);
       // print(responseCode);
-      throw (error);
+      rethrow;
+    }
+  }
+
+    Future<Map<String, dynamic>> getAllPaymentStatus() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userInfo = json.decode(sharedPreferences.getString('userData')!)
+        as Map<String, dynamic>;
+    var token = userInfo['data']['token'];
+    var responseCode;
+    try {
+      var response = await http.get(
+          Uri.parse("${config.hit_pay}payment-logs/"),
+          headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
+      print(response.statusCode);
+      print(json.decode(response.body));
+      var jsonResponse = json.decode(response.body);
+      notifyListeners();
+      return jsonResponse;
+    } catch (error) {
+      print(error);
+      // print(responseCode);
+      rethrow;
     }
   }
 }

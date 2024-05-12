@@ -2,13 +2,16 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:konek_app/config/httpexception.dart';
+import 'package:konek_app/config/notification.dart';
 import 'package:konek_app/content/provider/content.dart';
 import 'package:konek_app/content/provider/pos.dart';
 import 'package:konek_app/content/provider/voucher.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 // import 'package:flutter_slidable/flutter_slidable.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 //Widget
@@ -22,17 +25,19 @@ import 'pos.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = "/home";
+
+  const HomePage({super.key});
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  bool _isKeptOn = false;
-  double _brightness = 1.0;
-  static int _currentPage = 0;
-  int _currentIndex = 0;
+  final bool _isKeptOn = false;
+  final double _brightness = 1.0;
+  static final int _currentPage = 0;
+  final int _currentIndex = 0;
 
-  PageController _controller = PageController(
+  final PageController _controller = PageController(
     initialPage: _currentPage,
   );
 
@@ -151,7 +156,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     // assignData();
     //getUser();
-    // getVoucherData();
+    getVoucherData();
     getStreamData();
     refreshPage();
   }
@@ -242,17 +247,29 @@ class _HomePageState extends State<HomePage> {
 
     try {
       //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
-      var vouchData =
-          await Provider.of<POSProvider>(context, listen: false).getMyPaymentStatus();
+      var vouchData = await Provider.of<POSProvider>(context, listen: false)
+          .getMyPaymentStatus();
 
       setState(() {
         voucherData = vouchData;
       });
-      await UrlLauncher.launch(voucherData['url']);
+      // await UrlLauncher.launch(voucherData['url']);
+      
+      if (await Permission.notification.request().isGranted) {
+        if (vouchData['status'] == 'completed') {
+          // Future.delayed(const Duration(milliseconds: 3000), () {
+          //   NotificationController.scheduleNewNotification(
+          //       vouchData['description'], vouchData['expire_date']);
+          // });
+        }
+        Future.delayed(const Duration(milliseconds: 3000), () async{
+          print('notif here');
+          await NotificationController.cancelNotifications();
+          await NotificationController.scheduleNewNotification(
+              vouchData['description'], vouchData['expire_date']);
+        });
+      }
       assignData(vouchData);
-
-      print(vouchData);
-
     } on HttpException catch (error) {
       print(error);
       showError(error.toString());
@@ -321,7 +338,7 @@ class _HomePageState extends State<HomePage> {
               'Enter Voucher Code',
               // style: Theme.of(context).textTheme.titleLarge,
               style: GoogleFonts.poppins(
-                  color: Color.fromARGB(255, 55, 57, 175),
+                  color: const Color.fromARGB(255, 55, 57, 175),
                   fontWeight: FontWeight.bold),
             ),
             const SizedBox(
@@ -350,7 +367,7 @@ class _HomePageState extends State<HomePage> {
             AnimatedButton(
               isFixedHeight: false,
               text: 'OK',
-              color: Color.fromARGB(255, 55, 57, 175),
+              color: const Color.fromARGB(255, 55, 57, 175),
               pressEvent: () {
                 dialog.dismiss();
               },
@@ -374,6 +391,12 @@ class _HomePageState extends State<HomePage> {
     await loadData();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
     final bool useMobileLayout = shortestSide < 600.0;
@@ -417,7 +440,7 @@ class _HomePageState extends State<HomePage> {
                     image: AssetImage('assets/images/swak-img.png'),
                   ),
                 ),
-                child: Column(children: [
+                child: const Column(children: [
                   SizedBox(
                     height: 45,
                   ),
@@ -437,7 +460,7 @@ class _HomePageState extends State<HomePage> {
                   // )
                 ]),
               ),
-              Container(
+              SizedBox(
                 width: double.infinity,
                 child: isLoading
                     ? Column(
@@ -447,11 +470,11 @@ class _HomePageState extends State<HomePage> {
                               builder: (context, vouchData) {
                                 var newVoucherData = json.decode(vouchData);
                                 return Container(
-                                  padding: EdgeInsets.all(10),
+                                  padding: const EdgeInsets.all(10),
                                   child: Card(
                                     elevation: 4,
                                     color: Colors.white.withOpacity(0.8),
-                                    margin: EdgeInsets.all(8),
+                                    margin: const EdgeInsets.all(8),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
@@ -464,9 +487,9 @@ class _HomePageState extends State<HomePage> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(10),
-                                          color:
-                                              Color.fromARGB(255, 55, 57, 175)),
-                                      padding: EdgeInsets.symmetric(
+                                          color: const Color.fromARGB(
+                                              255, 55, 57, 175)),
+                                      padding: const EdgeInsets.symmetric(
                                           vertical: 5, horizontal: 15),
                                       child: Row(
                                         children: <Widget>[
@@ -477,7 +500,7 @@ class _HomePageState extends State<HomePage> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: <Widget>[
-                                                SizedBox(height: 10),
+                                                const SizedBox(height: 10),
                                                 Expanded(
                                                   child: Text(
                                                     'MY ACCOUNT',
@@ -497,16 +520,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                                 Expanded(
                                                   child: Text(
-                                                    (isLoading
-                                                            ? (newVoucherData[
-                                                                        'status'] ==
-                                                                    'completed'
-                                                                ? newVoucherData[
-                                                                        "duration"]
-                                                                    .toString()
-                                                                : "0")
-                                                            : "0") +
-                                                        " Day/s",
+                                                    "${isLoading ? (newVoucherData['status'] == 'completed' ? newVoucherData["duration"].toString() : "0") : "0"} Day/s",
                                                     textAlign: TextAlign.center,
                                                     style: GoogleFonts.poppins(
                                                       textStyle: TextStyle(
@@ -522,21 +536,26 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                 ),
                                                 Expanded(
-                                                  child: Text(
-                                                    'Remaining',
-                                                    textAlign: TextAlign.center,
-                                                    style: GoogleFonts.poppins(
-                                                      textStyle: TextStyle(
-                                                        fontSize:
-                                                            useMobileLayout
-                                                                ? 16
-                                                                : 28,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        color: Colors.white,
+                                                  child: AutoSizeText(
+                                                      'Remaining',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        textStyle: TextStyle(
+                                                          fontSize:
+                                                              useMobileLayout
+                                                                  ? 16
+                                                                  : 28,
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                          color: Colors.white,
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ),
+                                                      minFontSize: 12,
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow
+                                                          .ellipsis),
                                                 ),
                                               ],
                                             ),
@@ -594,7 +613,7 @@ class _HomePageState extends State<HomePage> {
                                           Container(
                                             alignment: Alignment.centerLeft,
                                             child: Column(children: [
-                                              SizedBox(
+                                              const SizedBox(
                                                 height: 40,
                                               ),
                                               Icon(
@@ -610,38 +629,46 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                               Container(
                                                 child: Row(children: [
-                                                  Text(
-                                                    "Status: ",
-                                                    style: GoogleFonts.poppins(
+                                                  AutoSizeText("Status: ",
+                                                      style: GoogleFonts.poppins(
+                                                          fontSize:
+                                                              useMobileLayout
+                                                                  ? 16
+                                                                  : 28,
+                                                          color: Colors.white),
+                                                      minFontSize: 12,
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow
+                                                          .ellipsis),
+                                                  AutoSizeText(
+                                                      isLoading
+                                                          ? (newVoucherData[
+                                                                      'status'] ==
+                                                                  'completed'
+                                                              ? "Online"
+                                                              : "Offline")
+                                                          : 'Offline',
+                                                      style:
+                                                          GoogleFonts.poppins(
                                                         fontSize:
                                                             useMobileLayout
                                                                 ? 16
                                                                 : 28,
-                                                        color: Colors.white),
-                                                  ),
-                                                  Text(
-                                                    isLoading
-                                                        ? (newVoucherData[
-                                                                    'status'] ==
-                                                                'completed'
-                                                            ? "Online"
-                                                            : "Offline")
-                                                        : 'Offline',
-                                                    style: GoogleFonts.poppins(
-                                                      fontSize: useMobileLayout
-                                                          ? 16
-                                                          : 28,
-                                                      color: isLoading
-                                                          ? (newVoucherData[
-                                                                      'status'] ==
-                                                                  'completed'
-                                                              ? Colors
-                                                                  .greenAccent
-                                                              : Colors
-                                                                  .redAccent)
-                                                          : Colors.greenAccent,
-                                                    ),
-                                                  )
+                                                        color: isLoading
+                                                            ? (newVoucherData[
+                                                                        'status'] ==
+                                                                    'completed'
+                                                                ? Colors
+                                                                    .greenAccent
+                                                                : Colors
+                                                                    .redAccent)
+                                                            : Colors
+                                                                .greenAccent,
+                                                      ),
+                                                      minFontSize: 12,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis)
                                                 ]),
                                               ),
                                             ]),
@@ -663,11 +690,11 @@ class _HomePageState extends State<HomePage> {
                                           : false)
                                       : true,
                                   child: Container(
-                                    padding: EdgeInsets.all(10),
+                                    padding: const EdgeInsets.all(10),
                                     child: Card(
                                       elevation: 4,
                                       color: Colors.white.withOpacity(0.8),
-                                      margin: EdgeInsets.all(8),
+                                      margin: const EdgeInsets.all(8),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
@@ -688,15 +715,15 @@ class _HomePageState extends State<HomePage> {
                                                   : Colors.white)
                                               : Colors.white,
                                         ),
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                             vertical: 30, horizontal: 15),
                                         child: Container(
                                           child: Column(
-                                            children: subscriptions!.length > 0
+                                            children: subscriptions!.isNotEmpty
                                                 ? <Widget>[
                                                     for (var x = 0;
                                                         x <
-                                                            subscriptions!
+                                                            subscriptions
                                                                 .length;
                                                         x++) ...[
                                                       Row(
@@ -719,6 +746,33 @@ class _HomePageState extends State<HomePage> {
                                                                   height: 50,
                                                                   child:
                                                                       ElevatedButton(
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      foregroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      shape:
+                                                                          RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(50.0),
+                                                                      ),
+                                                                      backgroundColor: const Color
+                                                                          .fromARGB(
+                                                                          255,
+                                                                          55,
+                                                                          57,
+                                                                          175), // foreground
+                                                                    ),
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.pushReplacementNamed(
+                                                                          context,
+                                                                          POS.routeName,
+                                                                          arguments: {
+                                                                            'subscription':
+                                                                                subscriptions[x]
+                                                                          });
+                                                                    },
                                                                     child: Text(
                                                                       //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
                                                                       subscriptions[x]
@@ -742,38 +796,12 @@ class _HomePageState extends State<HomePage> {
                                                                         ),
                                                                       ),
                                                                     ),
-                                                                    style: ElevatedButton
-                                                                        .styleFrom(
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(50.0),
-                                                                      ),
-                                                                      primary: Color.fromARGB(
-                                                                          255,
-                                                                          55,
-                                                                          57,
-                                                                          175), // background
-                                                                      onPrimary:
-                                                                          Colors
-                                                                              .white, // foreground
-                                                                    ),
-                                                                    onPressed:
-                                                                        () {
-                                                                      Navigator.pushReplacementNamed(
-                                                                          context,
-                                                                          POS.routeName,
-                                                                          arguments: {
-                                                                            'subscription':
-                                                                                subscriptions[x]
-                                                                          });
-                                                                    },
                                                                     // color: Colors.white,
                                                                     // textColor: Colors.black,
                                                                     // splashColor: Colors.yellowAccent[800],
                                                                   ),
                                                                 ),
-                                                                SizedBox(
+                                                                const SizedBox(
                                                                   width: 50,
                                                                 ),
                                                                 Expanded(
@@ -807,7 +835,7 @@ class _HomePageState extends State<HomePage> {
                                                           ),
                                                         ],
                                                       ),
-                                                      SizedBox(
+                                                      const SizedBox(
                                                         height: 10,
                                                       ),
                                                     ]
@@ -908,7 +936,7 @@ class _HomePageState extends State<HomePage> {
                           //   ),
                           // ),
                           Container(
-                            padding: EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(8),
                             alignment: Alignment.center,
                             //        decoration: BoxDecoration(
                             //   borderRadius: BorderRadius.circular(10),
@@ -932,7 +960,7 @@ class _HomePageState extends State<HomePage> {
                                 //   color: Colors.white,
                                 // ),
                                 // color: Colors.white,
-                                padding: EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                     vertical: 30, horizontal: 15),
                                 child: Container(
                                   height: 200.0,
@@ -944,15 +972,15 @@ class _HomePageState extends State<HomePage> {
                                     // color: Colors.white,
                                   ),
                                   alignment: Alignment.centerLeft,
-                                  padding: EdgeInsets.symmetric(
+                                  padding: const EdgeInsets.symmetric(
                                       vertical: 15, horizontal: 5),
-                                  child: quickLinks!.length > 0
+                                  child: quickLinks!.isNotEmpty
                                       ? ListView(
                                           scrollDirection: Axis.horizontal,
                                           shrinkWrap: true,
                                           children: <Widget>[
                                               for (var x = 0;
-                                                  x < quickLinks!.length;
+                                                  x < quickLinks.length;
                                                   x++) ...[
                                                 (Container(
                                                   alignment: Alignment.center,
@@ -974,7 +1002,7 @@ class _HomePageState extends State<HomePage> {
                                                           alignment:
                                                               Alignment.center,
                                                           decoration:
-                                                              new BoxDecoration(
+                                                              BoxDecoration(
                                                             image: DecorationImage(
                                                                 image: NetworkImage(
                                                                     quickLinks[x]
@@ -986,13 +1014,13 @@ class _HomePageState extends State<HomePage> {
                                                           // child: Text(quickLinks[x][y]['description']),
                                                         ),
                                                       ),
-                                                      SizedBox(
+                                                      const SizedBox(
                                                         height: 15,
                                                       )
                                                     ]
                                                   ]),
                                                 )),
-                                                SizedBox(
+                                                const SizedBox(
                                                   height: 10,
                                                 )
                                               ]
@@ -1019,7 +1047,7 @@ class _HomePageState extends State<HomePage> {
                         ],
                       )
                     : Container(
-                        child: Center(
+                        child: const Center(
                         child: CircularProgressIndicator(),
                       )),
               ),
@@ -1028,10 +1056,10 @@ class _HomePageState extends State<HomePage> {
                       elevation: 4,
                       color: Colors.white.withOpacity(0.8),
                       //margin: EdgeInsets.all(8),
-                      shape: RoundedRectangleBorder(
+                      shape: const RoundedRectangleBorder(
                           // borderRadius: BorderRadius.circular(10),
                           ),
-                      child: Container(
+                      child: SizedBox(
                         // height:  150,
                         width: double.infinity,
                         //width: useMobileLayout ? 600 : 700,
@@ -1060,9 +1088,9 @@ class _HomePageState extends State<HomePage> {
                           //     ),
                           //   ),
                           // ),
-                          Container(
+                          SizedBox(
                             width: double.infinity,
-                            child: ads.length > 0
+                            child: ads.isNotEmpty
                                 ? CarouselSlider(
                                     options: CarouselOptions(
                                         autoPlay: true,
@@ -1073,7 +1101,7 @@ class _HomePageState extends State<HomePage> {
                                         enlargeStrategy:
                                             CenterPageEnlargeStrategy.height,
                                         scrollPhysics:
-                                            NeverScrollableScrollPhysics()),
+                                            const NeverScrollableScrollPhysics()),
                                     items: ads.map((i) {
                                       return Builder(
                                         builder: (BuildContext context) {
@@ -1109,7 +1137,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 5,
                           ),
                           // Container(
@@ -1164,11 +1192,6 @@ class _HomePageState extends State<HomePage> {
     print(extractedUserData['personCode']);
     return extractedUserData['personCode'];
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }
 
 class TabButton extends StatelessWidget {
@@ -1189,6 +1212,7 @@ class TabButton extends StatelessWidget {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
     final bool useMobileLayout = shortestSide < 600.0;
     return TextButton(
+      onPressed: onPressed(),
       child: Column(
         children: <Widget>[
           Text(
@@ -1211,13 +1235,12 @@ class TabButton extends StatelessWidget {
           ),
         ],
       ),
-      onPressed: onPressed(),
     );
   }
 }
 
 class ItemDetails extends StatelessWidget {
-  ItemDetails(this.title, this.value);
+  const ItemDetails(this.title, this.value, {super.key});
 
   final String title;
   final String value;
@@ -1229,7 +1252,7 @@ class ItemDetails extends StatelessWidget {
           TextSpan(
             text: title.toUpperCase(),
             style: GoogleFonts.nunito(
-              textStyle: TextStyle(
+              textStyle: const TextStyle(
                 color: Colors.black,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -1239,7 +1262,7 @@ class ItemDetails extends StatelessWidget {
           TextSpan(
             text: value,
             style: GoogleFonts.nunito(
-              textStyle: TextStyle(
+              textStyle: const TextStyle(
                 color: Colors.black87,
                 fontWeight: FontWeight.w600,
                 fontSize: 14,

@@ -20,8 +20,8 @@ import 'content/pos.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await NotificationController.initializeLocalNotifications();
-  // await NotificationController.initializeIsolateReceivePort();
+  await NotificationController.initializeLocalNotifications();
+  await NotificationController.initializeIsolateReceivePort();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
     runApp(MyApp());
@@ -30,6 +30,8 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
   // how it looks.
@@ -134,26 +136,26 @@ class _MyAppPageState extends State<MyApp> {
             //home: MySplashScreen(Login()),
             debugShowCheckedModeBanner: false,
             home: auth.isAuth
-                ? MySplashScreen(Dashboard())
+                ? MySplashScreen(const Dashboard())
                 // ? MySplashScreen(CovidDashboard())
                 : FutureBuilder(
                     future: auth.tryAutoLogin(),
                     builder: (ctx, authResultSnapshot) =>
                         authResultSnapshot.connectionState ==
                                 ConnectionState.waiting
-                            ? CircularProgressIndicator()
-                            : MySplashScreen(Login()),
+                            ? const CircularProgressIndicator()
+                            : MySplashScreen(const Login()),
                   ),
             routes: {
-              Dashboard.routeName: (context) => Dashboard(),
-              Login.routeName: (context) => Login(),
+              Dashboard.routeName: (context) => const Dashboard(),
+              Login.routeName: (context) => const Login(),
               // ignore: equal_keys_in_map
               AccountRegister.routeName: (context) => AccountRegister(),
               MyProfile.routeName: (context) => MyProfile(),
-              POS.routeName: (context) => POS(),
-              ScanQR.routeName: (context) => ScanQR(),
-              UploadPicture.routeName: (context) => UploadPicture(),
-              NotificationList.routeName: (context) => NotificationList(),
+              POS.routeName: (context) => const POS(),
+              ScanQR.routeName: (context) => const ScanQR(),
+              UploadPicture.routeName: (context) => const UploadPicture(),
+              NotificationList.routeName: (context) => const NotificationList(),
             },
           ),
         ),

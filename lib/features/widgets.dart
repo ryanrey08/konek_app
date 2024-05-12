@@ -12,7 +12,7 @@ class FileRequirements extends StatelessWidget {
   final String title;
   final String copy;
 
-  FileRequirements({
+  const FileRequirements({super.key, 
     required this.points,
     required this.title,
     required this.copy,
@@ -31,7 +31,7 @@ class FileRequirements extends StatelessWidget {
             children: <TextSpan>[
               TextSpan(
                   text: copy,
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.blue,
                       fontSize: 10,
                       fontWeight: FontWeight.bold)),
@@ -39,7 +39,7 @@ class FileRequirements extends StatelessWidget {
           ),
         ),
         Text(points,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
             )),
       ],
@@ -55,8 +55,8 @@ class CustomFormField extends StatelessWidget {
   final String initialValue;
   final bool status;
 
-  CustomFormField(
-      {required this.label,
+  const CustomFormField(
+      {super.key, required this.label,
       required this.controller,
       required this.validator,
       required this.onFieldSubmitted,
@@ -72,17 +72,18 @@ class CustomFormField extends StatelessWidget {
       child: TextFormField(
         enabled: status,
 
-        style: GoogleFonts.poppins(fontSize: useMobileLayout ? 16 : 18),
+        style: GoogleFonts.poppins(fontSize: useMobileLayout ? 16 : 18, color: status ? Colors.black : Colors.grey),
         // decoration: InputDecoration(
         //   border: OutlineInputBorder(),
         //   labelText: label,
         // ),
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.symmetric(horizontal: 20),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           floatingLabelBehavior: FloatingLabelBehavior.auto,
           // OutlineInputBorder
           // UnderlineInputBorder
           focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(50),
             borderSide: BorderSide(
               color: Colors.grey.shade400,
               width: 1,
@@ -111,7 +112,7 @@ class CustomFormField extends StatelessWidget {
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: Colors.redAccent,
               width: 1,
             ),
@@ -130,7 +131,7 @@ class CustomFormField extends StatelessWidget {
             ),
           ),
           helperStyle: GoogleFonts.poppins(
-            textStyle: TextStyle(
+            textStyle: const TextStyle(
               fontSize: 12,
               color: Colors.grey,
             ),
@@ -148,18 +149,18 @@ class StatementAccountListItem extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  StatementAccountListItem({required this.title, required this.subtitle});
+  const StatementAccountListItem({super.key, required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
     return RichText(
       text: TextSpan(
         text: title,
-        style: TextStyle(color: Colors.black, fontSize: 13),
+        style: const TextStyle(color: Colors.black, fontSize: 13),
         children: <TextSpan>[
           TextSpan(
               text: subtitle,
-              style: TextStyle(
+              style: const TextStyle(
                   color: Colors.black,
                   fontSize: 13,
                   fontWeight: FontWeight.bold)),
@@ -170,8 +171,8 @@ class StatementAccountListItem extends StatelessWidget {
 }
 
 class DrawerOptions extends StatelessWidget {
-  DrawerOptions(
-      {required this.dense,
+  const DrawerOptions(
+      {super.key, required this.dense,
       required this.title,
       required this.useMobileLayout,
       required this.iconData,
@@ -204,8 +205,8 @@ class DrawerOptions extends StatelessWidget {
           // style: SettingsStyle.listTileText(),
         ),
         leading:
-            Icon(iconData, color: Color.fromARGB(255, 55, 57, 175), size: 20),
-        trailing: Icon(Icons.keyboard_arrow_right, size: 15),
+            Icon(iconData, color: const Color.fromARGB(255, 55, 57, 175), size: 20),
+        trailing: const Icon(Icons.keyboard_arrow_right, size: 15),
         onTap: onTapFunc,
       ),
     );
@@ -217,8 +218,8 @@ class DragContainer extends StatelessWidget {
   final String label2;
   final String location;
 
-  DragContainer(
-      {required this.label1, required this.label2, required this.location});
+  const DragContainer(
+      {super.key, required this.label1, required this.label2, required this.location});
 
   @override
   Widget build(BuildContext context) {
@@ -247,7 +248,7 @@ class DragContainer extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                     fontSize: useMobileLayout ? 10 : 18, color: Colors.black)),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
           ],
@@ -258,10 +259,12 @@ class DragContainer extends StatelessWidget {
 }
 
 class ShimmerLayout extends StatelessWidget {
+  const ShimmerLayout({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -275,7 +278,7 @@ class ShimmerLayout extends StatelessWidget {
                     color: Colors.grey[300],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 5,
                 ),
                 Expanded(
@@ -288,7 +291,7 @@ class ShimmerLayout extends StatelessWidget {
                           color: Colors.grey[300],
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 2,
                       ),
                       Container(
@@ -298,7 +301,7 @@ class ShimmerLayout extends StatelessWidget {
                           color: Colors.grey[300],
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 2,
                       ),
                       Container(
@@ -321,13 +324,15 @@ class ShimmerLayout extends StatelessWidget {
 }
 
 class ShimmerList extends StatelessWidget {
+  const ShimmerList({super.key});
+
   @override
   Widget build(BuildContext context) {
     int offset = 0;
     int time = 800;
 
     return Container(
-      padding: EdgeInsets.only(top: 5),
+      padding: const EdgeInsets.only(top: 5),
       child: ListView.builder(
         shrinkWrap: true,
         itemCount: 12,
@@ -335,10 +340,10 @@ class ShimmerList extends StatelessWidget {
           offset += 5;
           time = 800 + offset;
           return Shimmer.fromColors(
-            child: ShimmerLayout(),
             baseColor: Colors.grey.shade300,
             highlightColor: Colors.white,
             period: Duration(milliseconds: time),
+            child: ShimmerLayout(),
           );
         },
       ),
@@ -371,14 +376,17 @@ class CustomDropDown extends StatefulWidget {
 class _CustomDropDownState extends State<CustomDropDown> {
   @override
   Widget build(BuildContext context) {
+    var brightness = MediaQuery.of(context).platformBrightness;
+    bool isDarkMode = brightness == Brightness.dark;
     return Container(
-      margin: EdgeInsets.only(bottom: 15),
+      margin: const EdgeInsets.only(bottom: 15),
       child: DropdownButtonFormField(
         value: widget.value,
+        dropdownColor: Colors.white,
         items: widget.items
             .map((text) => DropdownMenuItem(
-                  child: Text('$text'),
                   value: text,
+                  child: Text('$text'),
                 ))
             .toList(),
         style: GoogleFonts.poppins(
@@ -388,41 +396,41 @@ class _CustomDropDownState extends State<CustomDropDown> {
           ),
         ),
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.symmetric(horizontal: 20),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           floatingLabelBehavior: FloatingLabelBehavior.always,
           // OutlineInputBorder
           // UnderlineInputBorder
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
             borderSide: BorderSide(
-              color: widget.value != null ? Colors.green : Colors.grey.shade400,
+              color: widget.value != null ? Colors.black : Colors.grey.shade400,
               width: 1,
             ),
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
             borderSide: BorderSide(
-              color: widget.value != null ? Colors.green : Colors.grey.shade400,
+              color: widget.value != null ? Colors.grey.shade400 : Colors.grey.shade400,
               width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
             borderSide: BorderSide(
-              color: widget.value != null ? Colors.green : Colors.grey.shade400,
+              color: widget.value != null ? Colors.grey.shade400 : Colors.grey.shade400,
               width: 1,
             ),
           ),
           disabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
             borderSide: BorderSide(
-              color: widget.value != null ? Colors.green : Colors.grey.shade400,
+              color: widget.value != null ? Colors.grey.shade400 : Colors.grey.shade400,
               width: 1,
             ),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: Colors.redAccent,
               width: 1,
             ),
@@ -436,7 +444,7 @@ class _CustomDropDownState extends State<CustomDropDown> {
           labelText: widget.value != null ? widget.title : null,
           labelStyle: widget.value != null
               ? GoogleFonts.poppins(
-                  textStyle: TextStyle(
+                  textStyle: const TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
                   ),
@@ -445,7 +453,7 @@ class _CustomDropDownState extends State<CustomDropDown> {
           hintText: widget.value == null ? widget.title : null,
           hintStyle: widget.value == null
               ? GoogleFonts.poppins(
-                  textStyle: TextStyle(
+                  textStyle: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
                   ),
@@ -497,7 +505,7 @@ class _CustomDateTimeState extends State<CustomDateTime> {
         child: DateTimeField(
           controller: widget.controller,
           style: GoogleFonts.poppins(
-            textStyle: TextStyle(
+            textStyle: const TextStyle(
               fontSize: 16,
               color: Colors.black,
             ),
@@ -520,7 +528,7 @@ class _CustomDateTimeState extends State<CustomDateTime> {
               }
               setState(() {
                 // final f = new DateFormat('yyyy-MM-dd');
-                final f = new DateFormat('MMMM dd, yyyy');
+                final f = DateFormat('MMMM dd, yyyy');
                 widget.controller.text = f.format(pickedDate).toString();
               });
               return pickedDate;
@@ -529,7 +537,7 @@ class _CustomDateTimeState extends State<CustomDateTime> {
           focusNode: widget.focusNode,
           onFieldSubmitted: widget.onFieldSubmitted(),
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.symmetric(horizontal: 20),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
             // OutlineInputBorder
             // UnderlineInputBorder
@@ -562,7 +570,7 @@ class _CustomDateTimeState extends State<CustomDateTime> {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(50),
-              borderSide: BorderSide(
+              borderSide: const BorderSide(
                 color: Colors.redAccent,
                 width: 1,
               ),
@@ -581,7 +589,7 @@ class _CustomDateTimeState extends State<CustomDateTime> {
               ),
             ),
             helperStyle: GoogleFonts.poppins(
-              textStyle: TextStyle(
+              textStyle: const TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
               ),
@@ -626,7 +634,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 15),
+      margin: const EdgeInsets.only(bottom: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -639,14 +647,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
               //   UpperCaseTextFormatter(),
               // ],
               style: GoogleFonts.poppins(
-                textStyle: TextStyle(
+                textStyle: const TextStyle(
                   fontSize: 16,
                   color: Colors.black,
                 ),
               ),
               enabled: true,
               decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
                 // OutlineInputBorder
                 // UnderlineInputBorder
@@ -680,7 +688,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 ),
                 errorBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(50),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: Colors.redAccent,
                     width: 1,
                   ),
@@ -700,14 +708,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 //       ),
                 hintText: widget.controller.text == "" ? widget.title : null,
                 hintStyle: GoogleFonts.poppins(
-                  textStyle: TextStyle(
+                  textStyle: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
                   ),
                 ),
                 helperText: widget.helperText,
                 helperStyle: GoogleFonts.poppins(
-                  textStyle: TextStyle(
+                  textStyle: const TextStyle(
                     fontSize: 12,
                     color: Colors.grey,
                   ),
@@ -733,7 +741,7 @@ class DropDownCustom extends StatelessWidget {
   final String title;
   final String copy;
 
-  DropDownCustom({
+  const DropDownCustom({super.key, 
     required this.points,
     required this.title,
     required this.copy,
@@ -752,7 +760,7 @@ class DropDownCustom extends StatelessWidget {
             children: <TextSpan>[
               TextSpan(
                   text: copy,
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.blue,
                       fontSize: 10,
                       fontWeight: FontWeight.bold)),
@@ -760,7 +768,7 @@ class DropDownCustom extends StatelessWidget {
           ),
         ),
         Text(points,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
             )),
       ],
@@ -769,8 +777,8 @@ class DropDownCustom extends StatelessWidget {
 }
 
 class ProductionCostList extends StatelessWidget {
-  ProductionCostList(
-      {required this.dense,
+  const ProductionCostList(
+      {super.key, required this.dense,
       required this.title,
       required this.useMobileLayout,
       required this.iconData,
@@ -804,7 +812,7 @@ class ProductionCostList extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           color: Colors.white,
         ),
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         width: useMobileLayout
             ? MediaQuery.of(context).size.width
             : MediaQuery.of(context).size.width / 2 - 25,
@@ -815,66 +823,66 @@ class ProductionCostList extends StatelessWidget {
             RichText(
               text: TextSpan(
                 text: 'REF No.: ',
-                style: TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black),
                 children: <TextSpan>[
                   TextSpan(
                       text: text1,
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
             RichText(
               text: TextSpan(
                 text: 'Product: ',
-                style: TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black),
                 children: <TextSpan>[
                   TextSpan(
                       text: text2,
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
             RichText(
               text: TextSpan(
                 text: 'Area (Hectare): ',
-                style: TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black),
                 children: <TextSpan>[
                   TextSpan(
                       text: text2,
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
             RichText(
               text: TextSpan(
                 text: 'Total Loan: ',
-                style: TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black),
                 children: <TextSpan>[
                   TextSpan(
                       text: text2,
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
             RichText(
               text: TextSpan(
                 text: 'Date: ',
-                style: TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black),
                 children: <TextSpan>[
                   TextSpan(
                       text: text2,
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
             RichText(
               text: TextSpan(
                 text: 'Request Status: ',
-                style: TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black),
                 children: <TextSpan>[
                   TextSpan(
                       text: text2,
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -891,7 +899,7 @@ void showError(String message) {
     toastLength: Toast.LENGTH_SHORT,
     gravity: ToastGravity.BOTTOM,
     timeInSecForIosWeb: 1,
-    backgroundColor: Color(0xff404747),
+    backgroundColor: const Color(0xff404747),
     textColor: Colors.white,
     fontSize: 13.0,
   );
@@ -905,8 +913,8 @@ class ParticularDetails extends StatelessWidget {
   final String amount;
   final Color color;
 
-  ParticularDetails(
-      {required this.particularName,
+  const ParticularDetails(
+      {super.key, required this.particularName,
       required this.measurement,
       required this.quantity,
       required this.unit,
@@ -918,15 +926,15 @@ class ParticularDetails extends StatelessWidget {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
     final bool useMobileLayout = shortestSide < 900.0;
 
-    var _selectedUnit;
-    var _unitPrice = [400, 500, 600];
+    var selectedUnit;
+    var unitPrice = [400, 500, 600];
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Container(
-          padding: EdgeInsets.only(left: 40),
+          padding: const EdgeInsets.only(left: 40),
           width: useMobileLayout ? 250 : MediaQuery.of(context).size.width / 5,
           child: Text(
             particularName,
@@ -935,7 +943,7 @@ class ParticularDetails extends StatelessWidget {
                 color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
           ),
         ),
-        Container(
+        SizedBox(
           width: useMobileLayout ? 150 : MediaQuery.of(context).size.width / 5,
           child: Center(
               child: Text(
@@ -944,7 +952,7 @@ class ParticularDetails extends StatelessWidget {
                 color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
           )),
         ),
-        Container(
+        SizedBox(
           width: useMobileLayout ? 150 : MediaQuery.of(context).size.width / 5,
           child: Center(
               child: Text(
@@ -953,7 +961,7 @@ class ParticularDetails extends StatelessWidget {
                 color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
           )),
         ),
-        Container(
+        SizedBox(
           width: useMobileLayout ? 150 : MediaQuery.of(context).size.width / 5,
           child: Center(
               child: Text(
@@ -962,7 +970,7 @@ class ParticularDetails extends StatelessWidget {
                 color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
           )),
         ),
-        Container(
+        SizedBox(
           width: useMobileLayout ? 150 : MediaQuery.of(context).size.width / 5,
           child: Center(
               child: Text(
@@ -1019,7 +1027,7 @@ class _ProductionState extends State<Production> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Container(
-            padding: EdgeInsets.only(left: 40),
+            padding: const EdgeInsets.only(left: 40),
             width:
                 useMobileLayout ? 250 : MediaQuery.of(context).size.width / 5,
             child: Text(
@@ -1029,7 +1037,7 @@ class _ProductionState extends State<Production> {
                   color: Colors.black, fontSize: useMobileLayout ? 16 : 18),
             ),
           ),
-          Container(
+          SizedBox(
             width:
                 useMobileLayout ? 150 : MediaQuery.of(context).size.width / 5,
             child: Center(
@@ -1040,7 +1048,7 @@ class _ProductionState extends State<Production> {
             )),
           ),
           // Production(controller: quantityTextA),
-          Container(
+          SizedBox(
             width:
                 useMobileLayout ? 150 : MediaQuery.of(context).size.width / 5,
             child: Center(
@@ -1053,7 +1061,7 @@ class _ProductionState extends State<Production> {
           Expanded(
             child: DropdownButtonFormField(
               isExpanded: true,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                   border: UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.white))),
               items: widget.items,
@@ -1082,7 +1090,7 @@ class _ProductionState extends State<Production> {
               },
             ),
           ),
-          Container(
+          SizedBox(
             width:
                 useMobileLayout ? 150 : MediaQuery.of(context).size.width / 5,
             child: Center(

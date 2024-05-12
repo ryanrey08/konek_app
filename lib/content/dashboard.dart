@@ -5,14 +5,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:konek_app/auth/providers/auth.dart';
 import 'package:konek_app/auth/screens/login.dart';
 import 'package:konek_app/config/config.dart';
+import 'package:konek_app/config/httpexception.dart';
 import 'package:konek_app/config/notification.dart';
 import 'package:konek_app/content/network.dart';
 import 'package:konek_app/content/notification.dart';
+import 'package:konek_app/content/provider/pos.dart';
 import 'package:konek_app/content/uploadpic.dart';
 import 'package:konek_app/features/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
 import './home.dart';
 import '../profile/screens/profile.dart';
@@ -45,8 +48,10 @@ class _DashboardState extends State<Dashboard> {
   String? fullName;
 
   var voucherData;
+  var notifLength = 0;
 
   late Preference<String> globalVoucherData;
+  late Preference<String> globalNotifData;
 
   int currentPageIndex = 0;
 
@@ -57,10 +62,42 @@ class _DashboardState extends State<Dashboard> {
     _pageTitle = pageTitle[0];
     // startTime();
     //assignData();
+    lauchUrl();
     showLoading();
     getStreamData();
-    // NotificationController.startListeningNotificationEvents();
+    getStreamNotifData();
+    NotificationController.startListeningNotificationEvents();
     //getVoucherData();
+    getNotification();
+  }
+
+  //   @override
+  // void didChangeDependencies() {
+  //   // TODO: implement didChangeDependencies
+  //   super.didChangeDependencies();
+
+  //   String? subsData =
+  //       ModalRoute.of(context)?.settings?.arguments! as String;
+  //   print("url" + subsData);
+  //     if(subsData != null){
+  //       lauchUrl(subsData);
+  //     }
+  // }
+
+  lauchUrl() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey('swakUrl')) {
+      var url = prefs.getString('swakUrl') as String;
+      if(url != ''){
+        await UrlLauncher.launch(url);
+        await clearUrl();
+      }
+    }
+  }
+
+  clearUrl() async{
+     final prefs = await SharedPreferences.getInstance();
+    prefs.remove('swakUrl');
   }
 
   getStreamData() async {
@@ -70,7 +107,14 @@ class _DashboardState extends State<Dashboard> {
       globalVoucherData = preferences.getString('voucherData',
           defaultValue:
               '{ "voucher_code": "","duration": 0,"description": "","amount": 0,"claimed_date": "","expire_date": "","status": ""}');
-      isLoading = true;
+    });
+  }
+
+  getStreamNotifData() async {
+    final preferences = await StreamingSharedPreferences.instance;
+
+    setState(() {
+      globalNotifData = preferences.getString('notifData', defaultValue: '');
     });
   }
 
@@ -130,15 +174,38 @@ class _DashboardState extends State<Dashboard> {
     final sharedPreferences = await SharedPreferences.getInstance();
     final extractedUserData =
         json.decode(sharedPreferences.getString('userData')!) as Map;
-    if(extractedUserData['data']['user'] != null){
-          fullName = extractedUserData['data']['user']['first_name'] +
-        " " +
-        extractedUserData['data']['user']['last_name'];
-    }else{
-          fullName = extractedUserData['data']['first_name'] +
-        " " +
-        extractedUserData['data']['last_name'];
+    if (extractedUserData['data']['user'] != null) {
+      fullName = extractedUserData['data']['user']['first_name'] +
+          " " +
+          extractedUserData['data']['user']['last_name'];
+    } else {
+      fullName = extractedUserData['data']['first_name'] +
+          " " +
+          extractedUserData['data']['last_name'];
     }
+  }
+
+  Future<void> getNotification() async {
+    var errorMessage;
+
+    try {
+      var voucher = await Provider.of<POSProvider>(context, listen: false)
+          .getAllPaymentStatus();
+      print(voucher);
+      setState(() {
+        notifLength = voucher['data'].length;
+      });
+    } on HttpException catch (error) {
+      print(error);
+      showError(error.toString());
+    } catch (error) {
+      showError(error.toString());
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -150,7 +217,7 @@ class _DashboardState extends State<Dashboard> {
     var height = MediaQuery.of(context).size.height;
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
       child: SafeArea(
         child: Scaffold(
           backgroundColor: Colors.white,
@@ -159,27 +226,50 @@ class _DashboardState extends State<Dashboard> {
               _pageTitle!,
               style: GoogleFonts.poppins(
                 textStyle: TextStyle(
-                  fontSize: useMobileLayout ? 16 : 18,
-                  color: Colors.white
-                ),
+                    fontSize: useMobileLayout ? 16 : 18, color: Colors.white),
               ),
             ),
-            iconTheme: IconThemeData(color: Colors.white),
-            backgroundColor: Color.fromARGB(255, 55, 57, 175),
+            iconTheme: const IconThemeData(color: Colors.white),
+            backgroundColor: const Color.fromARGB(255, 55, 57, 175),
             actions: <Widget>[
               Padding(
-                  padding: EdgeInsets.only(right: 20.0),
+                  padding: const EdgeInsets.only(right: 20.0),
                   child: GestureDetector(
                     onTap: () async {
                       // await Provider.of<Auth>(context, listen: false).logout();
                       // Navigator.of(context).pushReplacementNamed(Login.routeName);
+                      final preferences =
+                          await StreamingSharedPreferences.instance;
+                      preferences.setString('notifData', '');
                       Navigator.of(context)
                           .pushReplacementNamed(NotificationList.routeName);
                     },
-                    child: Icon(
-                      Icons.notifications,
-                      size: 26.0,
-                    ),
+                    child: !isLoading
+                        ? PreferenceBuilder<String>(
+                            preference: globalNotifData,
+                            builder: (context, notifData) {
+                              return notifData != ''
+                                  ? Badge(
+                                      label: Text(notifData),
+                                      child: const Icon(
+                                        Icons.notifications,
+                                        size: 26.0,
+                                      ),
+                                    )
+                                  : const Icon(
+                                      Icons.notifications,
+                                      size: 26.0,
+                                    );
+                            }
+                            // child: Badge(
+                            //   label: Text(notifLength.toString()),
+                            //   child: const Icon(
+                            //     Icons.notifications,
+                            //     size: 26.0,
+                            //   ),
+                            // ),
+                            )
+                        : Container(),
                   )),
             ],
           ),
@@ -187,9 +277,9 @@ class _DashboardState extends State<Dashboard> {
           body: tabs[_currentIndex!],
           bottomNavigationBar: !isLoading
               ? BottomAppBar(
-                height: 70,
-                padding: EdgeInsets.zero,
-                color: Color.fromARGB(255, 55, 57, 175),
+                  height: 70,
+                  padding: EdgeInsets.zero,
+                  color: const Color.fromARGB(255, 55, 57, 175),
                   child: PreferenceBuilder<String>(
                       preference: globalVoucherData,
                       builder: (context, vouchData) {
@@ -214,11 +304,12 @@ class _DashboardState extends State<Dashboard> {
                               print(index.toString());
                             });
                           },
-                          backgroundColor: Color.fromARGB(255, 55, 57, 175),
+                          backgroundColor:
+                              const Color.fromARGB(255, 55, 57, 175),
                           currentIndex: 0,
                           items: [
                             BottomNavigationBarItem(
-                                icon: new Icon(
+                                icon: const Icon(
                                   Icons.home,
                                   size: 20,
                                   color: Colors.white,
@@ -236,7 +327,7 @@ class _DashboardState extends State<Dashboard> {
                                 // backgroundColor: Colors.green[50],
                                 ),
                             BottomNavigationBarItem(
-                                icon: new Icon(
+                                icon: Icon(
                                   Icons.qr_code,
                                   size: 30,
                                   // color: Colors.white,
@@ -250,7 +341,7 @@ class _DashboardState extends State<Dashboard> {
                                 // backgroundColor: Colors.green[50],
                                 ),
                             BottomNavigationBarItem(
-                                icon: new Icon(
+                                icon: const Icon(
                                   Icons.list,
                                   size: 20,
                                   color: Colors.white,
@@ -333,8 +424,9 @@ class _DashboardState extends State<Dashboard> {
                         // );
                       }),
                 )
-              : Container(child: Center(child: CircularProgressIndicator())),
-      
+              : Container(
+                  child: const Center(child: CircularProgressIndicator())),
+
           drawer: Container(
             color: Colors.white,
             width: useMobileLayout ? 250 : 300,
@@ -350,12 +442,12 @@ class _DashboardState extends State<Dashboard> {
                     Flexible(
                       child: ListView(
                         children: <Widget>[
-                          Container(
+                          SizedBox(
                             height: 180,
                             child: Theme(
                               data: ThemeData(dividerColor: Colors.transparent),
                               child: DrawerHeader(
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                     color: Color.fromARGB(255, 55, 57, 175)),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -364,7 +456,7 @@ class _DashboardState extends State<Dashboard> {
                                     Container(
                                       height: 90,
                                       width: 180,
-                                      decoration: BoxDecoration(
+                                      decoration: const BoxDecoration(
                                         image: DecorationImage(
                                           image: AssetImage(
                                               'assets/images/swak-img.png'),
@@ -376,7 +468,7 @@ class _DashboardState extends State<Dashboard> {
                                     Text(
                                       fullName.toString(),
                                       style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
+                                        textStyle: const TextStyle(
                                           fontSize: 14,
                                           color: Colors.white,
                                           fontWeight: FontWeight.w600,
@@ -409,7 +501,7 @@ class _DashboardState extends State<Dashboard> {
                               borderRadius: BorderRadius.circular(10),
                               color: Colors.white,
                             ),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 15, vertical: 10),
                             child: Wrap(
                               children: <Widget>[
@@ -434,7 +526,7 @@ class _DashboardState extends State<Dashboard> {
                                   },
                                   color: Colors.white,
                                 ),
-      
+
                                 // DrawerOptions(
                                 //   dense: true,
                                 //   title: "Account Setting",
@@ -465,7 +557,7 @@ class _DashboardState extends State<Dashboard> {
                                 //     //     TransactionPage.routeName);
                                 //   },
                                 // ),
-      
+
                                 // DrawerOptions(
                                 //   dense: true,
                                 //   title: "Login Activity",
@@ -476,10 +568,10 @@ class _DashboardState extends State<Dashboard> {
                                 //     //     TransactionPage.routeName);
                                 //   },
                                 // ),
-                                Divider(),
-      
+                                const Divider(),
+
                                 Container(
-                                  margin: EdgeInsets.symmetric(
+                                  margin: const EdgeInsets.symmetric(
                                       horizontal: 10, vertical: 10),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
@@ -499,15 +591,16 @@ class _DashboardState extends State<Dashboard> {
                                           .pushNamedAndRemoveUntil(
                                               Login.routeName,
                                               (Route<dynamic> route) => false);
-      
+
                                       Navigator.of(context)
-                                          .pushReplacementNamed(Login.routeName);
+                                          .pushReplacementNamed(
+                                              Login.routeName);
                                     },
                                     color: Colors.white,
                                     dense: false,
                                   ),
                                 ),
-      
+
                                 // SizedBox(
                                 //   height: useMobileLayout ? 100 : 150,
                                 // ),
@@ -522,7 +615,7 @@ class _DashboardState extends State<Dashboard> {
                       title: Text(
                         "",
                         style: GoogleFonts.poppins(
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                             fontSize: 12,
                             color: Colors.black,
                           ),
@@ -531,7 +624,7 @@ class _DashboardState extends State<Dashboard> {
                       trailing: Text(
                         "v4.1",
                         style: GoogleFonts.poppins(
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                             fontSize: 10,
                             color: Colors.black,
                           ),

@@ -45,7 +45,7 @@ dependencies:
   datetime_picker_formfield_new: ^2.1.0
   rflutter_alert: ^2.0.7
   connectivity_plus: ^4.0.2
-  flutter_local_notifications: ^15.1.1
+  flutter_local_notifications: ^17.1.2
   awesome_dialog: ^3.1.0
   streaming_shared_preferences: ^2.0.0
   dotted_border: ^2.1.0
@@ -60,12 +60,15 @@ dependencies:
   scan: ^1.6.0
   image_picker: ^1.0.4
   wifi_scan: ^0.4.0+2
-  # awesome_notifications: ^0.8.2
+  # awesome_notifications: ^0.0.5
   palette_generator: ^0.3.3+3
   url_launcher: ^6.2.5
   carousel_slider: ^4.2.1
   flutter_device_identifier: ^0.0.1
   mobile_device_identifier: ^0.0.2
+  auto_size_text: ^3.0.0
+  permission_handler: ^11.3.1
+  awesome_notifications: ^0.8.2
 
 dev_dependencies:
   flutter_test:
