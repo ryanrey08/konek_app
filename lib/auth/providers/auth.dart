@@ -100,7 +100,7 @@ class Auth with ChangeNotifier {
 
     try {
       final response = await http.post(
-       Uri.parse("${config.pre_url}/register"),
+       Uri.parse("${config.pre_url}/register-v2"),
         body: userInfo,
       );
 

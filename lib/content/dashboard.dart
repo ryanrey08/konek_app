@@ -88,15 +88,15 @@ class _DashboardState extends State<Dashboard> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey('swakUrl')) {
       var url = prefs.getString('swakUrl') as String;
-      if(url != ''){
+      if (url != '') {
         await UrlLauncher.launch(url);
         await clearUrl();
       }
     }
   }
 
-  clearUrl() async{
-     final prefs = await SharedPreferences.getInstance();
+  clearUrl() async {
+    final prefs = await SharedPreferences.getInstance();
     prefs.remove('swakUrl');
   }
 
@@ -250,13 +250,16 @@ class _DashboardState extends State<Dashboard> {
                             builder: (context, notifData) {
                               return notifData != ''
                                   ? Badge(
-                                      label: Text(notifData),
+                                      label: Text(' '),
+                                      backgroundColor: Colors.red,
+                                      smallSize: 10,
+                                      largeSize: 10,
                                       child: const Icon(
                                         Icons.notifications,
                                         size: 26.0,
                                       ),
                                     )
-                                  : const Icon(
+                                  : Icon(
                                       Icons.notifications,
                                       size: 26.0,
                                     );

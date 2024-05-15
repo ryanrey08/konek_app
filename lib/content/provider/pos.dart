@@ -171,7 +171,7 @@ class POSProvider with ChangeNotifier {
       var response = await http.get(
           Uri.parse("${config.hit_pay}payment-logs/" +
               paymentData['reference_number']),
-          headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
+          headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},);
       print(response.statusCode);
       print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
@@ -219,11 +219,17 @@ class POSProvider with ChangeNotifier {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var userInfo = json.decode(sharedPreferences.getString('userData')!)
         as Map<String, dynamic>;
+            var phoneNo;
+    if (userInfo['data']['user'] != null) {
+      phoneNo = userInfo['data']['user']['mobile_no'];
+    }else{
+    phoneNo = userInfo['data']['mobile_no'];
+    }
     var token = userInfo['data']['token'];
     var responseCode;
     try {
       var response = await http.get(
-          Uri.parse("${config.hit_pay}payment-logs/"),
+          Uri.parse("${config.hit_pay}payment-logs/?phone=" + phoneNo),
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       print(response.statusCode);
       print(json.decode(response.body));

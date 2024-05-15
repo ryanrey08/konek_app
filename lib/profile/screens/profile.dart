@@ -380,17 +380,9 @@ class _MyProfileState extends State<MyProfile> {
   String getImageName(filePath, ext) {
     var fileName = (filePath.path).split('/').last;
     if (fileName.contains('pdf')) {
-      return "${txtFirstName.text.replaceAll(' ', '') +
-          "_" +
-          txtLastName.text.replaceAll(' ', '') +
-          "_" +
-          ext}.pdf";
+      return "${txtFirstName.text.replaceAll(' ', '') + "_" + txtLastName.text.replaceAll(' ', '') + "_" + ext}.pdf";
     } else {
-      return "${txtFirstName.text.replaceAll(' ', '') +
-          "_" +
-          txtLastName.text.replaceAll(' ', '') +
-          "_" +
-          ext}.png";
+      return "${txtFirstName.text.replaceAll(' ', '') + "_" + txtLastName.text.replaceAll(' ', '') + "_" + ext}.png";
     }
   }
 
@@ -494,25 +486,65 @@ class _MyProfileState extends State<MyProfile> {
     getPH();
   }
 
-  getProfile()async{
-           SharedPreferences sharedPreferences;
+  getProfile() async {
+    SharedPreferences sharedPreferences;
 
     sharedPreferences = await SharedPreferences.getInstance();
 
+    // final extractedUserData =
+    //     json.decode(sharedPreferences.getString('userData')!)
+    //         as Map<String, dynamic>;
+    // final data = extractedUserData['data']['user'] as Map<String, dynamic>;
+
     final extractedUserData =
-        json.decode(sharedPreferences.getString('userData')!)
-            as Map<String, dynamic>;
-    final data = extractedUserData['data']['user'] as Map<String, dynamic>;
-    print(data);
-
-    setState(() {
-              txtFirstName.text = data['first_name'] ?? '';
-    txtMiddleName.text = data['middle_name'] ?? '';
-    txtLastName.text = data['last_name'] ?? '';
-    txtEmailAddress.text = data['email'] ?? '';
-    txtPhoneNumber.text = data['mobile_no'] ?? '';
-    });
-
+        json.decode(sharedPreferences.getString('userData')!) as Map;
+    if (extractedUserData['data']['user'] != null) {
+      setState(() {
+        txtFirstName.text =
+            extractedUserData['data']['user']['first_name'] == null
+                ? ''
+                : extractedUserData['data']['user']['first_name'];
+        txtMiddleName.text =
+            extractedUserData['data']['user']['middle_name'] == null
+                ? ''
+                : extractedUserData['data']['user']['middle_name'];
+        txtLastName.text =
+            extractedUserData['data']['user']['last_name'] == null
+                ? ''
+                : extractedUserData['data']['user']['last_name'];
+        txtEmailAddress.text =
+            extractedUserData['data']['user']['email'] == null
+                ? ''
+                : extractedUserData['data']['user']['email'];
+        txtPhoneNumber.text =
+            extractedUserData['data']['user']['mobile_no'] == null
+                ? ''
+                : extractedUserData['data']['user']['mobile_no'];
+      });
+    } else {
+      setState(() {
+        txtFirstName.text =
+            extractedUserData['data']['first_name'] == null
+                ? ''
+                : extractedUserData['data']['first_name'];
+        txtMiddleName.text =
+            extractedUserData['data']['middle_name'] == null
+                ? ''
+                : extractedUserData['data']['middle_name'];
+        txtLastName.text =
+            extractedUserData['data']['last_name'] == null
+                ? ''
+                : extractedUserData['data']['last_name'];
+        txtEmailAddress.text =
+            extractedUserData['data']['email'] == null
+                ? ''
+                : extractedUserData['data']['email'];
+        txtPhoneNumber.text =
+            extractedUserData['data']['mobile_no'] == null
+                ? ''
+                : extractedUserData['data']['mobile_no'];
+      });
+    }
   }
 
   @override
@@ -615,17 +647,17 @@ class _MyProfileState extends State<MyProfile> {
             backgroundColor: const Color.fromARGB(255, 55, 57, 175),
             leading: Builder(builder: (BuildContext context) {
               return IconButton(
-                  icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
+                  icon: const Icon(Icons.keyboard_arrow_left,
+                      color: Colors.white),
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, Dashboard.routeName);
+                    Navigator.pushReplacementNamed(
+                        context, Dashboard.routeName);
                   } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
             }),
             automaticallyImplyLeading: false,
             title: Text('My Profile',
                 style: GoogleFonts.poppins(
-                  fontSize: useMobileLayout ? 16 : 18,
-                  color: Colors.white
-                )),
+                    fontSize: useMobileLayout ? 16 : 18, color: Colors.white)),
           ),
           body: isLoading
               ? Container(child: const Text("Loading..."))
@@ -637,8 +669,8 @@ class _MyProfileState extends State<MyProfile> {
                         child: SingleChildScrollView(
                             child: Container(
                           color: Colors.white,
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 15),
                           child: Column(
                             children: <Widget>[
                               // CustomFormField(
@@ -662,7 +694,8 @@ class _MyProfileState extends State<MyProfile> {
                                 label: 'First Name',
                                 controller: txtFirstName,
                                 onFieldSubmitted: (_) {
-                                  FocusScope.of(context).requestFocus(mNameFocus);
+                                  FocusScope.of(context)
+                                      .requestFocus(mNameFocus);
                                 },
                                 validator: (value) {
                                   if (value.isEmpty) {
@@ -682,7 +715,8 @@ class _MyProfileState extends State<MyProfile> {
                                 },
                                 initialValue: '',
                                 onFieldSubmitted: (_) {
-                                  FocusScope.of(context).requestFocus(lNameFocus);
+                                  FocusScope.of(context)
+                                      .requestFocus(lNameFocus);
                                 },
                               ),
                               const SizedBox(height: 4),
@@ -708,7 +742,8 @@ class _MyProfileState extends State<MyProfile> {
                                 label: 'Email Address',
                                 controller: txtEmailAddress,
                                 onFieldSubmitted: (_) {
-                                  FocusScope.of(context).requestFocus(phoneFocus);
+                                  FocusScope.of(context)
+                                      .requestFocus(phoneFocus);
                                 },
                                 validator: (value) {
                                   if (value.isEmpty) {
@@ -741,7 +776,8 @@ class _MyProfileState extends State<MyProfile> {
                                 label: 'Address',
                                 controller: txtCompleteAddress,
                                 onFieldSubmitted: (_) {
-                                  FocusScope.of(context).requestFocus(phoneFocus);
+                                  FocusScope.of(context)
+                                      .requestFocus(phoneFocus);
                                 },
                                 validator: (value) {
                                   if (value.isEmpty) {
@@ -814,7 +850,7 @@ class _MyProfileState extends State<MyProfile> {
                                 height: 4,
                               ),
                               CustomDropDown(
-                                 status: editStatus,
+                                status: editStatus,
                                 value: _selectedProvince,
                                 items: _province,
                                 title: "Province",
@@ -838,7 +874,7 @@ class _MyProfileState extends State<MyProfile> {
                                 height: 4,
                               ),
                               CustomDropDown(
-                                 status: editStatus,
+                                status: editStatus,
                                 value: _selectedMunicipality,
                                 items: _municipality,
                                 title: "Municipality",
@@ -860,7 +896,7 @@ class _MyProfileState extends State<MyProfile> {
                                 height: 4,
                               ),
                               CustomDropDown(
-                                 status: editStatus,
+                                status: editStatus,
                                 value: _selectedBarangay,
                                 items: _barangay,
                                 title: "Barangay",
@@ -878,12 +914,12 @@ class _MyProfileState extends State<MyProfile> {
                                   return null;
                                 },
                               ),
-      
+
                               Container(
                                 // height:  150,
                                 //width: double.infinity,
                                 width: useMobileLayout ? 600 : 700,
-      
+
                                 //height: useMobileLayout ? 90 : 150,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
@@ -897,7 +933,8 @@ class _MyProfileState extends State<MyProfile> {
                                     height: 50,
                                     child: ElevatedButton(
                                       style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.white, shape: RoundedRectangleBorder(
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(50.0),
                                         ),
@@ -951,7 +988,9 @@ class _MyProfileState extends State<MyProfile> {
                             // _formKey1.currentState.validate();
                           },
                           style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white, backgroundColor: Color.fromARGB(255, 55, 57, 175), // foreground
+                            foregroundColor: Colors.white,
+                            backgroundColor:
+                                Color.fromARGB(255, 55, 57, 175), // foreground
                             //                color: Colors.yellow,
                             // textColor: Colors.black,
                             // splashColor: Colors.yellowAccent[800],
@@ -978,7 +1017,9 @@ class _MyProfileState extends State<MyProfile> {
                             proceed();
                           },
                           style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white, backgroundColor: Color.fromARGB(255, 55, 57, 175), // foreground
+                            foregroundColor: Colors.white,
+                            backgroundColor:
+                                Color.fromARGB(255, 55, 57, 175), // foreground
                             //                color: Colors.yellow,
                             // textColor: Colors.black,
                             // splashColor: Colors.yellowAccent[800],
