@@ -7,6 +7,7 @@ import 'package:konek_app/content/provider/pos.dart';
 import 'package:konek_app/content/provider/voucher.dart';
 import 'package:konek_app/content/scan.dart';
 import 'package:konek_app/content/uploadpic.dart';
+import 'package:konek_app/profile/providers/profileprovider.dart';
 import 'package:konek_app/profile/screens/profile.dart';
 import 'package:provider/provider.dart';
 import 'package:konek_app/auth/screens/login.dart';
@@ -121,6 +122,28 @@ class _MyAppPageState extends State<MyApp> {
 
             // Instantiate the UserProvider with the token
             return POSProvider(token);
+          },
+          // create: (BuildContext context) {
+          //   // This won't be used because we use the update function.
+          //   throw UnimplementedError();
+          // },
+        ),
+        ChangeNotifierProxyProvider<Auth, ProfileProvider>(
+          //create: (context) => Voucher(''),
+          update: (context, auth, userData) {
+            // Pass the value from AuthProvider to UserProvider
+            // userData?.updateUserData(authProvider?.isLoggedIn ?? false);
+            // return userData!;
+            return userData ?? ProfileProvider(auth.token);
+          },
+          create: (BuildContext context) {
+            // You can pass any required parameters to the create method
+            // In this example, we pass a token from AuthProvider
+            final Auth authProvider = Provider.of<Auth>(context, listen: false);
+            final String token = authProvider.token;
+
+            // Instantiate the UserProvider with the token
+            return ProfileProvider(token);
           },
           // create: (BuildContext context) {
           //   // This won't be used because we use the update function.

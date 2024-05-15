@@ -228,7 +228,7 @@ class _UploadPictureState extends State<UploadPicture> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       if (vouchData['voucher_code'] != '') {
         // var data = json.decode(prefs.getString('voucherData')!) as Map<String, dynamic>;
-        NotificationController.scheduleNewNotification(vouchData['description'], vouchData['expire_date']);
+        NotificationController.scheduleNewNotification(vouchData['description'], vouchData['expire_date'], vouchData['payment_request_at'], vouchData['subscription']['duration']);
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const Dashboard(),
@@ -457,7 +457,7 @@ class _UploadPictureState extends State<UploadPicture> {
                       _onImageButtonPressed(ImageSource.camera,
                           context: context);
                     },
-                    heroTag: 'image2',
+                    heroTag: 'image1',
                     tooltip: 'Take a Photo',
                     child: const Icon(Icons.camera_alt),
                   ),
@@ -474,12 +474,14 @@ class _UploadPictureState extends State<UploadPicture> {
 
                     setState(() {
                       _setImageFileListFromFile(null);
-                      qrCode = result;
+                      if(result != null){
+                        qrCode = result;
+                      } 
                     });
 
                     print(result);
                   },
-                  heroTag: 'image0',
+                  heroTag: 'image2',
                   tooltip: 'Scan QR Code',
                   child: const Icon(Icons.qr_code),
                 ),
@@ -491,7 +493,7 @@ class _UploadPictureState extends State<UploadPicture> {
                   onPressed: () async {
                     enterVoucherCode();
                   },
-                  heroTag: 'image0',
+                  heroTag: 'image3',
                   tooltip: 'Enter Voucher Code',
                   child: const Icon(Icons.input),
                 ),

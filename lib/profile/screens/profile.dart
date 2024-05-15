@@ -88,6 +88,9 @@ class _MyProfileState extends State<MyProfile> {
   List<dynamic> _barangay = [];
 
   List<dynamic> _regionsId = [];
+  String _provsId = '';
+  String _munId = '';
+  String _brgyId = '';
   List<dynamic> _tempMunicipalityKeys = [];
   List<dynamic> _tempMunicipality = [];
   var _tempRegion = {};
@@ -120,7 +123,7 @@ class _MyProfileState extends State<MyProfile> {
       _region = region;
       _selectedRegion = _region[0];
       _regionId = _regionsId[0];
-      //print(_region);
+      print(_regionId);
       // if (_userData['region'] == null) {
       //   _selectedRegion = _region[0];
       //   _regionId = _regionsId[0];
@@ -128,7 +131,7 @@ class _MyProfileState extends State<MyProfile> {
     });
   }
 
-  getRegionId() {
+  String getRegionId() {
     int index = 0;
     for (var x = 0; x < _region.length; x++) {
       if (_selectedRegion == _region[x]) {
@@ -136,9 +139,55 @@ class _MyProfileState extends State<MyProfile> {
       }
     }
 
-    setState(() {
-      _regionId = _regionsId[index];
-    });
+    // setState(() {
+    //   _regionId = _regionsId[index];
+    // });
+    return _regionsId[index];
+  }
+
+  String getProvId() {
+    int index = 0;
+    for (var x = 0; x < _province.length; x++) {
+      if (_selectedProvince == _province[x]) {
+        index = x;
+      }
+    }
+
+    // setState(() {
+    //   _regionId = _provsId[index];
+    // });
+
+    return _provsId[index];
+  }
+
+  String getMunId() {
+    int index = 0;
+    for (var x = 0; x < _municipality.length; x++) {
+      if (_selectedMunicipality == _municipality[x]) {
+        index = x;
+      }
+    }
+
+    // setState(() {
+    //   _regionId = _regionsId[index];
+    // });
+
+    return _munId[index];
+  }
+
+  String getBrgyId() {
+    int index = 0;
+    for (var x = 0; x < _barangay.length; x++) {
+      if (_selectedBarangay == _barangay[x]) {
+        index = x;
+      }
+    }
+
+    // setState(() {
+    //   _regionId = _regionsId[index];
+    // });
+
+    return '123';
   }
 
   getProvince() {
@@ -151,6 +200,7 @@ class _MyProfileState extends State<MyProfile> {
       if (region[x]['region_name'] == _selectedRegion) {
         tempRegion = region[x];
         tempProvince = region[x]['province_list'].keys.toList();
+        _provsId = region[x]['province_list'].keys.toList();
         for (var y = 0; y < tempProvince.length; y++) {
           provinces.add(tempProvince[y]);
         }
@@ -160,7 +210,7 @@ class _MyProfileState extends State<MyProfile> {
     setState(() {
       _tempRegion = tempRegion;
       _province = provinces;
-      print(_province);
+      print(_regionId);
       _selectedProvince = _province[0];
     });
   }
@@ -199,8 +249,14 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   changeProvince() {
-    getMunicipality();
-    getBarangay();
+    provinces.forEach((element) {
+      if (_selectedProvince == element['provDesc']) {
+        _provsId = element['provCode'];
+      }
+    });
+    print("provId" + _provsId);
+    getMunicipalities(_provsId);
+    // getBarangay(_provsId, );
   }
 
   getMunicipality() {
@@ -216,6 +272,7 @@ class _MyProfileState extends State<MyProfile> {
       if (tempProvinceKeys[y] == _selectedProvince) {
         tempMunicipalitiesKeys =
             tempProvince[y]['municipality_list'].keys.toList();
+        _munId = tempProvince[y]['municipality_list'].keys.toList();
         tempMunicipalities =
             tempProvince[y]['municipality_list'].values.toList();
 
@@ -239,8 +296,10 @@ class _MyProfileState extends State<MyProfile> {
       if (_tempMunicipalityKeys[a] == _selectedMunicipality) {
         setState(() {
           _barangay = _tempMunicipality[a]['barangay_list'];
+          _brgyId = _tempMunicipality[a]['barangay_list'];
           _selectedBarangay = _barangay[0];
           isLoading = false;
+          print(_brgyId);
         });
       }
     }
@@ -339,6 +398,11 @@ class _MyProfileState extends State<MyProfile> {
   final double _brightness = 1.0;
   static final int _currentPage = 0;
   final int _currentIndex = 0;
+  var provinces = [];
+  var municipalities = [];
+  var barangays = [];
+
+  var myProfile;
 
   final PageController _controller = PageController(
     initialPage: _currentPage,
@@ -387,67 +451,24 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   void updateProfile() {
-    // var userInfo = {
-    //     'id' : user['user']['id'].toString(),
-    //     'email':user['user']['email'].toString(),
-    //     'contact_number' : user['user']['contact_number'].toString(),
-    //     'system_access' : user['user']['system_access'].toString(),
-    //     'status' : user['status'].toString(),
-    //   // 'spouse_last_name': txtFamLastName.text,
-    //   // 'spouse_first_name': txtFamFirstName.text,
-    //   // 'spouse_middle_name': txtFamMiddleName.text,
-    //   // 'spouse_date_of_birth': txtFamBirthDate.text,
-    //   // 'spouse_contact_number': txtFamPhoneNumber.text,
-    //   // 'spouse_occupation': txtFamOccupation.text,
-    //   // 'spouse_educational_attainment': txtFamEducational.text,
-    //   // 'bank_name': txtBankName.text,
-    //   // 'account_name': txtAccountName.text,
-    //   // 'account_number': txtAccountNumber.text
-    // };
-
-    var img1;
-    var img2;
-    var img3;
-    var img1Name;
-    var img2Name;
-    var img3Name;
-
-    var encodedProfile;
-    var encodedSignature;
-    var encodedGov;
-
-    var farmerInfo = {
-      'token': token,
-      'farmer_id': farmer['farmer_id'].toString(),
-      'user_id': farmer['user_id'].toString(),
-      'rsbsa_no': farmer['rsbsa_no'].toString(),
-      'landparcelInfo': farmer['landparcelInfo'].toString(),
-      'address': txtCompleteAddress.text,
-      'last_name': txtLastName.text,
+    var userInfo = {
+      'm_name': txtMiddleName.text,
       'first_name': txtFirstName.text,
-      'middle_name': txtMiddleName.text,
-      'suffix': '',
-      'birthdate': txtBirthDate.text,
-      'tin_no': txtTINnumber.text,
-      'profile_picture': encodedProfile,
-      'government_id': encodedGov,
-      'e_signiture': encodedSignature,
-      'contact_number': txtPhoneNumber.text,
-      'place_of_birth': txtPlaceOfBirth.text,
-      'gender': _selectedSex.toString(),
-      'civil_status': _selectedCivilStatus.toString(),
-      'educational_attainment': txtEducational.text,
-      'degree_course': txtDegree.text,
+      'last_name': txtLastName.text,
+      'address': txtCompleteAddress.text,
+      'province': _provsId,
+      'municipality': _munId,
+      'barangay': _brgyId
     };
-    updateFarmerProfile(token, farmerInfo);
+
+    print(userInfo);
+    updateFarmerProfile(userInfo);
   }
 
-  void updateFarmerProfile(
-      String token, Map<String, dynamic> farmerInfo) async {
+  void updateFarmerProfile(Map<String, dynamic> userInfo) async {
     try {
       bool isSaved = await Provider.of<ProfileProvider>(context, listen: false)
-          .updateProfiling(token, farmerInfo);
-      print('error here');
+          .updateProfile(userInfo);
       if (isSaved) {
         setState(() {
           isLoadingSend = false;
@@ -456,15 +477,16 @@ class _MyProfileState extends State<MyProfile> {
           dismissOnBackKeyPress: false,
           dismissOnTouchOutside: false,
           onDismissCallback: (BuildContext) {
-            Navigator.pushReplacementNamed(context, Dashboard.routeName);
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
           },
           context: context,
           animType: AnimType.scale,
           dialogType: DialogType.success,
-          title: "Update farmer profile",
+          title: "Update Profile",
           desc: "Successfully Updated",
           btnOkOnPress: () {
-            Navigator.pushReplacementNamed(context, Dashboard.routeName);
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+            print(_selectedProvince);
           },
         ).show();
 
@@ -472,8 +494,11 @@ class _MyProfileState extends State<MyProfile> {
         //   _currentStep += 1;
         // });
       }
-    } catch (error) {
+    } on HttpException catch (error) {
       print(error);
+      showError(error.toString());
+    } catch (error) {
+      showError(error.toString());
     }
   }
 
@@ -483,67 +508,199 @@ class _MyProfileState extends State<MyProfile> {
     super.didChangeDependencies();
     print("here");
     //getProfile();
-    getPH();
+    // getPH();
   }
 
   getProfile() async {
-    SharedPreferences sharedPreferences;
+    // SharedPreferences sharedPreferences;
 
-    sharedPreferences = await SharedPreferences.getInstance();
+    // sharedPreferences = await SharedPreferences.getInstance();
 
     // final extractedUserData =
-    //     json.decode(sharedPreferences.getString('userData')!)
-    //         as Map<String, dynamic>;
-    // final data = extractedUserData['data']['user'] as Map<String, dynamic>;
+    //     json.decode(sharedPreferences.getString('userData')!) as Map;
+    // if (extractedUserData['data']['user'] != null) {
+    //   setState(() {
+    //     txtFirstName.text =
+    //         extractedUserData['data']['user']['first_name'] == null
+    //             ? ''
+    //             : extractedUserData['data']['user']['first_name'];
+    //     txtMiddleName.text =
+    //         extractedUserData['data']['user']['middle_name'] == null
+    //             ? ''
+    //             : extractedUserData['data']['user']['middle_name'];
+    //     txtLastName.text =
+    //         extractedUserData['data']['user']['last_name'] == null
+    //             ? ''
+    //             : extractedUserData['data']['user']['last_name'];
+    //     txtEmailAddress.text =
+    //         extractedUserData['data']['user']['email'] == null
+    //             ? ''
+    //             : extractedUserData['data']['user']['email'];
+    //     txtPhoneNumber.text =
+    //         extractedUserData['data']['user']['mobile_no'] == null
+    //             ? ''
+    //             : extractedUserData['data']['user']['mobile_no'];
+    //   });
+    // } else {
+    //   setState(() {
+    //     txtFirstName.text = extractedUserData['data']['first_name'] == null
+    //         ? ''
+    //         : extractedUserData['data']['first_name'];
+    //     txtMiddleName.text = extractedUserData['data']['middle_name'] == null
+    //         ? ''
+    //         : extractedUserData['data']['middle_name'];
+    //     txtLastName.text = extractedUserData['data']['last_name'] == null
+    //         ? ''
+    //         : extractedUserData['data']['last_name'];
+    //     txtEmailAddress.text = extractedUserData['data']['email'] == null
+    //         ? ''
+    //         : extractedUserData['data']['email'];
+    //     txtPhoneNumber.text = extractedUserData['data']['mobile_no'] == null
+    //         ? ''
+    //         : extractedUserData['data']['mobile_no'];
+    //   });
+    // }
 
-    final extractedUserData =
-        json.decode(sharedPreferences.getString('userData')!) as Map;
-    if (extractedUserData['data']['user'] != null) {
+    txtFirstName.text =
+        myProfile['first_name'] == null ? '' : myProfile['first_name'];
+    txtMiddleName.text =
+        myProfile['middle_name'] == null ? '' : myProfile['middle_name'];
+    txtLastName.text =
+        myProfile['last_name'] == null ? '' : myProfile['last_name'];
+    txtEmailAddress.text = myProfile['email'] == null ? '' : myProfile['email'];
+    txtPhoneNumber.text =
+        myProfile['mobile_no'] == null ? '' : myProfile['mobile_no'];
+    txtCompleteAddress.text =
+        myProfile['address'] == null ? '' : myProfile['address'];
+  }
+
+  Future<void> getMyProfile() async {
+    var errorMessage;
+    provinces = [];
+    _province = [];
+    try {
+      //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
+      var prof = await Provider.of<ProfileProvider>(context, listen: false)
+          .getProfile();
       setState(() {
-        txtFirstName.text =
-            extractedUserData['data']['user']['first_name'] == null
-                ? ''
-                : extractedUserData['data']['user']['first_name'];
-        txtMiddleName.text =
-            extractedUserData['data']['user']['middle_name'] == null
-                ? ''
-                : extractedUserData['data']['user']['middle_name'];
-        txtLastName.text =
-            extractedUserData['data']['user']['last_name'] == null
-                ? ''
-                : extractedUserData['data']['user']['last_name'];
-        txtEmailAddress.text =
-            extractedUserData['data']['user']['email'] == null
-                ? ''
-                : extractedUserData['data']['user']['email'];
-        txtPhoneNumber.text =
-            extractedUserData['data']['user']['mobile_no'] == null
-                ? ''
-                : extractedUserData['data']['user']['mobile_no'];
+        myProfile = prof['data'];
+        getProfile();
+        print(myProfile);
       });
-    } else {
+    } on HttpException catch (error) {
+      print(error);
+      showError(error.toString());
+    } catch (error) {
+      showError(error.toString());
+    }
+  }
+
+  Future<void> getProvinces() async {
+    var errorMessage;
+    provinces = [];
+    _province = [];
+    try {
+      //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
+      var province = await Provider.of<ProfileProvider>(context, listen: false)
+          .getProvince();
       setState(() {
-        txtFirstName.text =
-            extractedUserData['data']['first_name'] == null
-                ? ''
-                : extractedUserData['data']['first_name'];
-        txtMiddleName.text =
-            extractedUserData['data']['middle_name'] == null
-                ? ''
-                : extractedUserData['data']['middle_name'];
-        txtLastName.text =
-            extractedUserData['data']['last_name'] == null
-                ? ''
-                : extractedUserData['data']['last_name'];
-        txtEmailAddress.text =
-            extractedUserData['data']['email'] == null
-                ? ''
-                : extractedUserData['data']['email'];
-        txtPhoneNumber.text =
-            extractedUserData['data']['mobile_no'] == null
-                ? ''
-                : extractedUserData['data']['mobile_no'];
+        var userProv = '';
+        var userProvCode = '';
+        provinces = province['data'];
+        provinces.forEach((element) {
+          _province.add(element['provDesc']);
+          if (myProfile['provCode'] != null) {
+            if (myProfile['provCode'] == element['provCode']) {
+              userProv = element['provDesc'];
+              userProvCode = element['provCode'];
+            }
+          }
+        });
+        print(_province);
+        _selectedProvince = userProv == '' ? _province[0] : userProv;
+        _provsId = myProfile['provCode'] == null
+            ? provinces[0]['provCode'].toString()
+            : myProfile['provCode'];
+        getMunicipalities(_provsId);
       });
+    } on HttpException catch (error) {
+      print(error);
+      showError(error.toString());
+    } catch (error) {
+      showError(error.toString());
+    }
+  }
+
+  Future<void> getMunicipalities(code) async {
+    print(code);
+    var errorMessage;
+    municipalities = [];
+    _municipality = [];
+    try {
+      //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
+      var municipality =
+          await Provider.of<ProfileProvider>(context, listen: false)
+              .getCity(code);
+      setState(() {
+        var userMun = '';
+        var userMunCode = '';
+        municipalities = municipality['data'];
+        municipalities.forEach((element) {
+          _municipality.add(element['citymunDesc']);
+          if (myProfile['citymunCode'] != null) {
+            if (myProfile['citymunCode'] == element['citymunCode']) {
+              userMun = element['citymunDesc'];
+              userMunCode = element['citymunCode'];
+            }
+          }
+        });
+        _selectedMunicipality = userMun == '' ? _municipality[0] : userMun;
+        _munId = myProfile['citymunCode'] == null
+            ? municipalities[0]['citymunCode'].toString()
+            : myProfile['citymunCode'];
+        getBarangays(_munId);
+      });
+    } on HttpException catch (error) {
+      print(error);
+      showError(error.toString());
+    } catch (error) {
+      showError(error.toString());
+    }
+  }
+
+  Future<void> getBarangays(munCode) async {
+    var errorMessage;
+    barangays = [];
+    _barangay = [];
+    try {
+      setState(() {
+        isLoading = false;
+      });
+      //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
+      var barangay = await Provider.of<ProfileProvider>(context, listen: false)
+          .getBarangay(_provsId, munCode);
+      setState(() {
+        var userBrgy = '';
+        var userBrgyCode = '';
+        barangays = barangay['data'];
+        barangays.forEach((element) {
+          _barangay.add(element['brgyDesc']);
+          if (myProfile['brgyCode'] != null) {
+            if (myProfile['brgyCode'] == element['brgyCode']) {
+              userBrgy = element['brgyDesc'];
+              userBrgyCode = element['brgyCode'];
+            }
+          }
+        });
+        _selectedBarangay = userBrgy == '' ? _barangay[0] : userBrgy;
+        _brgyId = myProfile['brgyCode'] == null ? barangays[0]['brgyCode'] : myProfile['brgyCode'];
+        isLoading = false;
+      });
+    } on HttpException catch (error) {
+      print(error);
+      showError(error.toString());
+    } catch (error) {
+      showError(error.toString());
     }
   }
 
@@ -551,13 +708,19 @@ class _MyProfileState extends State<MyProfile> {
   void initState() {
     super.initState();
     //getUser();
-    editStatus = false;
-    getProfile();
+    // editStatus = false;
+    // getProfile();
+    loadData();
     // txtFirstName.text = 'John';
     // txtMiddleName.text = 'Black';
     // txtLastName.text = 'Doe';
     // txtEmailAddress.text = 'johndoe@me.com';
     // txtPhoneNumber.text = '09123456789';
+  }
+
+  loadData() async {
+    await getMyProfile();
+    await getProvinces();
   }
 
   @override
@@ -825,30 +988,30 @@ class _MyProfileState extends State<MyProfile> {
                               const SizedBox(
                                 height: 4,
                               ),
-                              CustomDropDown(
-                                status: editStatus,
-                                value: _selectedRegion,
-                                items: _region,
-                                title: "Region",
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedRegion = value.toString();
-                                    _regionId =
-                                        _regionsId[_region.indexOf(value)];
-                                    changeRegion();
-                                  });
-                                  return null;
-                                },
-                                validator: (value) {
-                                  if (value == null) {
-                                    return 'Please choose your region';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(
-                                height: 4,
-                              ),
+                              // CustomDropDown(
+                              //   status: editStatus,
+                              //   value: _selectedRegion,
+                              //   items: _region,
+                              //   title: "Region",
+                              //   onChanged: (value) {
+                              //     setState(() {
+                              //       _selectedRegion = value.toString();
+                              //       _regionId =
+                              //           _regionsId[_region.indexOf(value)];
+                              //       changeRegion();
+                              //     });
+                              //     return null;
+                              //   },
+                              //   validator: (value) {
+                              //     if (value == null) {
+                              //       return 'Please choose your region';
+                              //     }
+                              //     return null;
+                              //   },
+                              // ),
+                              // const SizedBox(
+                              //   height: 4,
+                              // ),
                               CustomDropDown(
                                 status: editStatus,
                                 value: _selectedProvince,
@@ -856,10 +1019,8 @@ class _MyProfileState extends State<MyProfile> {
                                 title: "Province",
                                 onChanged: (value) {
                                   setState(() {
-                                    print(_selectedProvince);
                                     _selectedProvince = value.toString();
                                     changeProvince();
-                                    print(value);
                                   });
                                   return null;
                                 },
@@ -881,7 +1042,14 @@ class _MyProfileState extends State<MyProfile> {
                                 onChanged: (value) {
                                   setState(() {
                                     _selectedMunicipality = value.toString();
-                                    getBarangay();
+                                    var munCode;
+                                    municipalities.forEach((element) {
+                                      if (_selectedMunicipality ==
+                                          element['citymunDesc']) {
+                                        munCode = element['citymunCode'];
+                                      }
+                                    });
+                                    getBarangays(munCode);
                                   });
                                   return null;
                                 },

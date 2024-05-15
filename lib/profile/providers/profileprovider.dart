@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
@@ -15,42 +14,125 @@ class ProfileProvider with ChangeNotifier {
 
   ProfileProvider(this._token);
 
-  Future<bool> updateProfiling(
+  Future<bool> updateProfile(
       // String status, Map<String, dynamic> basicInfo, Map<String, dynamic> businessDetails, Map<String, dynamic> req, int id) async {
-   String ftoken,Map<String, dynamic> farmerInfo) async {
- 
+      Map<String, dynamic> userData) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    var userInfo = json.decode(sharedPreferences.getString('userData')!) as Map<String, dynamic>;
-    var token = userInfo['token'];
+    var userInfo = json.decode(sharedPreferences.getString('userData')!)
+        as Map<String, dynamic>;
+    var token = userInfo['data']['token'];
 
     //  Map data ={'token': ftoken,'data': json.encode(farmerInfo) as Map<String, dynamic>};
     // Map data = farmerInfo;
     print(token);
     Map<String, dynamic> jsonResponse;
-    print(farmerInfo);
     try {
-
-      
       //  Route::post('/farmer/update-profile', 'FarmerController@updateProfile
-      var response = await http.post((config.pre_url + config.auth_update_profile) as Uri,
-          body: farmerInfo, headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
+      var response = await http.post(
+          Uri.parse("${config.auth_update_profile}update-profile"),
+          body: userData,
+          headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
 // Map<String, dynamic> data = new Map<String, dynamic>.from(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
       if (jsonResponse['success'] == true) {
-        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-        sharedPreferences.setString('userData', json.encode(farmerInfo));
+        // SharedPreferences sharedPreferences =
+        //     await SharedPreferences.getInstance();
+        // sharedPreferences.setString('userData', json.encode(userInfo));
         return jsonResponse['success'];
       } else {
         throw HttpException(jsonResponse['message']);
       }
-       
     } catch (error) {
       print(error);
-      print('error here update profile');
       // print(responseCode);
       rethrow;
     }
   }
 
+      Future<Map<String, dynamic>> getProfile() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userInfo = json.decode(sharedPreferences.getString('userData')!)
+        as Map<String, dynamic>;
 
+    var token = userInfo['data']['token'];
+    var responseCode;
+    try {
+      var response = await http.get(
+          Uri.parse("${config.auth_update_profile}my-profile"),
+          headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
+      var jsonResponse = json.decode(response.body);
+      notifyListeners();
+      return jsonResponse;
+    } catch (error) {
+      print(error);
+      // print(responseCode);
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getProvince() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userInfo = json.decode(sharedPreferences.getString('userData')!)
+        as Map<String, dynamic>;
+    var token = userInfo['data']['token'];
+    var responseCode;
+    try {
+      var response = await http.get(
+          Uri.parse("${config.my_address}get-province"),
+          headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
+      var jsonResponse = json.decode(response.body);
+      notifyListeners();
+      return jsonResponse;
+    } catch (error) {
+      print(error);
+      // print(responseCode);
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getCity(code) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userInfo = json.decode(sharedPreferences.getString('userData')!)
+        as Map<String, dynamic>;
+    var token = userInfo['data']['token'];
+    var responseCode;
+    try {
+      var response = await http.get(
+          Uri.parse("${config.my_address}get-city/" + code),
+          headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
+      var jsonResponse = json.decode(response.body);
+      notifyListeners();
+      return jsonResponse;
+    } catch (error) {
+      print(error);
+      // print(responseCode);
+      rethrow;
+    }
+  }
+
+    Future<Map<String, dynamic>> getBarangay(provCode, munCode) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userInfo = json.decode(sharedPreferences.getString('userData')!)
+        as Map<String, dynamic>;
+    var phoneNo;
+    if (userInfo['data']['user'] != null) {
+      phoneNo = userInfo['data']['user']['mobile_no'];
+    } else {
+      phoneNo = userInfo['data']['mobile_no'];
+    }
+    var token = userInfo['data']['token'];
+    var responseCode;
+    try {
+      var response = await http.get(
+          Uri.parse("${config.my_address}get-brgy/" + provCode + "/" + munCode),
+          headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
+      var jsonResponse = json.decode(response.body);
+      notifyListeners();
+      return jsonResponse;
+    } catch (error) {
+      print(error);
+      // print(responseCode);
+      rethrow;
+    }
+  }
 }

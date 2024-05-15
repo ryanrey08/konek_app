@@ -192,6 +192,8 @@ class POSProvider with ChangeNotifier {
           "amount": 0,
           "claimed_date": jsonResponse["data"]['subscription']['start_date'],
           "expire_date": jsonResponse["data"]['subscription']['end_date'],
+          "payment_request_at": jsonResponse["data"]['payment_request_at'],
+          "current_date": jsonResponse["current_date"],
           "status": jsonResponse["data"]['payment_status'],
           "url": jsonResponse['redirect_url'] == null ? '' : jsonResponse['redirect_url']
         };

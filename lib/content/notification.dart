@@ -73,7 +73,7 @@ class _NotificationListState extends State<NotificationList> {
       print(voucher);
       setState(() {
          voucher['data'].forEach((item) {
-          if(item['payment_status'] == 'pending'){
+          if(item['payment_status'] == 'completed'){
             voucherData.add(item);
           }
         });
@@ -149,21 +149,19 @@ class _NotificationListState extends State<NotificationList> {
                           return Column(
                             children: <Widget>[
                               ListTile(
-                                title: Expanded(
-                                  child: Text(
-                                    'Your ' + 
-                                    voucherData[index]['subscription']
-                                            ['duration'] +
-                                        " " +
-                                        voucherData[index]['subscription']
-                                            ['duration_unit'] +
-                                        "/s Unlimited Data has been expired",
-                                    style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w800,
-                                      ),
+                                title: Text(
+                                  'Your ' + 
+                                  voucherData[index]['subscription']
+                                          ['duration'] +
+                                      " " +
+                                      voucherData[index]['subscription']
+                                          ['duration_unit'] +
+                                      "/s Unlimited Data has been expired",
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800,
                                     ),
                                   ),
                                 ),

@@ -253,12 +253,17 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         voucherData = vouchData;
       });
+
       // await UrlLauncher.launch(voucherData['url']);
       if (await Permission.notification.request().isGranted) {
-        if (vouchData['status'] == 'completed') {
-          Future.delayed(const Duration(milliseconds: 3000), () {
-            NotificationController.scheduleNewNotification(
-                vouchData['description'], vouchData['expire_date']);
+        // print(vouchData['current_date']);
+        // print(vouchData['payment_request_at']);
+        // print(vouchData['duration']);
+        if (vouchData['status'] == 'pending') {
+          Future.delayed(const Duration(milliseconds: 3000), () async{
+            await NotificationController.cancelNotifications();
+            await NotificationController.scheduleNewNotification(
+                vouchData['description'], vouchData['current_date'], vouchData['payment_request_at'], vouchData['duration']);
           });
         }
       }
@@ -1018,21 +1023,19 @@ class _HomePageState extends State<HomePage> {
                                                 )
                                               ]
                                             ])
-                                      : Expanded(
-                                          child: Center(
-                                            child: Text(
-                                              "NO CURRENT DATA",
-                                              style: GoogleFonts.poppins(
-                                                textStyle: TextStyle(
-                                                  color: Colors.red,
-                                                  fontSize:
-                                                      useMobileLayout ? 14 : 25,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
+                                      : Center(
+                                        child: Text(
+                                          "NO CURRENT DATA",
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              color: Colors.red,
+                                              fontSize:
+                                                  useMobileLayout ? 14 : 25,
+                                              fontWeight: FontWeight.w600,
                                             ),
                                           ),
                                         ),
+                                      ),
                                 ),
                               ),
                             ),
@@ -1115,20 +1118,18 @@ class _HomePageState extends State<HomePage> {
                                       );
                                     }).toList(),
                                   )
-                                : Expanded(
-                                    child: Center(
-                                      child: Text(
-                                        "NO CURRENT ADS",
-                                        style: GoogleFonts.poppins(
-                                          textStyle: TextStyle(
-                                            color: Colors.red,
-                                            fontSize: useMobileLayout ? 14 : 25,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
+                                : Center(
+                                  child: Text(
+                                    "NO CURRENT ADS",
+                                    style: GoogleFonts.poppins(
+                                      textStyle: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: useMobileLayout ? 14 : 25,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ),
+                                ),
                           ),
                           const SizedBox(
                             height: 5,

@@ -47,7 +47,7 @@ class _TransactionState extends State<Transaction> {
       print(voucher);
       setState(() {
         voucher['data'].forEach((item) {
-          if (item['payment_status'] == 'pending') {
+          if (item['payment_status'] == 'completed') {
             voucherData.add(item);
           }
         });
