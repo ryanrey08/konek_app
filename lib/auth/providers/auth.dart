@@ -67,6 +67,13 @@ class Auth with ChangeNotifier {
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
         sharedPreferences.setString('userData', json.encode(jsonResponse));
+        if(jsonResponse['activePromo'] != null){
+                sharedPreferences.setString(
+          'swakPaymentRefNo', json.encode({"reference_number" : jsonResponse['activePromo']}));
+        }else{
+          sharedPreferences.setString(
+          'swakPaymentRefNo', json.encode({"reference_number" : '00000'}));
+        }
       } else {
         print("exp" + jsonResponse['message']);
         throw HttpException(jsonResponse['data']['mobile_number'][0].toString());

@@ -178,6 +178,7 @@ class _DashboardState extends State<Dashboard> {
       fullName = extractedUserData['data']['user']['first_name'] +
           " " +
           extractedUserData['data']['user']['last_name'];
+      print(extractedUserData['activePromo']);
     } else {
       fullName = extractedUserData['data']['first_name'] +
           " " +

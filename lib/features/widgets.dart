@@ -396,6 +396,7 @@ class _CustomDropDownState extends State<CustomDropDown> {
           ),
         ),
         decoration: InputDecoration(
+          enabled: widget.status,
           contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           floatingLabelBehavior: FloatingLabelBehavior.always,
           // OutlineInputBorder

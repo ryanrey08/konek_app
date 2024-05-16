@@ -650,7 +650,7 @@ class _MyProfileState extends State<MyProfile> {
           if (myProfile['citymunCode'] != null) {
             if (myProfile['citymunCode'] == element['citymunCode']) {
               userMun = element['citymunDesc'];
-              userMunCode = element['citymunCode'];
+              _selectedMunicipality = element['citymunCode'];
             }
           }
         });
@@ -693,7 +693,9 @@ class _MyProfileState extends State<MyProfile> {
           }
         });
         _selectedBarangay = userBrgy == '' ? _barangay[0] : userBrgy;
-        _brgyId = myProfile['brgyCode'] == null ? barangays[0]['brgyCode'] : myProfile['brgyCode'];
+        _brgyId = myProfile['brgyCode'] == null
+            ? barangays[0]['brgyCode']
+            : myProfile['brgyCode'];
         isLoading = false;
       });
     } on HttpException catch (error) {
@@ -1047,6 +1049,7 @@ class _MyProfileState extends State<MyProfile> {
                                       if (_selectedMunicipality ==
                                           element['citymunDesc']) {
                                         munCode = element['citymunCode'];
+                                        _munId = element['citymunCode'];
                                       }
                                     });
                                     getBarangays(munCode);
@@ -1072,6 +1075,12 @@ class _MyProfileState extends State<MyProfile> {
                                   setState(() {
                                     _selectedBarangay = value.toString();
                                     //_brgyId = (_barangay.indexOf(value) + 1).toString();
+                                    barangays.forEach((element) {
+                                      if (_selectedBarangay ==
+                                          element['brgyDesc']) {
+                                        _brgyId = element['brgyCode'];
+                                      }
+                                    });
                                   });
                                   return null;
                                 },
