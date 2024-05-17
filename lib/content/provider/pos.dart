@@ -60,7 +60,7 @@ class POSProvider with ChangeNotifier {
           body: data,
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       var jsonResponse = json.decode(response.body);
-      print(jsonResponse);
+      // print(jsonResponse);
       if (jsonResponse['success'] == true) {
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
@@ -71,7 +71,7 @@ class POSProvider with ChangeNotifier {
 
         return jsonResponse['data'];
       } else {
-        print(jsonResponse['message']);
+        // print(jsonResponse['message']);
         throw HttpException(jsonResponse['data'].toString());
         // var data = {
         //   "voucher_code": "GNXPMX",
@@ -91,7 +91,7 @@ class POSProvider with ChangeNotifier {
         // return data;
       }
     } catch (error) {
-      print(error);
+      // print(error);
       // print(responseCode);
       rethrow;
     }
@@ -112,7 +112,6 @@ class POSProvider with ChangeNotifier {
       notifyListeners();
       return jsonResponse["data"];
     } catch (error) {
-      print(error);
       // print(responseCode);
       rethrow;
     }
@@ -137,7 +136,7 @@ class POSProvider with ChangeNotifier {
           Uri.parse("${config.hit_pay}send-payment-request"),
           body: data,
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
-      print(json.decode(response.body));
+      // print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
@@ -146,7 +145,6 @@ class POSProvider with ChangeNotifier {
       notifyListeners();
       return jsonResponse;
     } catch (error) {
-      print(error);
       // print(responseCode);
       rethrow;
     }
@@ -164,7 +162,7 @@ class POSProvider with ChangeNotifier {
     } else {
       paymentData = {'reference_number': '00000'};
     }
-    print(paymentData['reference_number']);
+    // print(paymentData['reference_number']);
     var token = userInfo['data']['token'];
     var responseCode;
     try {
@@ -172,8 +170,8 @@ class POSProvider with ChangeNotifier {
           Uri.parse("${config.hit_pay}payment-logs/" +
               paymentData['reference_number']),
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},);
-      print(response.statusCode);
-      print(json.decode(response.body));
+      // print(response.statusCode);
+      // print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
       var responseData = {
         "voucher_code": '',
@@ -211,7 +209,6 @@ class POSProvider with ChangeNotifier {
       notifyListeners();
       return responseData;
     } catch (error) {
-      print(error);
       // print(responseCode);
       rethrow;
     }
@@ -233,13 +230,12 @@ class POSProvider with ChangeNotifier {
       var response = await http.get(
           Uri.parse("${config.hit_pay}payment-logs/?phone=" + phoneNo),
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
-      print(response.statusCode);
-      print(json.decode(response.body));
+      // print(response.statusCode);
+      // print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
       notifyListeners();
       return jsonResponse;
     } catch (error) {
-      print(error);
       // print(responseCode);
       rethrow;
     }

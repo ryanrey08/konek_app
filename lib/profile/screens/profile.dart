@@ -123,7 +123,6 @@ class _MyProfileState extends State<MyProfile> {
       _region = region;
       _selectedRegion = _region[0];
       _regionId = _regionsId[0];
-      print(_regionId);
       // if (_userData['region'] == null) {
       //   _selectedRegion = _region[0];
       //   _regionId = _regionsId[0];
@@ -210,7 +209,6 @@ class _MyProfileState extends State<MyProfile> {
     setState(() {
       _tempRegion = tempRegion;
       _province = provinces;
-      print(_regionId);
       _selectedProvince = _province[0];
     });
   }
@@ -254,7 +252,6 @@ class _MyProfileState extends State<MyProfile> {
         _provsId = element['provCode'];
       }
     });
-    print("provId" + _provsId);
     getMunicipalities(_provsId);
     // getBarangay(_provsId, );
   }
@@ -299,7 +296,6 @@ class _MyProfileState extends State<MyProfile> {
           _brgyId = _tempMunicipality[a]['barangay_list'];
           _selectedBarangay = _barangay[0];
           isLoading = false;
-          print(_brgyId);
         });
       }
     }
@@ -356,8 +352,7 @@ class _MyProfileState extends State<MyProfile> {
     // isLoading = false;
 
     // print(token);
-    print(extracteduserData);
-    print('here');
+    // print(extracteduserData);
   }
 
 //Personal Information
@@ -461,7 +456,7 @@ class _MyProfileState extends State<MyProfile> {
       'barangay': _brgyId
     };
 
-    print(userInfo);
+    // print(userInfo);
     updateFarmerProfile(userInfo);
   }
 
@@ -486,7 +481,7 @@ class _MyProfileState extends State<MyProfile> {
           desc: "Successfully Updated",
           btnOkOnPress: () {
             // Navigator.pushReplacementNamed(context, Dashboard.routeName);
-            print(_selectedProvince);
+            // print(_selectedProvince);
           },
         ).show();
 
@@ -495,7 +490,7 @@ class _MyProfileState extends State<MyProfile> {
         // });
       }
     } on HttpException catch (error) {
-      print(error);
+      // print(error);
       showError(error.toString());
     } catch (error) {
       showError(error.toString());
@@ -506,7 +501,7 @@ class _MyProfileState extends State<MyProfile> {
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    print("here");
+    // print("here");
     //getProfile();
     // getPH();
   }
@@ -585,13 +580,14 @@ class _MyProfileState extends State<MyProfile> {
       setState(() {
         myProfile = prof['data'];
         getProfile();
-        print(myProfile);
+        // print(myProfile);
       });
     } on HttpException catch (error) {
-      print(error);
+      // print(error);
       showError(error.toString());
     } catch (error) {
-      showError(error.toString());
+      // showError(error.toString());
+      showError('something went wrong');
     }
   }
 
@@ -616,7 +612,7 @@ class _MyProfileState extends State<MyProfile> {
             }
           }
         });
-        print(_province);
+        // print(_province);
         _selectedProvince = userProv == '' ? _province[0] : userProv;
         _provsId = myProfile['provCode'] == null
             ? provinces[0]['provCode'].toString()
@@ -624,7 +620,7 @@ class _MyProfileState extends State<MyProfile> {
         getMunicipalities(_provsId);
       });
     } on HttpException catch (error) {
-      print(error);
+      // print(error);
       showError(error.toString());
     } catch (error) {
       showError(error.toString());
@@ -632,7 +628,7 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   Future<void> getMunicipalities(code) async {
-    print(code);
+    // print(code);
     var errorMessage;
     municipalities = [];
     _municipality = [];
@@ -661,7 +657,7 @@ class _MyProfileState extends State<MyProfile> {
         getBarangays(_munId);
       });
     } on HttpException catch (error) {
-      print(error);
+      // print(error);
       showError(error.toString());
     } catch (error) {
       showError(error.toString());
@@ -699,7 +695,7 @@ class _MyProfileState extends State<MyProfile> {
         isLoading = false;
       });
     } on HttpException catch (error) {
-      print(error);
+      // print(error);
       showError(error.toString());
     } catch (error) {
       showError(error.toString());
@@ -825,7 +821,7 @@ class _MyProfileState extends State<MyProfile> {
                     fontSize: useMobileLayout ? 16 : 18, color: Colors.white)),
           ),
           body: isLoading
-              ? Container(child: const Text("Loading..."))
+              ? Center(child: CircularProgressIndicator())
               : Form(
                   key: _formKey1,
                   child: Column(
@@ -1146,7 +1142,7 @@ class _MyProfileState extends State<MyProfile> {
                     ],
                   ),
                 ),
-          bottomNavigationBar: Container(
+          bottomNavigationBar: !isLoading ? Container(
             padding: const EdgeInsets.symmetric(horizontal: 5),
             height: 50,
             width: double.infinity,
@@ -1215,7 +1211,7 @@ class _MyProfileState extends State<MyProfile> {
                       ),
               ],
             ),
-          ),
+          ) : Container(),
         ),
       ),
     );

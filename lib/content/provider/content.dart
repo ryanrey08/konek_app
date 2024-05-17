@@ -32,7 +32,7 @@ class Content with ChangeNotifier {
       notifyListeners();
       return jsonResponse["data"];
     } catch (error) {
-      print(error);
+      // print(error);
       // print(responseCode);
       rethrow;
     }
@@ -49,12 +49,12 @@ class Content with ChangeNotifier {
       final finalUri = uri.replace(queryParameters: {'type': 'link'});
       var response = await http.get(finalUri,
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
-      print(json.decode(response.body));
+      // print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
       notifyListeners();
       return jsonResponse["data"];
     } catch (error) {
-      print(error);
+      // print(error);
       // print(responseCode);
       rethrow;
     }
@@ -76,7 +76,7 @@ class Content with ChangeNotifier {
       notifyListeners();
       return jsonResponse["data"];
     } catch (error) {
-      print(error);
+      // print(error);
       // print(responseCode);
       rethrow;
     }

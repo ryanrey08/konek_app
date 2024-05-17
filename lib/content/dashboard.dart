@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:konek_app/auth/providers/auth.dart';
 import 'package:konek_app/auth/screens/login.dart';
+import 'package:konek_app/config/checkconnection.dart';
 import 'package:konek_app/config/config.dart';
 import 'package:konek_app/config/httpexception.dart';
 import 'package:konek_app/config/notification.dart';
@@ -147,7 +148,7 @@ class _DashboardState extends State<Dashboard> {
     } else {
       final extracteduserData =
           json.decode(prefs.getString('voucherData')!) as Map<String, dynamic>;
-      print(extracteduserData);
+      // print(extracteduserData);
 
       setState(() {
         voucherData = extracteduserData;
@@ -178,7 +179,7 @@ class _DashboardState extends State<Dashboard> {
       fullName = extractedUserData['data']['user']['first_name'] +
           " " +
           extractedUserData['data']['user']['last_name'];
-      print(extractedUserData['activePromo']);
+      // print(extractedUserData['activePromo']);
     } else {
       fullName = extractedUserData['data']['first_name'] +
           " " +
@@ -192,15 +193,16 @@ class _DashboardState extends State<Dashboard> {
     try {
       var voucher = await Provider.of<POSProvider>(context, listen: false)
           .getAllPaymentStatus();
-      print(voucher);
+      // print(voucher);
       setState(() {
         notifLength = voucher['data'].length;
       });
     } on HttpException catch (error) {
-      print(error);
+      // print(error);
       showError(error.toString());
     } catch (error) {
-      showError(error.toString());
+      // showError(error.toString());
+      showError('something went wrong');
     }
   }
 
@@ -305,7 +307,7 @@ class _DashboardState extends State<Dashboard> {
                                 _currentIndex = index;
                                 _pageTitle = pageTitle[index];
                               }
-                              print(index.toString());
+                              // print(index.toString());
                             });
                           },
                           backgroundColor:

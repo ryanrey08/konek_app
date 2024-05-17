@@ -24,7 +24,7 @@ class ProfileProvider with ChangeNotifier {
 
     //  Map data ={'token': ftoken,'data': json.encode(farmerInfo) as Map<String, dynamic>};
     // Map data = farmerInfo;
-    print(token);
+    // print(token);
     Map<String, dynamic> jsonResponse;
     try {
       //  Route::post('/farmer/update-profile', 'FarmerController@updateProfile
@@ -43,7 +43,6 @@ class ProfileProvider with ChangeNotifier {
         throw HttpException(jsonResponse['message']);
       }
     } catch (error) {
-      print(error);
       // print(responseCode);
       rethrow;
     }
@@ -64,7 +63,6 @@ class ProfileProvider with ChangeNotifier {
       notifyListeners();
       return jsonResponse;
     } catch (error) {
-      print(error);
       // print(responseCode);
       rethrow;
     }
@@ -84,7 +82,6 @@ class ProfileProvider with ChangeNotifier {
       notifyListeners();
       return jsonResponse;
     } catch (error) {
-      print(error);
       // print(responseCode);
       rethrow;
     }
@@ -104,7 +101,6 @@ class ProfileProvider with ChangeNotifier {
       notifyListeners();
       return jsonResponse;
     } catch (error) {
-      print(error);
       // print(responseCode);
       rethrow;
     }
@@ -130,7 +126,6 @@ class ProfileProvider with ChangeNotifier {
       notifyListeners();
       return jsonResponse;
     } catch (error) {
-      print(error);
       // print(responseCode);
       rethrow;
     }

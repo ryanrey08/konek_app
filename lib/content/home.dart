@@ -173,44 +173,65 @@ class _HomePageState extends State<HomePage> {
   }
 
   getSubscription() async {
-    var subscriptionsData =
-        await Provider.of<Content>(context, listen: false).getSubscription();
-    setState(() {
-      subscriptions = subscriptionsData;
-      //isLoading = false;
-    });
+    try {
+      var subscriptionsData =
+          await Provider.of<Content>(context, listen: false).getSubscription();
+      setState(() {
+        subscriptions = subscriptionsData;
+        //isLoading = false;
+      });
+    } on HttpException catch (error) {
+      showError(error.toString());
+    } catch (error) {
+      // showError(error.toString());
+      showError('something went wrong');
+    }
   }
 
   getQuickLinks() async {
-    var quickLinksData =
-        await Provider.of<Content>(context, listen: false).getQuickLinks();
-    setState(() {
-      // quickLinks = quickLinksData;
-      var newQuicklinks = [];
-      // int arrLength = ((quickLinksData.length / 2) ~/ 1000);
-      var myQuickLinks = [];
-      for (var x = 0; x < quickLinksData.length; x++) {
-        myQuickLinks.add(quickLinksData[x]);
-        if (x % 2 == 1) {
-          newQuicklinks.add(myQuickLinks);
-          myQuickLinks = [];
-        } else if (x == (quickLinksData.length - 1)) {
-          newQuicklinks.add(myQuickLinks);
+    try {
+      var quickLinksData =
+          await Provider.of<Content>(context, listen: false).getQuickLinks();
+      setState(() {
+        // quickLinks = quickLinksData;
+        var newQuicklinks = [];
+        // int arrLength = ((quickLinksData.length / 2) ~/ 1000);
+        var myQuickLinks = [];
+        for (var x = 0; x < quickLinksData.length; x++) {
+          myQuickLinks.add(quickLinksData[x]);
+          if (x % 2 == 1) {
+            newQuicklinks.add(myQuickLinks);
+            myQuickLinks = [];
+          } else if (x == (quickLinksData.length - 1)) {
+            newQuicklinks.add(myQuickLinks);
+          }
         }
-      }
-      quickLinks = newQuicklinks;
-      // print(newQuicklinks);
-      //isLoading = false;
-    });
+        quickLinks = newQuicklinks;
+        // print(newQuicklinks);
+        //isLoading = false;
+      });
+    } on HttpException catch (error) {
+      showError(error.toString());
+    } catch (error) {
+      // showError(error.toString());
+      showError('something went wrong');
+    }
   }
 
   getAds() async {
-    var adsData = await Provider.of<Content>(context, listen: false).getAds();
-    setState(() {
-      ads = adsData;
-      //isLoading = false;
-      print(ads);
-    });
+    try {
+      var adsData = await Provider.of<Content>(context, listen: false).getAds();
+      setState(() {
+        ads = adsData;
+        //isLoading = false;
+        // print(ads);
+      });
+    } on HttpException catch (error) {
+      showError(error.toString());
+    } catch (error) {
+      // showError(error.toString());
+      showError('something went wrong');
+    }
   }
 
   loadData() async {
@@ -259,20 +280,23 @@ class _HomePageState extends State<HomePage> {
         // print(vouchData['current_date']);
         // print(vouchData['payment_request_at']);
         // print(vouchData['duration']);
-        if (vouchData['status'] == 'pending') {
-          Future.delayed(const Duration(milliseconds: 3000), () async{
+        if (vouchData['status'] == 'completed') {
+          Future.delayed(const Duration(milliseconds: 3000), () async {
             await NotificationController.cancelNotifications();
             await NotificationController.scheduleNewNotification(
-                vouchData['description'], vouchData['current_date'], vouchData['payment_request_at'], vouchData['duration']);
+                vouchData['description'],
+                vouchData['current_date'],
+                vouchData['payment_request_at'],
+                vouchData['duration']);
           });
         }
       }
       assignData(vouchData);
     } on HttpException catch (error) {
-      print(error);
       showError(error.toString());
     } catch (error) {
-      showError(error.toString());
+      // showError(error.toString());
+      showError('something went wrong');
     }
     // setState(() {
     //   isLoading = true;
@@ -315,7 +339,7 @@ class _HomePageState extends State<HomePage> {
         farmer = extracteduserData;
       } else {
         farmer = extracteduserData['data'];
-        print(farmer);
+        // print(farmer);
       }
       isLoading = true;
     });
@@ -990,7 +1014,7 @@ class _HomePageState extends State<HomePage> {
                                                         y++) ...[
                                                       GestureDetector(
                                                         onTap: () {
-                                                          print("here");
+                                                          // print("here");
                                                           UrlLauncher.launch(
                                                               'tel:+${quickLinks[x][y]['link']}');
                                                         },
@@ -1024,18 +1048,18 @@ class _HomePageState extends State<HomePage> {
                                               ]
                                             ])
                                       : Center(
-                                        child: Text(
-                                          "NO CURRENT DATA",
-                                          style: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              color: Colors.red,
-                                              fontSize:
-                                                  useMobileLayout ? 14 : 25,
-                                              fontWeight: FontWeight.w600,
+                                          child: Text(
+                                            "NO CURRENT DATA",
+                                            style: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                color: Colors.red,
+                                                fontSize:
+                                                    useMobileLayout ? 14 : 25,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
                                 ),
                               ),
                             ),
@@ -1119,17 +1143,17 @@ class _HomePageState extends State<HomePage> {
                                     }).toList(),
                                   )
                                 : Center(
-                                  child: Text(
-                                    "NO CURRENT ADS",
-                                    style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: useMobileLayout ? 14 : 25,
-                                        fontWeight: FontWeight.w600,
+                                    child: Text(
+                                      "NO CURRENT ADS",
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                          color: Colors.red,
+                                          fontSize: useMobileLayout ? 14 : 25,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
                           ),
                           const SizedBox(
                             height: 5,
@@ -1183,7 +1207,7 @@ class _HomePageState extends State<HomePage> {
         json.decode(sharedPreferences.getString('userData')!)
             as Map<String, Object>;
 
-    print(extractedUserData['personCode']);
+    // print(extractedUserData['personCode']);
     return extractedUserData['personCode'];
   }
 }

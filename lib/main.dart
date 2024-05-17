@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:konek_app/config/checkconnection.dart';
 import 'package:konek_app/config/notification.dart';
 import 'package:konek_app/content/notification.dart';
 import 'package:konek_app/content/provider/content.dart';
@@ -28,6 +29,7 @@ void main() async {
     runApp(MyApp());
   });
   // runApp(MyApp());
+  GlobalToast.checkConnection();
 }
 
 class MyApp extends StatefulWidget {

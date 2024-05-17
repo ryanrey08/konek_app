@@ -39,7 +39,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
       subscription = subsData['subscription'];
       isLoading = false;
     });
-    print(subscription);
+    // print(subscription);
   }
 
   @override
@@ -144,7 +144,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
           prefs.setString('swakUrl', vouchData['url']);
         }
       } on HttpException catch (error) {
-        print(error);
+        // print(error);
         showError(error.toString());
       } catch (error) {
         showError(error.toString());
@@ -376,7 +376,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                                       onChanged: (value) {
                                         setState(() {
                                           paymentMethod = value.toString();
-                                          print(paymentMethod);
+                                          // print(paymentMethod);
                                         });
                                       }),
                                   SizedBox(

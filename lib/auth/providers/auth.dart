@@ -62,7 +62,7 @@ class Auth with ChangeNotifier {
       var response =
           await http.post(Uri.parse("${config.pre_url}/login-via-mobile"), body: data);
       var jsonResponse = json.decode(response.body);
-      print(jsonResponse);
+      // print(jsonResponse);
       if (jsonResponse['success'] == true) {
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
@@ -75,12 +75,12 @@ class Auth with ChangeNotifier {
           'swakPaymentRefNo', json.encode({"reference_number" : '00000'}));
         }
       } else {
-        print("exp" + jsonResponse['message']);
+        // print("exp" + jsonResponse['message']);
         throw HttpException(jsonResponse['data']['mobile_number'][0].toString());
       }
     } catch (error) {
-      print('error');
-      print(error);
+      // print('error');
+      // print(error);
       // print(responseCode);
       rethrow;
     }
@@ -101,7 +101,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> register(userInfo) async {
-    print(userInfo);
+    // print(userInfo);
     Map<String, dynamic> jsonResponse;
 
 
@@ -120,11 +120,11 @@ class Auth with ChangeNotifier {
       // print(jsonResponseRSBSA['message']);
 
       jsonResponse = json.decode(response.body);
-      print(jsonResponse);
+      // print(jsonResponse);
 
       if (jsonResponse['success']) {
         final userData = json.encode(jsonResponse);
-        print(userData);
+        // print(userData);
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
         sharedPreferences.setString('userData', userData);
@@ -145,7 +145,7 @@ class Auth with ChangeNotifier {
         }
       }
 
-      print(jsonResponse['message']);
+      // print(jsonResponse['message']);
     } catch (error) {
       rethrow;
     }

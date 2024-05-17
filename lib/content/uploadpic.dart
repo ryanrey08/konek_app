@@ -217,7 +217,7 @@ class _UploadPictureState extends State<UploadPicture> {
         qrCode = str.toString();
       }
     });
-    print(str);
+    // print(str);
   }
 
   void submitVoucherCode() async {
@@ -247,10 +247,11 @@ class _UploadPictureState extends State<UploadPicture> {
       //   final preferences = await StreamingSharedPreferences.instance;
       //   preferences.setString('voucherData', json.encode(voucherData));
     } on HttpException catch (error) {
-      print(error);
+      // print(error);
       showError(error.toString());
     } catch (error) {
-      showError(error.toString());
+      // showError(error.toString());
+      showError('something went wrong');
     }
     // await Future.delayed(const Duration(seconds: 2));
 
@@ -479,7 +480,7 @@ class _UploadPictureState extends State<UploadPicture> {
                       } 
                     });
 
-                    print(result);
+                    // print(result);
                   },
                   heroTag: 'image2',
                   tooltip: 'Scan QR Code',

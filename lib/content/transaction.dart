@@ -44,21 +44,22 @@ class _TransactionState extends State<Transaction> {
       //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
       var voucher = await Provider.of<POSProvider>(context, listen: false)
           .getAllPaymentStatus();
-      print(voucher);
+      // print(voucher);
       setState(() {
         voucher['data'].forEach((item) {
           if (item['payment_status'] == 'completed') {
             voucherData.add(item);
           }
         });
-        print(voucherData);
+        // print(voucherData);
         isLoading = true;
       });
     } on HttpException catch (error) {
-      print(error);
+      // print(error);
       showError(error.toString());
     } catch (error) {
-      showError(error.toString());
+      // showError(error.toString());
+      showError('something went wrong');
     }
     // setState(() {
     //   isLoading = true;

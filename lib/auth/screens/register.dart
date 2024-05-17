@@ -188,7 +188,7 @@ class _AccountRegisterState extends State<AccountRegister> {
     setState(() {
       _deviceId = deviceId;
 
-      print(_deviceId);
+      // print(_deviceId);
     });
   }
 
@@ -196,11 +196,11 @@ class _AccountRegisterState extends State<AccountRegister> {
     try {
       simInfo = await SimNumber.getSimData();
       for (var s in simInfo.cards) {
-        print('Serial number: ${s.phoneNumber}');
+        // print('Serial number: ${s.phoneNumber}');
       }
       setState(() {});
     } on PlatformException {
-      print("simInfo  : " "2");
+      // print("simInfo  : " "2");
     }
     if (!mounted) return;
   }
@@ -260,7 +260,7 @@ class _AccountRegisterState extends State<AccountRegister> {
 //                     'password': txtPassword.text,
       };
 
-      print(user);
+      // print(user);
       await Provider.of<Auth>(context, listen: false).register(user);
       final sharedPreferences = await SharedPreferences.getInstance();
 
@@ -268,7 +268,7 @@ class _AccountRegisterState extends State<AccountRegister> {
         Navigator.of(context).pushReplacementNamed(Dashboard.routeName);
       } else {}
     } on HttpException catch (error) {
-      print('here');
+      // print('here');
       showError(error.toString());
     } catch (error) {
       showError('something went wrong');
@@ -284,7 +284,7 @@ class _AccountRegisterState extends State<AccountRegister> {
     Grecaptcha()
         .verifyWithRecaptcha('6LcSiSQdAAAAAOyoKM6G5CeLAPE-P5ApqwNMUQaV')
         .then((result) {
-      print(result);
+      // print(result);
       if (result != '') {
         setState(() {
           isNotARobot = true;
@@ -301,7 +301,7 @@ class _AccountRegisterState extends State<AccountRegister> {
       // You should inform the user of errors, explaining why they can't
       // proceed. As the plugin is not available for iOS, you might consider
       // skipping the reCAPTCHA step when FGrecaptcha.isAvailable is false.
-      print("Could not verify:\n $e at $s");
+      // print("Could not verify:\n $e at $s");
     });
   }
 
@@ -360,8 +360,8 @@ class _AccountRegisterState extends State<AccountRegister> {
     String? errorMessage;
     try {
       Position position = await Geolocator.getCurrentPosition();
-      print(position.latitude.toString());
-      print(position.longitude.toString());
+      // print(position.latitude.toString());
+      // print(position.longitude.toString());
 
       Map<String, dynamic> user = {
         'first_name': txtFirstName.text,
@@ -398,7 +398,7 @@ class _AccountRegisterState extends State<AccountRegister> {
       });
       _showError(errorMessage);
     } catch (error) {
-      print(error);
+      // print(error);
       errorMessage = config.throwErrorAuth(error.toString());
       setState(() {
         _isLoading = false;

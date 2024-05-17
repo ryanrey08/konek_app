@@ -45,7 +45,7 @@ class _NotificationListState extends State<NotificationList> {
     } else {
       final extracteduserData = json
           .decode(prefs.getString('notificationData')!) as Map<String, dynamic>;
-      print(extracteduserData);
+      // print(extracteduserData);
       setState(() {
         notificationData = extracteduserData;
       });
@@ -70,21 +70,28 @@ class _NotificationListState extends State<NotificationList> {
       //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
       var voucher = await Provider.of<POSProvider>(context, listen: false)
           .getAllPaymentStatus();
-      print(voucher);
+      // print(voucher);
       setState(() {
-         voucher['data'].forEach((item) {
-          if(item['payment_status'] == 'completed'){
-            voucherData.add(item);
+        voucher['data'].forEach((item) {
+          if (item['payment_status'] == 'completed') {
+            var nowDate = DateTime.parse(item['payment_completion_at']);
+            var toDate = nowDate.add(
+                Duration(days: int.parse(item['subscription']['duration'])));
+            var diff = toDate.difference(nowDate).inSeconds;
+            if (diff <= 0) {
+              voucherData.add(item);
+            }
           }
         });
-        print(voucherData);
+        // print(voucherData);
         isLoading = true;
       });
     } on HttpException catch (error) {
-      print(error);
+      // print(error);
       showError(error.toString());
     } catch (error) {
-      showError(error.toString());
+      // showError(error.toString());
+      showError('something went wrong');
     }
     // setState(() {
     //   isLoading = true;
@@ -103,11 +110,13 @@ class _NotificationListState extends State<NotificationList> {
     );
   }
 
-    getTimeText(time){
-      var nowDate = DateTime.now();
-     var toDate = nowDate.add(Duration(days: 1));
+  getTimeText(time, duration) {
+    var nowDate = DateTime.parse(time);
+    var toDate = nowDate.add(Duration(days: int.parse(duration)));
     // int interval = toDate.difference(nowDate).inSeconds;
-    return DateFormat("yyyy-MM-dd hh:mm").format(DateTime.now()).toString() + " - " + DateFormat("yyyy-MM-dd hh:mm").format(toDate).toString();
+    return DateFormat("yyyy-MM-dd hh:mm").format(nowDate).toString() +
+        " - " +
+        DateFormat("yyyy-MM-dd hh:mm").format(toDate).toString();
   }
 
   @override
@@ -150,8 +159,8 @@ class _NotificationListState extends State<NotificationList> {
                             children: <Widget>[
                               ListTile(
                                 title: Text(
-                                  'Your ' + 
-                                  voucherData[index]['subscription']
+                                  'Your ' +
+                                      voucherData[index]['subscription']
                                           ['duration'] +
                                       " " +
                                       voucherData[index]['subscription']
@@ -167,7 +176,11 @@ class _NotificationListState extends State<NotificationList> {
                                 ),
                                 // subtitle: Text(voucherData[index]['created_at'] + " - " + (voucherData[index]['expire_date'])),
                                 subtitle: Text(
-                                  getTimeText(voucherData[index]['payment_request_at']),
+                                  getTimeText(
+                                      voucherData[index]
+                                          ['payment_completion_at'],
+                                      voucherData[index]['subscription']
+                                          ['duration']),
                                   style: GoogleFonts.poppins(
                                     textStyle: TextStyle(
                                       color: Colors.black,

@@ -60,7 +60,7 @@ class Voucher with ChangeNotifier {
           body: data,
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       var jsonResponse = json.decode(response.body);
-      print(jsonResponse);
+      // print(jsonResponse);
       if (jsonResponse['success'] == true) {
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
@@ -72,7 +72,7 @@ class Voucher with ChangeNotifier {
         return jsonResponse['data'];
 
       } else {
-        print(jsonResponse['message']);
+        // print(jsonResponse['message']);
         throw HttpException(jsonResponse['data'].toString());
         // var data = {
         //   "voucher_code": "GNXPMX",
@@ -92,7 +92,6 @@ class Voucher with ChangeNotifier {
         // return data;
       }
     } catch (error) {
-      print(error);
       // print(responseCode);
       rethrow;
     }
@@ -133,7 +132,7 @@ class Voucher with ChangeNotifier {
   }
 
   Future<void> register(userInfo) async {
-    print(userInfo);
+    // print(userInfo);
     Map<String, dynamic> jsonResponse;
 
     try {
@@ -151,11 +150,11 @@ class Voucher with ChangeNotifier {
       // print(jsonResponseRSBSA['message']);
 
       jsonResponse = json.decode(response.body);
-      print(jsonResponse);
+      // print(jsonResponse);
 
       if (jsonResponse['success']) {
         final userData = json.encode(jsonResponse);
-        print(userData);
+        // print(userData);
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
         sharedPreferences.setString('userData', userData);
@@ -164,7 +163,7 @@ class Voucher with ChangeNotifier {
         throw HttpException('Something went wrong.');
       }
 
-      print(jsonResponse['message']);
+      // print(jsonResponse['message']);
     } catch (error) {
       rethrow;
     }
