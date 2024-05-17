@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:konek_app/auth/providers/auth.dart';
 import 'package:konek_app/auth/screens/login.dart';
+import 'package:konek_app/config/checkconnection.dart';
 import 'package:konek_app/config/config.dart';
 import 'package:konek_app/config/httpexception.dart';
 import 'package:konek_app/config/notification.dart';
@@ -58,6 +59,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
+    GlobalToast.checkConnection();
     _currentIndex = 0;
     _pageTitle = pageTitle[0];
     // startTime();
@@ -199,7 +201,8 @@ class _DashboardState extends State<Dashboard> {
       print(error);
       showError(error.toString());
     } catch (error) {
-      showError(error.toString());
+      // showError(error.toString());
+      showError('something went wrong');
     }
   }
 

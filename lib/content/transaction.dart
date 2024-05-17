@@ -51,7 +51,8 @@ class _TransactionState extends State<Transaction> {
       print(error);
       showError(error.toString());
     } catch (error) {
-      showError(error.toString());
+      // showError(error.toString());
+      showError('something went wrong');
     }
     // setState(() {
     //   isLoading = true;

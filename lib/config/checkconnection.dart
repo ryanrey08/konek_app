@@ -27,13 +27,12 @@ class GlobalToast with ChangeNotifier {
 
   BuildContext? context;
 
-  static checkConnection(
-      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) {
+  static checkConnection() {
     GlobalToast.connectivity.initialise();
     GlobalToast.connectivity.myStream.listen((event) {
       GlobalToast.source = event;
       //GlobalToast.showToast();
-      GlobalToast.showToast(flutterLocalNotificationsPlugin);
+      GlobalToast.showToast();
 
       // function get recent updates
     });
@@ -71,8 +70,7 @@ class GlobalToast with ChangeNotifier {
 //     }
 // }
 
-  static showToast(
-      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
+  static showToast() async {
     switch (source.keys.toList()[0]) {
       case ConnectivityResult.none:
         message = "Offline";
@@ -85,47 +83,47 @@ class GlobalToast with ChangeNotifier {
     }
 
     if (message == "Offline") {
-      // Fluttertoast.showToast(
-      //   msg: 'Connection Error',
-      //   toastLength: Toast.LENGTH_SHORT,
-      //   gravity: ToastGravity.BOTTOM,
-      //   timeInSecForIosWeb: 1,
-      //   backgroundColor: Color(0xff404747),
-      //   textColor: Colors.white,
-      //   fontSize: 13.0,
-      // );
+      Fluttertoast.showToast(
+        msg: 'No Internt Connection',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Color(0xff404747),
+        textColor: Colors.white,
+        fontSize: 13.0,
+      );
     } else if (message == "Mobile: Online") {
-      // Fluttertoast.showToast(
-      //   msg: 'Connection Established',
-      //   toastLength: Toast.LENGTH_SHORT,
-      //   gravity: ToastGravity.BOTTOM,
-      //   timeInSecForIosWeb: 1,
-      //   backgroundColor: Color(0xff404747),
-      //   textColor: Colors.white,
-      //   fontSize: 13.0,
-      // );
+      Fluttertoast.showToast(
+        msg: 'Connection Established',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Color(0xff404747),
+        textColor: Colors.white,
+        fontSize: 13.0,
+      );
 
-      sharedPreferences = await SharedPreferences.getInstance();
-      if (sharedPreferences!.containsKey('userData')) {
-        // _showNotification(flutterLocalNotificationsPlugin);
-      }
+      // sharedPreferences = await SharedPreferences.getInstance();
+      // if (sharedPreferences!.containsKey('userData')) {
+      //   // _showNotification(flutterLocalNotificationsPlugin);
+      // }
 
       // _showNotification(flutterLocalNotificationsPlugin);
     } else if (message == "WiFi: Online") {
-      // Fluttertoast.showToast(
-      //   msg: 'Connection Established',
-      //   toastLength: Toast.LENGTH_SHORT,
-      //   gravity: ToastGravity.BOTTOM,
-      //   timeInSecForIosWeb: 1,
-      //   backgroundColor: Color(0xff404747),
-      //   textColor: Colors.white,
-      //   fontSize: 13.0,
-      // );
+      Fluttertoast.showToast(
+        msg: 'Connection Established',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Color(0xff404747),
+        textColor: Colors.white,
+        fontSize: 13.0,
+      );
 
-      sharedPreferences = await SharedPreferences.getInstance();
-      if (sharedPreferences!.containsKey('userData')) {
-        // _showNotification(flutterLocalNotificationsPlugin);
-      }
+      // sharedPreferences = await SharedPreferences.getInstance();
+      // if (sharedPreferences!.containsKey('userData')) {
+      //   // _showNotification(flutterLocalNotificationsPlugin);
+      // }
     }
 
     //  return scaffoldKey.currentState.showSnackBar(SnackBar(

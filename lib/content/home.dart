@@ -173,44 +173,62 @@ class _HomePageState extends State<HomePage> {
   }
 
   getSubscription() async {
-    var subscriptionsData =
-        await Provider.of<Content>(context, listen: false).getSubscription();
-    setState(() {
-      subscriptions = subscriptionsData;
-      //isLoading = false;
-    });
+    try {
+      var subscriptionsData =
+          await Provider.of<Content>(context, listen: false).getSubscription();
+      setState(() {
+        subscriptions = subscriptionsData;
+        //isLoading = false;
+      });
+    } on HttpException catch (error) {
+      showError(error.toString());
+    } catch (error) {
+      showError('something went wrong');
+    }
   }
 
   getQuickLinks() async {
-    var quickLinksData =
-        await Provider.of<Content>(context, listen: false).getQuickLinks();
-    setState(() {
-      // quickLinks = quickLinksData;
-      var newQuicklinks = [];
-      // int arrLength = ((quickLinksData.length / 2) ~/ 1000);
-      var myQuickLinks = [];
-      for (var x = 0; x < quickLinksData.length; x++) {
-        myQuickLinks.add(quickLinksData[x]);
-        if (x % 2 == 1) {
-          newQuicklinks.add(myQuickLinks);
-          myQuickLinks = [];
-        } else if (x == (quickLinksData.length - 1)) {
-          newQuicklinks.add(myQuickLinks);
+    try {
+      var quickLinksData =
+          await Provider.of<Content>(context, listen: false).getQuickLinks();
+      setState(() {
+        // quickLinks = quickLinksData;
+        var newQuicklinks = [];
+        // int arrLength = ((quickLinksData.length / 2) ~/ 1000);
+        var myQuickLinks = [];
+        for (var x = 0; x < quickLinksData.length; x++) {
+          myQuickLinks.add(quickLinksData[x]);
+          if (x % 2 == 1) {
+            newQuicklinks.add(myQuickLinks);
+            myQuickLinks = [];
+          } else if (x == (quickLinksData.length - 1)) {
+            newQuicklinks.add(myQuickLinks);
+          }
         }
-      }
-      quickLinks = newQuicklinks;
-      // print(newQuicklinks);
-      //isLoading = false;
-    });
+        quickLinks = newQuicklinks;
+        // print(newQuicklinks);
+        //isLoading = false;
+      });
+    } on HttpException catch (error) {
+      showError(error.toString());
+    } catch (error) {
+      showError('something went wrong');
+    }
   }
 
   getAds() async {
-    var adsData = await Provider.of<Content>(context, listen: false).getAds();
-    setState(() {
-      ads = adsData;
-      //isLoading = false;
-      print(ads);
-    });
+    try {
+      var adsData = await Provider.of<Content>(context, listen: false).getAds();
+      setState(() {
+        ads = adsData;
+        //isLoading = false;
+        print(ads);
+      });
+    } on HttpException catch (error) {
+      showError(error.toString());
+    } catch (error) {
+      showError('something went wrong');
+    }
   }
 
   loadData() async {
@@ -254,7 +272,7 @@ class _HomePageState extends State<HomePage> {
         voucherData = vouchData;
       });
       // await UrlLauncher.launch(voucherData['url']);
-      
+
       if (await Permission.notification.request().isGranted) {
         if (vouchData['status'] == 'completed') {
           // Future.delayed(const Duration(milliseconds: 3000), () {
@@ -262,7 +280,7 @@ class _HomePageState extends State<HomePage> {
           //       vouchData['description'], vouchData['expire_date']);
           // });
         }
-        Future.delayed(const Duration(milliseconds: 3000), () async{
+        Future.delayed(const Duration(milliseconds: 3000), () async {
           print('notif here');
           await NotificationController.cancelNotifications();
           await NotificationController.scheduleNewNotification(
@@ -274,7 +292,8 @@ class _HomePageState extends State<HomePage> {
       print(error);
       showError(error.toString());
     } catch (error) {
-      showError(error.toString());
+      // showError(error.toString());
+      showError('something went wrong');
     }
     // setState(() {
     //   isLoading = true;
