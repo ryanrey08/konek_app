@@ -186,6 +186,7 @@ class POSProvider with ChangeNotifier {
         responseData = {
           "voucher_code": jsonResponse["data"]['subscription']['id'],
           "duration": jsonResponse["data"]['subscription']['duration'],
+          "duration_unit": jsonResponse["data"]['subscription']['duration_unit'],
           "description": "",
           "amount": 0,
           "claimed_date": jsonResponse["data"]['subscription']['start_date'],
@@ -193,6 +194,7 @@ class POSProvider with ChangeNotifier {
           "payment_request_at": jsonResponse["data"]['payment_request_at'],
           "current_date": jsonResponse["current_date"],
           "status": jsonResponse["data"]['payment_status'],
+          // "status": 'completed',
           "url": jsonResponse['redirect_url'] == null ? '' : jsonResponse['redirect_url']
         };
       } else {

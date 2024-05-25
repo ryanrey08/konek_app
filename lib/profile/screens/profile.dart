@@ -5,6 +5,7 @@ import 'dart:convert';
 // import 'package:flutter/foundation.dart';
 // import 'package:intl/intl.dart';
 // import 'package:konek_app/Config/Config.dart';
+import 'package:konek_app/content/uploadpic.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../providers/profileprovider.dart';
@@ -363,13 +364,6 @@ class _MyProfileState extends State<MyProfile> {
   final txtCompleteAddress = TextEditingController();
   final txtPhoneNumber = TextEditingController();
   final txtSex = TextEditingController();
-  final txtBirthDate = TextEditingController();
-  final txtCivilStatus = TextEditingController();
-  final txtPlaceOfBirth = TextEditingController();
-  final txtTINnumber = TextEditingController();
-  final txtEducational = TextEditingController();
-  final txtDegree = TextEditingController();
-  final txtOldPassword = TextEditingController();
   final txtNewPassword = TextEditingController();
   final txtConfirmPassword = TextEditingController();
   final txtEmailAddress = TextEditingController();
@@ -379,12 +373,6 @@ class _MyProfileState extends State<MyProfile> {
   final lNameFocus = FocusNode();
   final addressFocus = FocusNode();
   final phoneFocus = FocusNode();
-  final birthFocu = FocusNode();
-  final civilFocus = FocusNode();
-  final placeBirthFocus = FocusNode();
-  final tinFocus = FocusNode();
-  final educationalFocus = FocusNode();
-  final degreeFocus = FocusNode();
 
   final bool _isInit = false;
   var businessApplication;
@@ -493,7 +481,11 @@ class _MyProfileState extends State<MyProfile> {
       // print(error);
       showError(error.toString());
     } catch (error) {
-      showError(error.toString());
+            if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
     }
   }
 
@@ -587,7 +579,11 @@ class _MyProfileState extends State<MyProfile> {
       showError(error.toString());
     } catch (error) {
       // showError(error.toString());
-      showError('something went wrong');
+            if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
     }
   }
 
@@ -623,7 +619,11 @@ class _MyProfileState extends State<MyProfile> {
       // print(error);
       showError(error.toString());
     } catch (error) {
-      showError(error.toString());
+      if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
     }
   }
 
@@ -660,7 +660,11 @@ class _MyProfileState extends State<MyProfile> {
       // print(error);
       showError(error.toString());
     } catch (error) {
-      showError(error.toString());
+           if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
     }
   }
 
@@ -698,7 +702,11 @@ class _MyProfileState extends State<MyProfile> {
       // print(error);
       showError(error.toString());
     } catch (error) {
-      showError(error.toString());
+            if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
     }
   }
 
@@ -723,6 +731,17 @@ class _MyProfileState extends State<MyProfile> {
 
   @override
   void dispose() {
+    txtFirstName.dispose();
+    txtMiddleName.dispose();
+    txtLastName.dispose();
+    txtEmailAddress.dispose();
+    txtPhoneNumber.dispose();
+    txtCompleteAddress.dispose();
+    fNameFocus.dispose();
+    mNameFocus.dispose();
+    lNameFocus.dispose();
+    addressFocus.dispose();
+    phoneFocus.dispose();
     super.dispose();
   }
 
@@ -751,14 +770,30 @@ class _MyProfileState extends State<MyProfile> {
               elevation: 0,
               color: Colors.blueGrey.withAlpha(40),
               child: TextFormField(
+                // controller: txtCodeController,
                 autofocus: true,
                 minLines: 1,
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.all(10),
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.all(10),
                   border: InputBorder.none,
                   labelText: 'Voucher Code',
                   //prefixIcon: Icon(Icons.code),
+                  errorStyle: GoogleFonts.poppins(
+                    textStyle: TextStyle(
+                      fontSize: 10,
+                      color: Colors.redAccent[200],
+                    ),
+                  ),
                 ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter voucher code';
+                  }
+                  // if (!value.contains('@')) {
+                  //   return 'Invalid username';
+                  // }
+                  return null;
+                },
               ),
             ),
             const SizedBox(
@@ -850,6 +885,9 @@ class _MyProfileState extends State<MyProfile> {
                               //   },
                               //   initialValue: '',
                               // ),
+                              SizedBox(
+                                height: 15,
+                              ),
                               CustomFormField(
                                 status: editStatus,
                                 label: 'First Name',
@@ -921,7 +959,7 @@ class _MyProfileState extends State<MyProfile> {
                                 controller: txtPhoneNumber,
                                 onFieldSubmitted: (_) {
                                   FocusScope.of(context)
-                                      .requestFocus(educationalFocus);
+                                      .requestFocus(addressFocus);
                                 },
                                 validator: (value) {
                                   if (value.isEmpty) {
@@ -1088,53 +1126,56 @@ class _MyProfileState extends State<MyProfile> {
                                 },
                               ),
 
-                              Container(
-                                // height:  150,
-                                //width: double.infinity,
-                                width: useMobileLayout ? 600 : 700,
+                              // Container(
+                              //   // height:  150,
+                              //   //width: double.infinity,
+                              //   width: useMobileLayout ? 600 : 700,
 
-                                //height: useMobileLayout ? 90 : 150,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 30, horizontal: 15),
-                                child: Container(
-                                  child: SizedBox(
-                                    width: useMobileLayout ? 130 : 180,
-                                    height: 50,
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(50.0),
-                                        ),
-                                        backgroundColor: const Color.fromARGB(
-                                            255, 55, 57, 175), // foreground
-                                      ),
-                                      onPressed: () {
-                                        enterVoucherCode();
-                                      },
-                                      child: Text(
-                                        //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
-                                        "VOUCHER CODE",
-                                        style: GoogleFonts.poppins(
-                                          textStyle: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: useMobileLayout ? 14 : 25,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                      // color: Colors.white,
-                                      // textColor: Colors.black,
-                                      // splashColor: Colors.yellowAccent[800],
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              //   //height: useMobileLayout ? 90 : 150,
+                              //   decoration: BoxDecoration(
+                              //     borderRadius: BorderRadius.circular(10),
+                              //     color: Colors.white,
+                              //   ),
+                              //   padding: const EdgeInsets.symmetric(
+                              //       vertical: 30, horizontal: 15),
+                              //   child: Container(
+                              //     child: SizedBox(
+                              //       width: useMobileLayout ? 130 : 180,
+                              //       height: 50,
+                              //       child: ElevatedButton(
+                              //         style: ElevatedButton.styleFrom(
+                              //           foregroundColor: Colors.white,
+                              //           shape: RoundedRectangleBorder(
+                              //             borderRadius:
+                              //                 BorderRadius.circular(50.0),
+                              //           ),
+                              //           backgroundColor: const Color.fromARGB(
+                              //               255, 55, 57, 175), // foreground
+                              //         ),
+                              //         onPressed: () {
+                              //           // enterVoucherCode();
+                              //           Navigator.of(context)
+                              //             .pushReplacementNamed(
+                              //                 UploadPicture.routeName);
+                              //         },
+                              //         child: Text(
+                              //           //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
+                              //           "VOUCHER CODE",
+                              //           style: GoogleFonts.poppins(
+                              //             textStyle: TextStyle(
+                              //               color: Colors.white,
+                              //               fontSize: useMobileLayout ? 14 : 25,
+                              //               fontWeight: FontWeight.w600,
+                              //             ),
+                              //           ),
+                              //         ),
+                              //         // color: Colors.white,
+                              //         // textColor: Colors.black,
+                              //         // splashColor: Colors.yellowAccent[800],
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
                         )),
@@ -1142,76 +1183,78 @@ class _MyProfileState extends State<MyProfile> {
                     ],
                   ),
                 ),
-          bottomNavigationBar: !isLoading ? Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5),
-            height: 50,
-            width: double.infinity,
-            child: Row(
-              children: <Widget>[
-                const SizedBox(
-                  width: 5,
-                ),
-                editStatus == false
-                    ? Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              editStatus = true;
-                            });
-                            // _formKey1.currentState.validate();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor:
-                                Color.fromARGB(255, 55, 57, 175), // foreground
-                            //                color: Colors.yellow,
-                            // textColor: Colors.black,
-                            // splashColor: Colors.yellowAccent[800],
-                          ),
-                          child: Text(
-                            "EDIT PROFILE",
-                            style: GoogleFonts.poppins(
-                              textStyle: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          // color: Colors.green,
-                          // textColor: Colors.black,
-                          // splashColor: Colors.yellowAccent[800],
-                        ),
-                      )
-                    : Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // _formKey1.currentState.validate();
-                            proceed();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor:
-                                Color.fromARGB(255, 55, 57, 175), // foreground
-                            //                color: Colors.yellow,
-                            // textColor: Colors.black,
-                            // splashColor: Colors.yellowAccent[800],
-                          ),
-                          child: Text(
-                            "UPDATE",
-                            style: GoogleFonts.poppins(
-                              textStyle: TextStyle(
-                                color: Colors.yellowAccent,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
+          bottomNavigationBar: !isLoading
+              ? Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  height: 50,
+                  width: double.infinity,
+                  child: Row(
+                    children: <Widget>[
+                      const SizedBox(
+                        width: 5,
                       ),
-              ],
-            ),
-          ) : Container(),
+                      editStatus == false
+                          ? Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    editStatus = true;
+                                  });
+                                  // _formKey1.currentState.validate();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: Color.fromARGB(
+                                      255, 55, 57, 175), // foreground
+                                  //                color: Colors.yellow,
+                                  // textColor: Colors.black,
+                                  // splashColor: Colors.yellowAccent[800],
+                                ),
+                                child: Text(
+                                  "EDIT PROFILE",
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                // color: Colors.green,
+                                // textColor: Colors.black,
+                                // splashColor: Colors.yellowAccent[800],
+                              ),
+                            )
+                          : Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  // _formKey1.currentState.validate();
+                                  proceed();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: Color.fromARGB(
+                                      255, 55, 57, 175), // foreground
+                                  //                color: Colors.yellow,
+                                  // textColor: Colors.black,
+                                  // splashColor: Colors.yellowAccent[800],
+                                ),
+                                child: Text(
+                                  "UPDATE",
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      color: Colors.yellowAccent,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                    ],
+                  ),
+                )
+              : Container(),
         ),
       ),
     );

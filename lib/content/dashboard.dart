@@ -63,7 +63,7 @@ class _DashboardState extends State<Dashboard> {
     _pageTitle = pageTitle[0];
     // startTime();
     //assignData();
-    lauchUrl();
+    // lauchUrl();
     showLoading();
     getStreamData();
     getStreamNotifData();
@@ -202,7 +202,11 @@ class _DashboardState extends State<Dashboard> {
       showError(error.toString());
     } catch (error) {
       // showError(error.toString());
-      showError('something went wrong');
+      if (error.toString().contains('Connection failed')) {
+        // showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
     }
   }
 

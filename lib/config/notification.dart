@@ -271,7 +271,7 @@ class NotificationController {
   }
 
   static Future<void> scheduleNewNotification(
-    String description, String currentDate, String sDate, String duration) async {
+    String description, String currentDate, String sDate, String duration, String duration_unit) async {
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
     if (!isAllowed) isAllowed = await displayNotificationRationale();
     if (!isAllowed) return;
@@ -279,7 +279,12 @@ class NotificationController {
 
     var nowDate = DateTime.parse(currentDate);
     var startDate = DateTime.parse(sDate);
-    var expDate = startDate.add(Duration(days: int.parse(duration)));
+    var expDate;
+    if(duration_unit == "day"){
+      expDate = startDate.add(Duration(days: int.parse(duration)));
+    }else if(duration_unit == "hour"){
+      expDate = startDate.add(Duration(hours: int.parse(duration)));
+    }
     // var toDate = DateTime.parse(expDate);
     var consume = nowDate.difference(startDate).inSeconds;
     var remaining = expDate.difference(nowDate).inSeconds;

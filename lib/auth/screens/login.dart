@@ -42,6 +42,14 @@ class _LoginState extends State<Login> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    txtUsernameController.dispose();
+    txtPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
     final bool useMobileLayout = shortestSide < 600.0;

@@ -91,7 +91,14 @@ class _NotificationListState extends State<NotificationList> {
       showError(error.toString());
     } catch (error) {
       // showError(error.toString());
-      showError('something went wrong');
+      if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+      setState(() {
+        isLoading = true;
+      });
     }
     // setState(() {
     //   isLoading = true;
@@ -196,18 +203,22 @@ class _NotificationListState extends State<NotificationList> {
                         },
                       )
                     : Center(
-                        child: Container(
-                        child: Text(
-                          'No Record Found',
-                          style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      )),
+                        child: SingleChildScrollView(
+                            physics: AlwaysScrollableScrollPhysics(),
+                            child: Column(children: <Widget>[
+                              Container(
+                                child: Text(
+                                  'No Record Found',
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ]))),
               )
             : Container(child: Center(child: CircularProgressIndicator())),
       ),

@@ -59,7 +59,14 @@ class _TransactionState extends State<Transaction> {
       showError(error.toString());
     } catch (error) {
       // showError(error.toString());
-      showError('something went wrong');
+      if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+      setState(() {
+        isLoading = true;
+      });
     }
     // setState(() {
     //   isLoading = true;
@@ -78,11 +85,13 @@ class _TransactionState extends State<Transaction> {
     );
   }
 
-  getTimeText(time){
-      var nowDate = DateTime.now();
-     var toDate = nowDate.add(Duration(days: 1));
+  getTimeText(time) {
+    var nowDate = DateTime.now();
+    var toDate = nowDate.add(Duration(days: 1));
     // int interval = toDate.difference(nowDate).inSeconds;
-    return DateFormat("yyyy-MM-dd hh:mm").format(DateTime.now()).toString() + " - " + DateFormat("yyyy-MM-dd hh:mm").format(toDate).toString();
+    return DateFormat("yyyy-MM-dd hh:mm").format(DateTime.now()).toString() +
+        " - " +
+        DateFormat("yyyy-MM-dd hh:mm").format(toDate).toString();
   }
 
   @override
@@ -118,13 +127,15 @@ class _TransactionState extends State<Transaction> {
               child: voucherData.length > 0
                   ? ListView.builder(
                       itemCount: voucherData.length,
+                      physics: AlwaysScrollableScrollPhysics(),
                       itemBuilder: (BuildContext context, int index) {
                         return Column(
                           children: <Widget>[
                             ListTile(
                               title: Text(
-                                "You are subscribed to " + 
-                                voucherData[index]['subscription']['duration'] +
+                                "You are subscribed to " +
+                                    voucherData[index]['subscription']
+                                        ['duration'] +
                                     " " +
                                     voucherData[index]['subscription']
                                         ['duration_unit'] +
@@ -139,7 +150,8 @@ class _TransactionState extends State<Transaction> {
                               ),
                               // subtitle: Text(voucherData[index]['created_at'] + " - " + (voucherData[index]['expire_date'])),
                               subtitle: Text(
-                                getTimeText(voucherData[index]['payment_request_at']),
+                                getTimeText(
+                                    voucherData[index]['payment_request_at']),
                                 style: GoogleFonts.poppins(
                                   textStyle: TextStyle(
                                     color: Colors.black,
@@ -155,18 +167,22 @@ class _TransactionState extends State<Transaction> {
                       },
                     )
                   : Center(
-                      child: Container(
-                      child: Text(
-                        'No Record Found',
-                        style: GoogleFonts.poppins(
-                          textStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    )),
+                      child: SingleChildScrollView(
+                           physics: AlwaysScrollableScrollPhysics(),
+                          child: Column(children: <Widget>[
+                            Container(
+                              child: Text(
+                                'No Record Found',
+                                style: GoogleFonts.poppins(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ]))),
             )
           : Container(child: Center(child: CircularProgressIndicator())),
     );

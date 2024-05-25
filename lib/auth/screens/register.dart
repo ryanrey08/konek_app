@@ -59,36 +59,36 @@ class _AccountRegisterState extends State<AccountRegister> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final txtrsbsanumber = TextEditingController();
+  // final txtrsbsanumber = TextEditingController();
   final txtFirstName = TextEditingController();
   final txtMiddleName = TextEditingController();
   final txtLastName = TextEditingController();
   final txtEmail = TextEditingController();
-  final txtBirthday = TextEditingController();
+  // final txtBirthday = TextEditingController();
   final txtContactNumber = TextEditingController();
   final txtPassword = TextEditingController();
   final txtConfirmPassword = TextEditingController();
-  final txtOTP = TextEditingController();
-  final txtCompanyName = TextEditingController();
+  // final txtOTP = TextEditingController();
+  // final txtCompanyName = TextEditingController();
 
   final fNameFocus = FocusNode();
   final mNameFocus = FocusNode();
   final lastNameFocus = FocusNode();
   final emailFocus = FocusNode();
-  final companyName = FocusNode();
-  final uNameFocus = FocusNode();
-  final contactFocus = FocusNode();
-  final passwordFocus = FocusNode();
-  final afiFocus = FocusNode();
-  final bdayFocus = FocusNode();
-  final civilFocus = FocusNode();
-  final genderFocus = FocusNode();
-  final homeAFocus = FocusNode();
-  final provinceFocus = FocusNode();
-  final cityFocus = FocusNode();
-  final brgyFocus = FocusNode();
-  final zipFocus = FocusNode();
-  final spiritualBdate = FocusNode();
+  // final companyName = FocusNode();
+  // final uNameFocus = FocusNode();
+  // final contactFocus = FocusNode();
+  // final passwordFocus = FocusNode();
+  // final afiFocus = FocusNode();
+  // final bdayFocus = FocusNode();
+  // final civilFocus = FocusNode();
+  // final genderFocus = FocusNode();
+  // final homeAFocus = FocusNode();
+  // final provinceFocus = FocusNode();
+  // final cityFocus = FocusNode();
+  // final brgyFocus = FocusNode();
+  // final zipFocus = FocusNode();
+  // final spiritualBdate = FocusNode();
 
   var _selectedUserType;
   final _userType = ['FARMER', 'SUPPLIER'];
@@ -230,52 +230,52 @@ class _AccountRegisterState extends State<AccountRegister> {
     );
   }
 
-  Future<void> proceed() async {
-    var errorMessage;
-    bool isValidUser = false;
-    final isValid = _form.currentState!.validate();
+//   Future<void> proceed() async {
+//     var errorMessage;
+//     bool isValidUser = false;
+//     final isValid = _form.currentState!.validate();
 
-    var number;
-//     var user = {
-//       'rsbsa_no': "",
-//       'last_name': "",
-//       'first_name': "",
-// //       'middle_name': "",
-//       'birthdate': "",
-//       'contact_number': "",
-// //       'password': "",
-// //       'password_confirmation': "",
-//     };
-    try {
-      _form.currentState!.save();
+//     var number;
+// //     var user = {
+// //       'rsbsa_no': "",
+// //       'last_name': "",
+// //       'first_name': "",
+// // //       'middle_name': "",
+// //       'birthdate': "",
+// //       'contact_number': "",
+// // //       'password': "",
+// // //       'password_confirmation': "",
+// //     };
+//     try {
+//       _form.currentState!.save();
 
-      var user = {
-        'rsbsa_no': txtrsbsanumber.text,
-        'last_name': txtLastName.text,
-        'first_name': txtFirstName.text,
-//                     'middle_name': txtMiddleName.text,
-        'birthdate': txtBirthday.text,
-        'contact_number': txtContactNumber.text,
-        'user_type': _selectedUserType.toString(),
-//                     'password': txtPassword.text,
-      };
+//       var user = {
+//         'rsbsa_no': txtrsbsanumber.text,
+//         'last_name': txtLastName.text,
+//         'first_name': txtFirstName.text,
+// //                     'middle_name': txtMiddleName.text,
+//         'birthdate': txtBirthday.text,
+//         'contact_number': txtContactNumber.text,
+//         'user_type': _selectedUserType.toString(),
+// //                     'password': txtPassword.text,
+//       };
 
-      // print(user);
-      await Provider.of<Auth>(context, listen: false).register(user);
-      final sharedPreferences = await SharedPreferences.getInstance();
+//       // print(user);
+//       await Provider.of<Auth>(context, listen: false).register(user);
+//       final sharedPreferences = await SharedPreferences.getInstance();
 
-      if (sharedPreferences.containsKey('userData')) {
-        Navigator.of(context).pushReplacementNamed(Dashboard.routeName);
-      } else {}
-    } on HttpException catch (error) {
-      // print('here');
-      showError(error.toString());
-    } catch (error) {
-      showError('something went wrong');
-    }
+//       if (sharedPreferences.containsKey('userData')) {
+//         Navigator.of(context).pushReplacementNamed(Dashboard.routeName);
+//       } else {}
+//     } on HttpException catch (error) {
+//       // print('here');
+//       showError(error.toString());
+//     } catch (error) {
+//       showError('something went wrong');
+//     }
 
-    // print(errorMessage);
-  }
+//     // print(errorMessage);
+//   }
 
   final String _token = 'Click the below button to generate token';
   bool badgeVisible = true;
@@ -419,6 +419,19 @@ class _AccountRegisterState extends State<AccountRegister> {
   //     _deviceMAC = mac;
   //   });
   // }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    txtFirstName.dispose();
+    txtLastName.dispose();
+    txtMiddleName.dispose();
+    txtContactNumber.dispose();
+    txtEmail.dispose();
+    txtPassword.dispose();
+    txtConfirmPassword.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

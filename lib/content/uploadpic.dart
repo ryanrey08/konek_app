@@ -228,7 +228,7 @@ class _UploadPictureState extends State<UploadPicture> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       if (vouchData['voucher_code'] != '') {
         // var data = json.decode(prefs.getString('voucherData')!) as Map<String, dynamic>;
-        NotificationController.scheduleNewNotification(vouchData['description'], vouchData['expire_date'], vouchData['payment_request_at'], vouchData['subscription']['duration']);
+        NotificationController.scheduleNewNotification(vouchData['description'], vouchData['expire_date'], vouchData['payment_request_at'], vouchData['subscription']['duration'], vouchData['duration_unit']);
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const Dashboard(),
