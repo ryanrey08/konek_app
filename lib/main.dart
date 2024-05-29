@@ -172,14 +172,22 @@ class _MyAppPageState extends State<MyApp> {
                             : MySplashScreen(const Login()),
                   ),
             routes: {
+              //Dashboard
               Dashboard.routeName: (context) => const Dashboard(),
+              //Login
               Login.routeName: (context) => const Login(),
               // ignore: equal_keys_in_map
+              //Registration
               AccountRegister.routeName: (context) => AccountRegister(),
+              //Profile
               MyProfile.routeName: (context) => MyProfile(),
+              //POS
               POS.routeName: (context) => const POS(),
+              //QR Code
               ScanQR.routeName: (context) => const ScanQR(),
+              //Voucher
               UploadPicture.routeName: (context) => const UploadPicture(),
+              //Notification
               NotificationList.routeName: (context) => const NotificationList(),
             },
           ),
