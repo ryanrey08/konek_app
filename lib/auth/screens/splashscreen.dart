@@ -8,9 +8,9 @@ class MySplashScreen extends StatefulWidget {
   final Widget _widget;
 
   @override
-  _MyAppState createState() => new _MyAppState();
+  _MyAppState createState() => _MyAppState();
 
-  MySplashScreen(this._widget);
+  const MySplashScreen(this._widget, {super.key});
 }
 
 class _MyAppState extends State<MySplashScreen> {
@@ -35,7 +35,7 @@ class SplashScreen extends StatefulWidget {
   final dynamic navigateAfterSeconds;
   final bool useMobileLayout;
 
-  SplashScreen({required this.seconds, this.navigateAfterSeconds, required this.useMobileLayout});
+  const SplashScreen({super.key, required this.seconds, this.navigateAfterSeconds, required this.useMobileLayout});
 
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -51,9 +51,9 @@ class _SplashScreenState extends State<SplashScreen> {
         // named route component
         Navigator.of(context).pushReplacementNamed(widget.navigateAfterSeconds);
       } else if (widget.navigateAfterSeconds is Widget) {
-        Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context) => widget.navigateAfterSeconds));
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => widget.navigateAfterSeconds));
       } else {
-        throw new ArgumentError('widget.navigateAfterSeconds must either be a String or Widget');
+        throw ArgumentError('widget.navigateAfterSeconds must either be a String or Widget');
       }
     });
   }
@@ -68,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen> {
         body: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          color: Color.fromARGB(255, 55, 57, 175),
+          color: const Color.fromARGB(255, 55, 57, 175),
           // decoration: BoxDecoration(
           //   image: DecorationImage(
           //     image: AssetImage('images/connections-clipart-md.png'),
@@ -132,11 +132,11 @@ class _SplashScreenState extends State<SplashScreen> {
                       // ),
                      
                       
-                      SizedBox(height: 40),
+                      const SizedBox(height: 40),
                       Container(
                         alignment: Alignment.bottomCenter,
                         child: CircularProgressIndicator(
-                          valueColor: new AlwaysStoppedAnimation<Color>(
+                          valueColor: const AlwaysStoppedAnimation<Color>(
                             Colors.white,
                           ),
                         ),

@@ -1,6 +1,7 @@
 // Packages and Libraries
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
 import 'package:konek_app/config/httpexception.dart';
 import 'package:konek_app/config/notification.dart';
 import 'package:konek_app/content/provider/content.dart';
@@ -127,26 +128,26 @@ class _HomePageState extends State<HomePage> {
   ];
 
   List subscriptions = [
-    {
-      "id": 1,
-      "name": "1 Day Surf",
-      "price": "30.00",
-      "duration": "1",
-      "duration_unit": "day",
-      "start_date": "2024-03-03 00:00:00",
-      "end_date": "2024-04-27 00:00:00",
-      "status": 1 // 1 = Active; 0 = Inactive
-    },
-    {
-      "id": 1,
-      "name": "1 Day Surf",
-      "price": "30.00",
-      "duration": "1",
-      "duration_unit": "day",
-      "start_date": "2024-03-03 00:00:00",
-      "end_date": "2024-04-27 00:00:00",
-      "status": 1 // 1 = Active; 0 = Inactive
-    },
+    // {
+    //   "id": 1,
+    //   "name": "1 Day Surf",
+    //   "price": "30.00",
+    //   "duration": "1",
+    //   "duration_unit": "day",
+    //   "start_date": "2024-03-03 00:00:00",
+    //   "end_date": "2024-04-27 00:00:00",
+    //   "status": 1 // 1 = Active; 0 = Inactive
+    // },
+    // {
+    //   "id": 1,
+    //   "name": "1 Day Surf",
+    //   "price": "30.00",
+    //   "duration": "1",
+    //   "duration_unit": "day",
+    //   "start_date": "2024-03-03 00:00:00",
+    //   "end_date": "2024-04-27 00:00:00",
+    //   "status": 1 // 1 = Active; 0 = Inactive
+    // },
   ];
   List quickLinks = [];
   List ads = [];
@@ -156,7 +157,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     // assignData();
     //getUser();
-    getVoucherData();
+    // getVoucherData();
     getStreamData();
     refreshPage();
   }
@@ -183,7 +184,11 @@ class _HomePageState extends State<HomePage> {
     } on HttpException catch (error) {
       showError(error.toString());
     } catch (error) {
-      showError('something went wrong');
+      // showError(error.toString());
+      if (error.toString().contains('Connection failed')) {
+      } else {
+        showError('something went wrong');
+      }
     }
   }
 
@@ -212,7 +217,11 @@ class _HomePageState extends State<HomePage> {
     } on HttpException catch (error) {
       showError(error.toString());
     } catch (error) {
-      showError('something went wrong');
+      // showError(error.toString());
+      if (error.toString().contains('Connection failed')) {
+      } else {
+        showError('something went wrong');
+      }
     }
   }
 
@@ -222,12 +231,16 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         ads = adsData;
         //isLoading = false;
-        print(ads);
+        // print(ads);
       });
     } on HttpException catch (error) {
       showError(error.toString());
     } catch (error) {
-      showError('something went wrong');
+      // showError(error.toString());
+      if (error.toString().contains('Connection failed')) {
+      } else {
+        showError('something went wrong');
+      }
     }
   }
 
@@ -271,29 +284,34 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         voucherData = vouchData;
       });
-      // await UrlLauncher.launch(voucherData['url']);
 
+      // await UrlLauncher.launch(voucherData['url']);
       if (await Permission.notification.request().isGranted) {
+        // print(vouchData['current_date']);
+        // print(vouchData['payment_request_at']);
+        // print(vouchData['duration']);
         if (vouchData['status'] == 'completed') {
-          // Future.delayed(const Duration(milliseconds: 3000), () {
-          //   NotificationController.scheduleNewNotification(
-          //       vouchData['description'], vouchData['expire_date']);
-          // });
+          Future.delayed(const Duration(milliseconds: 3000), () async {
+            await NotificationController.cancelNotifications();
+            await NotificationController.scheduleNewNotification(
+                vouchData['description'],
+                vouchData['current_date'],
+                vouchData['payment_request_at'],
+                vouchData['duration'],
+                vouchData['duration_unit']);
+          });
         }
-        Future.delayed(const Duration(milliseconds: 3000), () async {
-          print('notif here');
-          await NotificationController.cancelNotifications();
-          await NotificationController.scheduleNewNotification(
-              vouchData['description'], vouchData['expire_date']);
-        });
       }
       assignData(vouchData);
     } on HttpException catch (error) {
-      print(error);
       showError(error.toString());
     } catch (error) {
       // showError(error.toString());
-      showError('something went wrong');
+      if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
     }
     // setState(() {
     //   isLoading = true;
@@ -336,7 +354,7 @@ class _HomePageState extends State<HomePage> {
         farmer = extracteduserData;
       } else {
         farmer = extracteduserData['data'];
-        print(farmer);
+        // print(farmer);
       }
       isLoading = true;
     });
@@ -408,6 +426,58 @@ class _HomePageState extends State<HomePage> {
     await getAds();
     await getVoucherData();
     await loadData();
+  }
+
+  computeRemaining(currentDate, sDate, duration, duration_unit) {
+    var nowDate = DateTime.parse(currentDate);
+    var startDate = DateTime.parse(sDate);
+    var expDate;
+    var remaining;
+    if (duration_unit == "day") {
+      expDate = startDate.add(Duration(days: int.parse(duration)));
+      remaining = expDate.difference(nowDate).inDays;
+    } else if (duration_unit == "hour") {
+      expDate = startDate.add(Duration(hours: int.parse(duration)));
+      remaining = expDate.difference(nowDate).inHours;
+    }
+
+    var remainingInSeconds = expDate.difference(nowDate).inSeconds;
+    print(remainingInSeconds);
+
+    return remaining;
+  }
+
+  bool isRemainingHours(currentDate, sDate, duration, duration_unit) {
+    var nowDate = DateTime.parse(currentDate);
+    var startDate = DateTime.parse(sDate);
+    var expDate;
+
+    if (duration_unit == "day") {
+      expDate = startDate.add(Duration(days: int.parse(duration)));
+    } else if (duration_unit == "hour") {
+      expDate = startDate.add(Duration(hours: int.parse(duration)));
+    }
+
+    var remainingInSeconds = expDate.difference(nowDate).inSeconds;
+    print(remainingInSeconds);
+
+    return remainingInSeconds > 86400 ? true : false;
+  }
+
+    computeRemainingSeconds(currentDate, sDate, duration, duration_unit) {
+    var nowDate = DateTime.parse(currentDate);
+    var startDate = DateTime.parse(sDate);
+    var expDate;
+    if (duration_unit == "day") {
+      expDate = startDate.add(Duration(days: int.parse(duration)));
+    } else if (duration_unit == "hour") {
+      expDate = startDate.add(Duration(hours: int.parse(duration)));
+    }
+
+    var remainingInSeconds = expDate.difference(nowDate).inSeconds;
+    print(remainingInSeconds);
+
+    return remainingInSeconds;
   }
 
   @override
@@ -537,23 +607,104 @@ class _HomePageState extends State<HomePage> {
                                                     ),
                                                   ),
                                                 ),
-                                                Expanded(
-                                                  child: Text(
-                                                    "${isLoading ? (newVoucherData['status'] == 'completed' ? newVoucherData["duration"].toString() : "0") : "0"} Day/s",
-                                                    textAlign: TextAlign.center,
-                                                    style: GoogleFonts.poppins(
-                                                      textStyle: TextStyle(
-                                                        fontSize:
-                                                            useMobileLayout
-                                                                ? 16
-                                                                : 28,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
+                                                isLoading ? Expanded(
+                                                  child: newVoucherData["status"] == 'completed' ? (isRemainingHours(
+                                                          newVoucherData[
+                                                                  "current_date"]
+                                                              .toString(),
+                                                          newVoucherData[
+                                                                  "payment_request_at"]
+                                                              .toString(),
+                                                          newVoucherData[
+                                                                  "duration"]
+                                                              .toString(),
+                                                          newVoucherData[
+                                                                  "duration_unit"]
+                                                              .toString())
+                                                      ? Text(
+                                                          "${(computeRemaining(newVoucherData["current_date"].toString(), newVoucherData["payment_request_at"].toString(), newVoucherData["duration"].toString(), newVoucherData["duration_unit"].toString()))} ${newVoucherData["duration_unit"].toString() == 'days' ? 'Day/s' : 'Hour/s'}",
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            textStyle:
+                                                                TextStyle(
+                                                              fontSize:
+                                                                  useMobileLayout
+                                                                      ? 16
+                                                                      : 28,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w800,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : TimerCountdown(
+                                                          format: CountDownTimerFormat
+                                                              .hoursMinutesSeconds,
+                                                          spacerWidth: 5,
+                                                          timeTextStyle:
+                                                              GoogleFonts.poppins(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize:
+                                                                      useMobileLayout
+                                                                          ? 16
+                                                                          : 28,
+                                                                  color: Colors
+                                                                      .white),
+                                                          enableDescriptions:
+                                                              false,
+                                                          colonsTextStyle:
+                                                              GoogleFonts.poppins(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize:
+                                                                      useMobileLayout
+                                                                          ? 16
+                                                                          : 28,
+                                                                  color: Colors
+                                                                      .white),
+                                                          endTime:
+                                                              DateTime.now()
+                                                                  .add(
+                                                            Duration(
+                                                              days: 0,
+                                                              // days: 5,
+                                                              hours: 0,
+                                                              minutes: 0,
+                                                              seconds: computeRemainingSeconds(newVoucherData["current_date"].toString(), newVoucherData["payment_request_at"].toString(), newVoucherData["duration"].toString(), newVoucherData["duration_unit"].toString()),
+                                                            ),
+                                                          ),
+                                                          onEnd: () {
+                                                            print(
+                                                                "Timer finished");
+                                                          },
+                                                        )) : Text(
+                                                          "0 Day/s",
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            textStyle:
+                                                                TextStyle(
+                                                              fontSize:
+                                                                  useMobileLayout
+                                                                      ? 16
+                                                                      : 28,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w800,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                ) : Container(),
                                                 Expanded(
                                                   child: AutoSizeText(
                                                       'Remaining',
@@ -798,9 +949,9 @@ class _HomePageState extends State<HomePage> {
                                                                               [
                                                                               'duration'] +
                                                                           " " +
-                                                                          subscriptions[x]
-                                                                              [
-                                                                              'duration_unit'],
+                                                                          subscriptions[x]['duration_unit']
+                                                                              .toUpperCase() +
+                                                                          "/s",
                                                                       style: GoogleFonts
                                                                           .poppins(
                                                                         textStyle:
@@ -1011,7 +1162,7 @@ class _HomePageState extends State<HomePage> {
                                                         y++) ...[
                                                       GestureDetector(
                                                         onTap: () {
-                                                          print("here");
+                                                          // print("here");
                                                           UrlLauncher.launch(
                                                               'tel:+${quickLinks[x][y]['link']}');
                                                         },
@@ -1044,17 +1195,15 @@ class _HomePageState extends State<HomePage> {
                                                 )
                                               ]
                                             ])
-                                      : Expanded(
-                                          child: Center(
-                                            child: Text(
-                                              "NO CURRENT DATA",
-                                              style: GoogleFonts.poppins(
-                                                textStyle: TextStyle(
-                                                  color: Colors.red,
-                                                  fontSize:
-                                                      useMobileLayout ? 14 : 25,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
+                                      : Center(
+                                          child: Text(
+                                            "NO CURRENT DATA",
+                                            style: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                color: Colors.red,
+                                                fontSize:
+                                                    useMobileLayout ? 14 : 25,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                           ),
@@ -1141,16 +1290,14 @@ class _HomePageState extends State<HomePage> {
                                       );
                                     }).toList(),
                                   )
-                                : Expanded(
-                                    child: Center(
-                                      child: Text(
-                                        "NO CURRENT ADS",
-                                        style: GoogleFonts.poppins(
-                                          textStyle: TextStyle(
-                                            color: Colors.red,
-                                            fontSize: useMobileLayout ? 14 : 25,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                : Center(
+                                    child: Text(
+                                      "NO CURRENT ADS",
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                          color: Colors.red,
+                                          fontSize: useMobileLayout ? 14 : 25,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ),
@@ -1208,7 +1355,7 @@ class _HomePageState extends State<HomePage> {
         json.decode(sharedPreferences.getString('userData')!)
             as Map<String, Object>;
 
-    print(extractedUserData['personCode']);
+    // print(extractedUserData['personCode']);
     return extractedUserData['personCode'];
   }
 }

@@ -4,6 +4,7 @@ import 'package:konek_app/content/dashboard.dart';
 import 'package:konek_app/content/provider/pos.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import '../config/httpexception.dart';
 
 import 'provider/voucher.dart';
@@ -21,7 +22,7 @@ class _TransactionState extends State<Transaction> {
 
   List<String> data = [];
   bool isLoading = false;
-  var voucherData;
+  var voucherData = [];
 
   @override
   void initState() {
@@ -31,6 +32,7 @@ class _TransactionState extends State<Transaction> {
 
   Future<void> getVoucherData() async {
     var errorMessage;
+    voucherData = [];
     // setState(() {
     //   isLoading = true;
     // });
@@ -42,17 +44,29 @@ class _TransactionState extends State<Transaction> {
       //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
       var voucher = await Provider.of<POSProvider>(context, listen: false)
           .getAllPaymentStatus();
-      print(voucher);
+      // print(voucher);
       setState(() {
-        voucherData = voucher['data'];
+        voucher['data'].forEach((item) {
+          if (item['payment_status'] == 'completed') {
+            voucherData.add(item);
+          }
+        });
+        // print(voucherData);
         isLoading = true;
       });
     } on HttpException catch (error) {
-      print(error);
+      // print(error);
       showError(error.toString());
     } catch (error) {
       // showError(error.toString());
-      showError('something went wrong');
+      if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+      setState(() {
+        isLoading = true;
+      });
     }
     // setState(() {
     //   isLoading = true;
@@ -69,6 +83,15 @@ class _TransactionState extends State<Transaction> {
       textColor: Colors.white,
       fontSize: 13.0,
     );
+  }
+
+  getTimeText(time) {
+    var nowDate = DateTime.now();
+    var toDate = nowDate.add(Duration(days: 1));
+    // int interval = toDate.difference(nowDate).inSeconds;
+    return DateFormat("yyyy-MM-dd hh:mm").format(DateTime.now()).toString() +
+        " - " +
+        DateFormat("yyyy-MM-dd hh:mm").format(toDate).toString();
   }
 
   @override
@@ -101,43 +124,65 @@ class _TransactionState extends State<Transaction> {
               backgroundColor: Colors.blue,
               strokeWidth: 4.0,
               onRefresh: getVoucherData,
-              child: ListView.builder(
-                itemCount: voucherData.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Column(
-                    children: <Widget>[
-                      ListTile(
-                        title: Text(
-                          voucherData[index]['subscription']['duration'] +
-                              " " +
-                              voucherData[index]['subscription']
-                                  ['duration_unit'] +
-                              "/s Unlimited Data",
-                          style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
+              child: voucherData.length > 0
+                  ? ListView.builder(
+                      itemCount: voucherData.length,
+                      physics: AlwaysScrollableScrollPhysics(),
+                      itemBuilder: (BuildContext context, int index) {
+                        return Column(
+                          children: <Widget>[
+                            ListTile(
+                              title: Text(
+                                "You are subscribed to " +
+                                    voucherData[index]['subscription']
+                                        ['duration'] +
+                                    " " +
+                                    voucherData[index]['subscription']
+                                        ['duration_unit'] +
+                                    "/s Unlimited Data",
+                                style: GoogleFonts.poppins(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                              // subtitle: Text(voucherData[index]['created_at'] + " - " + (voucherData[index]['expire_date'])),
+                              subtitle: Text(
+                                getTimeText(
+                                    voucherData[index]['payment_request_at']),
+                                style: GoogleFonts.poppins(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        // subtitle: Text(voucherData[index]['created_at'] + " - " + (voucherData[index]['expire_date'])),
-                        subtitle: Text(
-                          voucherData[index]['created_at'],
-                          style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                            Divider(), //
+                          ],
+                        );
+                      },
+                    )
+                  : Center(
+                      child: SingleChildScrollView(
+                           physics: AlwaysScrollableScrollPhysics(),
+                          child: Column(children: <Widget>[
+                            Container(
+                              child: Text(
+                                'No Record Found',
+                                style: GoogleFonts.poppins(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
-                      Divider(), //
-                    ],
-                  );
-                },
-              ),
+                          ]))),
             )
           : Container(child: Center(child: CircularProgressIndicator())),
     );

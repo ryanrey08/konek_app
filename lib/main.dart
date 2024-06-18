@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:konek_app/config/checkconnection.dart';
 import 'package:konek_app/config/notification.dart';
 import 'package:konek_app/content/notification.dart';
 import 'package:konek_app/content/provider/content.dart';
@@ -7,6 +8,7 @@ import 'package:konek_app/content/provider/pos.dart';
 import 'package:konek_app/content/provider/voucher.dart';
 import 'package:konek_app/content/scan.dart';
 import 'package:konek_app/content/uploadpic.dart';
+import 'package:konek_app/profile/providers/profileprovider.dart';
 import 'package:konek_app/profile/screens/profile.dart';
 import 'package:provider/provider.dart';
 import 'package:konek_app/auth/screens/login.dart';
@@ -27,6 +29,7 @@ void main() async {
     runApp(MyApp());
   });
   // runApp(MyApp());
+  GlobalToast.checkConnection();
 }
 
 class MyApp extends StatefulWidget {
@@ -127,6 +130,28 @@ class _MyAppPageState extends State<MyApp> {
           //   throw UnimplementedError();
           // },
         ),
+        ChangeNotifierProxyProvider<Auth, ProfileProvider>(
+          //create: (context) => Voucher(''),
+          update: (context, auth, userData) {
+            // Pass the value from AuthProvider to UserProvider
+            // userData?.updateUserData(authProvider?.isLoggedIn ?? false);
+            // return userData!;
+            return userData ?? ProfileProvider(auth.token);
+          },
+          create: (BuildContext context) {
+            // You can pass any required parameters to the create method
+            // In this example, we pass a token from AuthProvider
+            final Auth authProvider = Provider.of<Auth>(context, listen: false);
+            final String token = authProvider.token;
+
+            // Instantiate the UserProvider with the token
+            return ProfileProvider(token);
+          },
+          // create: (BuildContext context) {
+          //   // This won't be used because we use the update function.
+          //   throw UnimplementedError();
+          // },
+        ),
       ],
       child: AppRetainWidget(
         child: Consumer<Auth>(
@@ -147,14 +172,22 @@ class _MyAppPageState extends State<MyApp> {
                             : MySplashScreen(const Login()),
                   ),
             routes: {
+              //Dashboard
               Dashboard.routeName: (context) => const Dashboard(),
+              //Login
               Login.routeName: (context) => const Login(),
               // ignore: equal_keys_in_map
+              //Registration
               AccountRegister.routeName: (context) => AccountRegister(),
+              //Profile
               MyProfile.routeName: (context) => MyProfile(),
+              //POS
               POS.routeName: (context) => const POS(),
+              //QR Code
               ScanQR.routeName: (context) => const ScanQR(),
+              //Voucher
               UploadPicture.routeName: (context) => const UploadPicture(),
+              //Notification
               NotificationList.routeName: (context) => const NotificationList(),
             },
           ),

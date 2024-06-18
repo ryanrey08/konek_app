@@ -39,7 +39,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
       subscription = subsData['subscription'];
       isLoading = false;
     });
-    print(subscription);
+    // print(subscription);
   }
 
   @override
@@ -87,15 +87,23 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
 
     sharedPreferences = await SharedPreferences.getInstance();
 
+    // final extractedUserData =
+    //     json.decode(sharedPreferences.getString('userData')!)
+    //         as Map<String, dynamic>;
+    // final data = extractedUserData['data']['user'] as Map<String, dynamic>;
     final extractedUserData =
-        json.decode(sharedPreferences.getString('userData')!)
-            as Map<String, dynamic>;
-    final data = extractedUserData['data']['user'] as Map<String, dynamic>;
-
-    setState(() {
-      email = data['email'] ?? '';
-      phone = data['mobile_no'] ?? '';
-    });
+        json.decode(sharedPreferences.getString('userData')!) as Map;
+    if (extractedUserData['data']['user'] != null) {
+      setState(() {
+        email = extractedUserData['data']['user']['email'] ?? '';
+        phone = extractedUserData['data']['user']['mobile_no'] ?? '';
+      });
+    } else {
+      setState(() {
+        email = extractedUserData['data']['email'] ?? '';
+        phone = extractedUserData['data']['mobile_no'] ?? '';
+      });
+    }
   }
 
   void showError(String message) {
@@ -123,24 +131,24 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
       setState(() {
         requestPaymentDataUrl = subscriptionsData['url'];
       });
-      // await UrlLauncher.launch("http://10.44.77.253:2060/ext_login?username=3MFREE&password=3MFREE&next_url=$requestPaymentDataUrl");
-      await UrlLauncher.launch(requestPaymentDataUrl);
+      await UrlLauncher.launch("http://10.44.77.253:2060/ext_login?username=3MFREE&password=3MFREE&next_url=$requestPaymentDataUrl");
+      // await UrlLauncher.launch(requestPaymentDataUrl);
       var vouchData;
 
-        try {
-          //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
-          vouchData = await Provider.of<POSProvider>(context, listen: false)
-              .getMyPaymentStatus();
-           SharedPreferences prefs = await SharedPreferences.getInstance();
-           if(vouchData['status'] == 'complete'){
-            prefs.setString('swakUrl', vouchData['url']);
-           }
-        } on HttpException catch (error) {
-          print(error);
-          showError(error.toString());
-        } catch (error) {
-          showError(error.toString());
+      try {
+        //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
+        vouchData = await Provider.of<POSProvider>(context, listen: false)
+            .getMyPaymentStatus();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        if (vouchData['status'] == 'complete') {
+          prefs.setString('swakUrl', vouchData['url']);
         }
+      } on HttpException catch (error) {
+        // print(error);
+        showError(error.toString());
+      } catch (error) {
+        showError(error.toString());
+      }
 
       Future.delayed(const Duration(milliseconds: 3000), () {
         Navigator.pushAndRemoveUntil(
@@ -368,7 +376,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                                       onChanged: (value) {
                                         setState(() {
                                           paymentMethod = value.toString();
-                                          print(paymentMethod);
+                                          // print(paymentMethod);
                                         });
                                       }),
                                   SizedBox(

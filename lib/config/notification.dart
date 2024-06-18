@@ -116,25 +116,25 @@ class NotificationController {
   @pragma('vm:entry-point')
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
-    print("hello");
+    // print("hello");
     if (receivedAction.actionType == ActionType.SilentAction ||
         receivedAction.actionType == ActionType.SilentBackgroundAction) {
       // For background actions, you must hold the execution until the end
-      print(
-          'Message sent via notification input: "${receivedAction.buttonKeyInput}"');
-      await executeLongTaskInBackground();
+      // print(
+      //     'Message sent via notification input: "${receivedAction.buttonKeyInput}"');
+      // await executeLongTaskInBackground();
     } else {
       // this process is only necessary when you need to redirect the user
       // to a new page or use a valid context, since parallel isolates do not
       // have valid context, so you need redirect the execution to main isolate
       if (receivePort == null) {
-        print(
-            'onActionReceivedMethod was called inside a parallel dart isolate.');
+        // print(
+        //     'onActionReceivedMethod was called inside a parallel dart isolate.');
         SendPort? sendPort =
             IsolateNameServer.lookupPortByName('notification_action_port');
 
         if (sendPort != null) {
-          print('Redirecting the execution to main isolate process.');
+          // print('Redirecting the execution to main isolate process.');
           sendPort.send(receivedAction);
           return;
         }
@@ -226,12 +226,12 @@ class NotificationController {
   ///     BACKGROUND TASKS TEST
   ///  *********************************************
   static Future<void> executeLongTaskInBackground() async {
-    print("starting long task");
+    // print("starting long task");
     await Future.delayed(const Duration(seconds: 4));
     final url = Uri.parse("http://google.com");
     final re = await http.get(url);
-    print(re.body);
-    print("long task done");
+    // print(re.body);
+    // print("long task done");
   }
 
   ///  *********************************************
@@ -271,27 +271,43 @@ class NotificationController {
   }
 
   static Future<void> scheduleNewNotification(
-    String description, String expDate) async {
+    String description, String currentDate, String sDate, String duration, String duration_unit) async {
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
     if (!isAllowed) isAllowed = await displayNotificationRationale();
     if (!isAllowed) return;
+    
 
-    var nowDate = DateTime.now();
+    var nowDate = DateTime.parse(currentDate);
+    var startDate = DateTime.parse(sDate);
+    var expDate;
+    if(duration_unit == "day"){
+      expDate = startDate.add(Duration(days: int.parse(duration)));
+    }else if(duration_unit == "hour"){
+      expDate = startDate.add(Duration(hours: int.parse(duration)));
+    }
     // var toDate = DateTime.parse(expDate);
+    var consume = nowDate.difference(startDate).inSeconds;
+    var remaining = expDate.difference(nowDate).inSeconds;
+    var whole = expDate.difference(startDate).inSeconds;
      var toDate = nowDate.add(Duration(minutes: 1));
-    int interval = toDate.difference(nowDate).inSeconds;
+    // int interval = toDate.difference(nowDate).inSeconds;
+    int interval = whole - consume;
+    // print("consume" + consume.toString());
+    // print("remain" + remaining.toString());
+    // print("whole" + whole.toString());
+    // print("inte" +  interval.toString());
 
-    // if(interval < 1800){
-    //       await myNotifyScheduleInHours(
-    //     title: 'Data Expiry',
-    //     msg: 'Your promo $description is about to expire on $expDate',
-    //     heroThumbUrl:
-    //         'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
-    //     hoursFromNow: 5,
-    //     username: 'test user',
-    //     interval: (interval - 1800),
-    //     repeatNotif: false);
-    // }
+    if(interval < 1800){
+          await myNotifyScheduleInHours(
+        title: 'Data Expiry',
+        msg: 'Your promo $description is about to expire on $expDate',
+        heroThumbUrl:
+            'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
+        hoursFromNow: 5,
+        username: 'test user',
+        interval: (interval - 1800),
+        repeatNotif: false);
+    }
 
     await myNotifyScheduleInHours(
         title: 'Data Expiry',

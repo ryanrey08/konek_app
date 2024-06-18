@@ -42,13 +42,21 @@ class _LoginState extends State<Login> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    txtUsernameController.dispose();
+    txtPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
     final bool useMobileLayout = shortestSide < 600.0;
     var height = MediaQuery.of(context).size.height;
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
       child: SafeArea(
         child: Scaffold(
           backgroundColor: Colors.white,
@@ -135,7 +143,7 @@ class _LoginState extends State<Login> {
                                           ),
                                         ),
                                       ),
-                                      Container(
+                                      SizedBox(
                                           width: 100,
                                           height: 100,
                                           child: const Image(
@@ -144,7 +152,7 @@ class _LoginState extends State<Login> {
                                             image: AssetImage(
                                                 'assets/images/swak-img.png'),
                                           )),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 15,
                                       ),
                                       loginEmailFields(
@@ -152,7 +160,7 @@ class _LoginState extends State<Login> {
                                           Icons.person_2,
                                           txtUsernameController,
                                           useMobileLayout),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 10,
                                       ),
                                       // loginFields("", Icons.lock,
@@ -187,11 +195,11 @@ class _LoginState extends State<Login> {
                                       //     ),
                                       //   ],
                                       // ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 10,
                                       ),
                                       loginButton(useMobileLayout),
-                                      SizedBox(height: 5),
+                                      const SizedBox(height: 5),
                                       Container(
                                         alignment: Alignment.center,
                                         width: useMobileLayout ? null : 500,
@@ -302,10 +310,10 @@ class _LoginState extends State<Login> {
                     fontSize: useMobileLayout ? 16 : 18, color: Colors.black),
               ),
               decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
                 hintText: hintText,
-                prefixIcon: Icon(
+                prefixIcon: const Icon(
                   Icons.person,
                   color: Color.fromARGB(255, 55, 57, 175),
                 ),
@@ -321,28 +329,28 @@ class _LoginState extends State<Login> {
                 // focusedBorder: _textFormBorder(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(50),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: Color.fromARGB(255, 55, 57, 175),
                     width: 1,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(50),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: CupertinoColors.systemGrey,
                     width: 1,
                   ),
                 ),
                 disabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(50),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: CupertinoColors.systemGrey,
                     width: 1,
                   ),
                 ),
                 errorBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(50),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: Colors.redAccent,
                     width: 1,
                   ),
@@ -384,7 +392,7 @@ class _LoginState extends State<Login> {
   }
 
   UnderlineInputBorder _textFormBorder() {
-    return UnderlineInputBorder(
+    return const UnderlineInputBorder(
       borderSide: BorderSide(
         color: Colors.black,
       ),
@@ -405,39 +413,39 @@ class _LoginState extends State<Login> {
               fontSize: useMobileLayout ? 16 : 18, color: Colors.black),
         ),
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.symmetric(horizontal: 20),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           floatingLabelBehavior: FloatingLabelBehavior.auto,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: Colors.green,
               width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: CupertinoColors.systemGrey,
               width: 1,
             ),
           ),
           disabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: CupertinoColors.systemGrey,
               width: 1,
             ),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: Colors.redAccent,
               width: 1,
             ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: CupertinoColors.systemGrey,
               width: 1,
             ),
@@ -455,7 +463,7 @@ class _LoginState extends State<Login> {
           fillColor: Colors.grey[200],
           filled: true,
           hintText: "PASSWORD",
-          prefixIcon: Icon(
+          prefixIcon: const Icon(
             Icons.lock,
             color: Color.fromARGB(255, 55, 57, 175),
           ),
@@ -467,13 +475,13 @@ class _LoginState extends State<Login> {
           suffixIcon: hintTextP == ""
               ? IconButton(
                   icon: _hidePassword
-                      ? Icon(
+                      ? const Icon(
                           Icons.visibility_off,
                           color: Colors.grey,
                           // size: useMobileLayout ? 15 : 18,
                           size: 22,
                         )
-                      : Icon(
+                      : const Icon(
                           Icons.visibility,
                           color: Colors.grey,
                           // size: useMobileLayout ? 15 : 18,
@@ -515,6 +523,16 @@ class _LoginState extends State<Login> {
               : null, // your tap handler moved here
           builder: (BuildContext context, TapDebouncerFunc? onTap) {
             return ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50.0),
+                  ),
+                  textStyle: const TextStyle(
+                    color: Colors.green,
+                    decorationColor: Colors.black,
+                  )),
+              onPressed: onTap,
               child: !_isLoading
                   ? Text(
                       "SIGN IN",
@@ -530,16 +548,6 @@ class _LoginState extends State<Login> {
                       color: Colors.white,
                       size: 50.0,
                     ),
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50.0),
-                  ),
-                  textStyle: const TextStyle(
-                    color: Colors.green,
-                    decorationColor: Colors.black,
-                  )),
-              onPressed: onTap,
             );
           },
         ),
@@ -559,7 +567,7 @@ class _LoginState extends State<Login> {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Color(0xff404747),
+      backgroundColor: const Color(0xff404747),
       textColor: Colors.white,
       fontSize: 13.0,
     );

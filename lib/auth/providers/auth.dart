@@ -52,30 +52,37 @@ class Auth with ChangeNotifier {
   //   }
   // }
 
-  Future<void> login(String contact_number, String password) async {
-    Map data = {'mobile_number': contact_number, 'password': password};
+  Future<void> login(String contactNumber, String password) async {
+    Map data = {'mobile_number': contactNumber, 'password': password};
     Map<String, dynamic> jsonResponse;
     var responseCode;
     try {
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       var response =
-          await http.post(Uri.parse(config.pre_url + "/login-via-mobile"), body: data);
+          await http.post(Uri.parse("${config.pre_url}/login-via-mobile"), body: data);
       var jsonResponse = json.decode(response.body);
-      print(jsonResponse);
+      // print(jsonResponse);
       if (jsonResponse['success'] == true) {
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
         sharedPreferences.setString('userData', json.encode(jsonResponse));
+        if(jsonResponse['activePromo'] != null){
+                sharedPreferences.setString(
+          'swakPaymentRefNo', json.encode({"reference_number" : jsonResponse['activePromo']}));
+        }else{
+          sharedPreferences.setString(
+          'swakPaymentRefNo', json.encode({"reference_number" : '00000'}));
+        }
       } else {
-        print("exp" + jsonResponse['message']);
+        // print("exp" + jsonResponse['message']);
         throw HttpException(jsonResponse['data']['mobile_number'][0].toString());
       }
     } catch (error) {
-      print('error');
-      print(error);
+      // print('error');
+      // print(error);
       // print(responseCode);
-      throw (error);
+      rethrow;
     }
   }
 
@@ -94,13 +101,13 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> register(userInfo) async {
-    print(userInfo);
+    // print(userInfo);
     Map<String, dynamic> jsonResponse;
 
 
     try {
       final response = await http.post(
-       Uri.parse(config.pre_url + "/register"),
+       Uri.parse("${config.pre_url}/register-v2"),
         body: userInfo,
       );
 
@@ -113,11 +120,11 @@ class Auth with ChangeNotifier {
       // print(jsonResponseRSBSA['message']);
 
       jsonResponse = json.decode(response.body);
-      print(jsonResponse);
+      // print(jsonResponse);
 
       if (jsonResponse['success']) {
         final userData = json.encode(jsonResponse);
-        print(userData);
+        // print(userData);
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
         sharedPreferences.setString('userData', userData);
@@ -138,9 +145,9 @@ class Auth with ChangeNotifier {
         }
       }
 
-      print(jsonResponse['message']);
+      // print(jsonResponse['message']);
     } catch (error) {
-      throw (error);
+      rethrow;
     }
 
     notifyListeners();

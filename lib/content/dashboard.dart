@@ -59,12 +59,11 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
-    GlobalToast.checkConnection();
     _currentIndex = 0;
     _pageTitle = pageTitle[0];
     // startTime();
     //assignData();
-    lauchUrl();
+    // lauchUrl();
     showLoading();
     getStreamData();
     getStreamNotifData();
@@ -90,15 +89,15 @@ class _DashboardState extends State<Dashboard> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey('swakUrl')) {
       var url = prefs.getString('swakUrl') as String;
-      if(url != ''){
+      if (url != '') {
         await UrlLauncher.launch(url);
         await clearUrl();
       }
     }
   }
 
-  clearUrl() async{
-     final prefs = await SharedPreferences.getInstance();
+  clearUrl() async {
+    final prefs = await SharedPreferences.getInstance();
     prefs.remove('swakUrl');
   }
 
@@ -149,7 +148,7 @@ class _DashboardState extends State<Dashboard> {
     } else {
       final extracteduserData =
           json.decode(prefs.getString('voucherData')!) as Map<String, dynamic>;
-      print(extracteduserData);
+      // print(extracteduserData);
 
       setState(() {
         voucherData = extracteduserData;
@@ -180,6 +179,7 @@ class _DashboardState extends State<Dashboard> {
       fullName = extractedUserData['data']['user']['first_name'] +
           " " +
           extractedUserData['data']['user']['last_name'];
+      // print(extractedUserData['activePromo']);
     } else {
       fullName = extractedUserData['data']['first_name'] +
           " " +
@@ -193,16 +193,20 @@ class _DashboardState extends State<Dashboard> {
     try {
       var voucher = await Provider.of<POSProvider>(context, listen: false)
           .getAllPaymentStatus();
-      print(voucher);
+      // print(voucher);
       setState(() {
         notifLength = voucher['data'].length;
       });
     } on HttpException catch (error) {
-      print(error);
+      // print(error);
       showError(error.toString());
     } catch (error) {
       // showError(error.toString());
-      showError('something went wrong');
+      if (error.toString().contains('Connection failed')) {
+        // showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
     }
   }
 
@@ -253,13 +257,16 @@ class _DashboardState extends State<Dashboard> {
                             builder: (context, notifData) {
                               return notifData != ''
                                   ? Badge(
-                                      label: Text(notifData),
+                                      label: Text(' '),
+                                      backgroundColor: Colors.red,
+                                      smallSize: 10,
+                                      largeSize: 10,
                                       child: const Icon(
                                         Icons.notifications,
                                         size: 26.0,
                                       ),
                                     )
-                                  : const Icon(
+                                  : Icon(
                                       Icons.notifications,
                                       size: 26.0,
                                     );
@@ -304,7 +311,7 @@ class _DashboardState extends State<Dashboard> {
                                 _currentIndex = index;
                                 _pageTitle = pageTitle[index];
                               }
-                              print(index.toString());
+                              // print(index.toString());
                             });
                           },
                           backgroundColor:

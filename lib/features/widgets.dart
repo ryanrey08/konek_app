@@ -391,11 +391,12 @@ class _CustomDropDownState extends State<CustomDropDown> {
             .toList(),
         style: GoogleFonts.poppins(
           textStyle: TextStyle(
-            fontSize: 16,
+            fontSize: 15,
             color: Colors.black,
           ),
         ),
         decoration: InputDecoration(
+          enabled: widget.status,
           contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           floatingLabelBehavior: FloatingLabelBehavior.always,
           // OutlineInputBorder
@@ -598,7 +599,7 @@ class _CustomDateTimeState extends State<CustomDateTime> {
           onSaved: widget.onSaved(),
           validator: widget.validator(),
           onChanged: (date) {
-            print(date);
+            // print(date);
           },
         ),
       ),

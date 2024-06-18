@@ -84,7 +84,7 @@ class GlobalToast with ChangeNotifier {
 
     if (message == "Offline") {
       Fluttertoast.showToast(
-        msg: 'No Internt Connection',
+        msg: 'No Internet Connection',
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 1,
@@ -207,8 +207,9 @@ class MyConnectivity with ChangeNotifier {
       final result = await InternetAddress.lookup('example.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         isOnline = true;
-      } else
+      } else {
         isOnline = false;
+      }
     } on SocketException catch (_) {
       isOnline = false;
     }

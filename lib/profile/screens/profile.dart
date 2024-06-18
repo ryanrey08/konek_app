@@ -5,6 +5,7 @@ import 'dart:convert';
 // import 'package:flutter/foundation.dart';
 // import 'package:intl/intl.dart';
 // import 'package:konek_app/Config/Config.dart';
+import 'package:konek_app/content/uploadpic.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../providers/profileprovider.dart';
@@ -88,6 +89,9 @@ class _MyProfileState extends State<MyProfile> {
   List<dynamic> _barangay = [];
 
   List<dynamic> _regionsId = [];
+  String _provsId = '';
+  String _munId = '';
+  String _brgyId = '';
   List<dynamic> _tempMunicipalityKeys = [];
   List<dynamic> _tempMunicipality = [];
   var _tempRegion = {};
@@ -120,7 +124,6 @@ class _MyProfileState extends State<MyProfile> {
       _region = region;
       _selectedRegion = _region[0];
       _regionId = _regionsId[0];
-      //print(_region);
       // if (_userData['region'] == null) {
       //   _selectedRegion = _region[0];
       //   _regionId = _regionsId[0];
@@ -128,7 +131,7 @@ class _MyProfileState extends State<MyProfile> {
     });
   }
 
-  getRegionId() {
+  String getRegionId() {
     int index = 0;
     for (var x = 0; x < _region.length; x++) {
       if (_selectedRegion == _region[x]) {
@@ -136,9 +139,55 @@ class _MyProfileState extends State<MyProfile> {
       }
     }
 
-    setState(() {
-      _regionId = _regionsId[index];
-    });
+    // setState(() {
+    //   _regionId = _regionsId[index];
+    // });
+    return _regionsId[index];
+  }
+
+  String getProvId() {
+    int index = 0;
+    for (var x = 0; x < _province.length; x++) {
+      if (_selectedProvince == _province[x]) {
+        index = x;
+      }
+    }
+
+    // setState(() {
+    //   _regionId = _provsId[index];
+    // });
+
+    return _provsId[index];
+  }
+
+  String getMunId() {
+    int index = 0;
+    for (var x = 0; x < _municipality.length; x++) {
+      if (_selectedMunicipality == _municipality[x]) {
+        index = x;
+      }
+    }
+
+    // setState(() {
+    //   _regionId = _regionsId[index];
+    // });
+
+    return _munId[index];
+  }
+
+  String getBrgyId() {
+    int index = 0;
+    for (var x = 0; x < _barangay.length; x++) {
+      if (_selectedBarangay == _barangay[x]) {
+        index = x;
+      }
+    }
+
+    // setState(() {
+    //   _regionId = _regionsId[index];
+    // });
+
+    return '123';
   }
 
   getProvince() {
@@ -151,6 +200,7 @@ class _MyProfileState extends State<MyProfile> {
       if (region[x]['region_name'] == _selectedRegion) {
         tempRegion = region[x];
         tempProvince = region[x]['province_list'].keys.toList();
+        _provsId = region[x]['province_list'].keys.toList();
         for (var y = 0; y < tempProvince.length; y++) {
           provinces.add(tempProvince[y]);
         }
@@ -160,7 +210,6 @@ class _MyProfileState extends State<MyProfile> {
     setState(() {
       _tempRegion = tempRegion;
       _province = provinces;
-      print(_province);
       _selectedProvince = _province[0];
     });
   }
@@ -199,8 +248,14 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   changeProvince() {
-    getMunicipality();
-    getBarangay();
+    provinces.forEach((element) {
+      if (_selectedProvince == element['provDesc']) {
+        _provsId = element['provCode'];
+      }
+    });
+    firstLoad = true;
+    getMunicipalities(_provsId);
+    // getBarangay(_provsId, );
   }
 
   getMunicipality() {
@@ -216,6 +271,7 @@ class _MyProfileState extends State<MyProfile> {
       if (tempProvinceKeys[y] == _selectedProvince) {
         tempMunicipalitiesKeys =
             tempProvince[y]['municipality_list'].keys.toList();
+        _munId = tempProvince[y]['municipality_list'].keys.toList();
         tempMunicipalities =
             tempProvince[y]['municipality_list'].values.toList();
 
@@ -239,6 +295,7 @@ class _MyProfileState extends State<MyProfile> {
       if (_tempMunicipalityKeys[a] == _selectedMunicipality) {
         setState(() {
           _barangay = _tempMunicipality[a]['barangay_list'];
+          _brgyId = _tempMunicipality[a]['barangay_list'];
           _selectedBarangay = _barangay[0];
           isLoading = false;
         });
@@ -297,8 +354,7 @@ class _MyProfileState extends State<MyProfile> {
     // isLoading = false;
 
     // print(token);
-    print(extracteduserData);
-    print('here');
+    // print(extracteduserData);
   }
 
 //Personal Information
@@ -309,13 +365,6 @@ class _MyProfileState extends State<MyProfile> {
   final txtCompleteAddress = TextEditingController();
   final txtPhoneNumber = TextEditingController();
   final txtSex = TextEditingController();
-  final txtBirthDate = TextEditingController();
-  final txtCivilStatus = TextEditingController();
-  final txtPlaceOfBirth = TextEditingController();
-  final txtTINnumber = TextEditingController();
-  final txtEducational = TextEditingController();
-  final txtDegree = TextEditingController();
-  final txtOldPassword = TextEditingController();
   final txtNewPassword = TextEditingController();
   final txtConfirmPassword = TextEditingController();
   final txtEmailAddress = TextEditingController();
@@ -325,12 +374,6 @@ class _MyProfileState extends State<MyProfile> {
   final lNameFocus = FocusNode();
   final addressFocus = FocusNode();
   final phoneFocus = FocusNode();
-  final birthFocu = FocusNode();
-  final civilFocus = FocusNode();
-  final placeBirthFocus = FocusNode();
-  final tinFocus = FocusNode();
-  final educationalFocus = FocusNode();
-  final degreeFocus = FocusNode();
 
   final bool _isInit = false;
   var businessApplication;
@@ -339,6 +382,12 @@ class _MyProfileState extends State<MyProfile> {
   final double _brightness = 1.0;
   static final int _currentPage = 0;
   final int _currentIndex = 0;
+  var provinces = [];
+  var municipalities = [];
+  var barangays = [];
+  var firstLoad = false;
+
+  var myProfile;
 
   final PageController _controller = PageController(
     initialPage: _currentPage,
@@ -380,82 +429,31 @@ class _MyProfileState extends State<MyProfile> {
   String getImageName(filePath, ext) {
     var fileName = (filePath.path).split('/').last;
     if (fileName.contains('pdf')) {
-      return "${txtFirstName.text.replaceAll(' ', '') +
-          "_" +
-          txtLastName.text.replaceAll(' ', '') +
-          "_" +
-          ext}.pdf";
+      return "${txtFirstName.text.replaceAll(' ', '') + "_" + txtLastName.text.replaceAll(' ', '') + "_" + ext}.pdf";
     } else {
-      return "${txtFirstName.text.replaceAll(' ', '') +
-          "_" +
-          txtLastName.text.replaceAll(' ', '') +
-          "_" +
-          ext}.png";
+      return "${txtFirstName.text.replaceAll(' ', '') + "_" + txtLastName.text.replaceAll(' ', '') + "_" + ext}.png";
     }
   }
 
   void updateProfile() {
-    // var userInfo = {
-    //     'id' : user['user']['id'].toString(),
-    //     'email':user['user']['email'].toString(),
-    //     'contact_number' : user['user']['contact_number'].toString(),
-    //     'system_access' : user['user']['system_access'].toString(),
-    //     'status' : user['status'].toString(),
-    //   // 'spouse_last_name': txtFamLastName.text,
-    //   // 'spouse_first_name': txtFamFirstName.text,
-    //   // 'spouse_middle_name': txtFamMiddleName.text,
-    //   // 'spouse_date_of_birth': txtFamBirthDate.text,
-    //   // 'spouse_contact_number': txtFamPhoneNumber.text,
-    //   // 'spouse_occupation': txtFamOccupation.text,
-    //   // 'spouse_educational_attainment': txtFamEducational.text,
-    //   // 'bank_name': txtBankName.text,
-    //   // 'account_name': txtAccountName.text,
-    //   // 'account_number': txtAccountNumber.text
-    // };
-
-    var img1;
-    var img2;
-    var img3;
-    var img1Name;
-    var img2Name;
-    var img3Name;
-
-    var encodedProfile;
-    var encodedSignature;
-    var encodedGov;
-
-    var farmerInfo = {
-      'token': token,
-      'farmer_id': farmer['farmer_id'].toString(),
-      'user_id': farmer['user_id'].toString(),
-      'rsbsa_no': farmer['rsbsa_no'].toString(),
-      'landparcelInfo': farmer['landparcelInfo'].toString(),
-      'address': txtCompleteAddress.text,
-      'last_name': txtLastName.text,
+    var userInfo = {
+      'm_name': txtMiddleName.text,
       'first_name': txtFirstName.text,
-      'middle_name': txtMiddleName.text,
-      'suffix': '',
-      'birthdate': txtBirthDate.text,
-      'tin_no': txtTINnumber.text,
-      'profile_picture': encodedProfile,
-      'government_id': encodedGov,
-      'e_signiture': encodedSignature,
-      'contact_number': txtPhoneNumber.text,
-      'place_of_birth': txtPlaceOfBirth.text,
-      'gender': _selectedSex.toString(),
-      'civil_status': _selectedCivilStatus.toString(),
-      'educational_attainment': txtEducational.text,
-      'degree_course': txtDegree.text,
+      'last_name': txtLastName.text,
+      'address': txtCompleteAddress.text,
+      'province': _provsId,
+      'municipality': _munId,
+      'barangay': _brgyId
     };
-    updateFarmerProfile(token, farmerInfo);
+
+    // print(userInfo);
+    updateFarmerProfile(userInfo);
   }
 
-  void updateFarmerProfile(
-      String token, Map<String, dynamic> farmerInfo) async {
+  void updateFarmerProfile(Map<String, dynamic> userInfo) async {
     try {
       bool isSaved = await Provider.of<ProfileProvider>(context, listen: false)
-          .updateProfiling(token, farmerInfo);
-      print('error here');
+          .updateProfile(userInfo);
       if (isSaved) {
         setState(() {
           isLoadingSend = false;
@@ -464,15 +462,16 @@ class _MyProfileState extends State<MyProfile> {
           dismissOnBackKeyPress: false,
           dismissOnTouchOutside: false,
           onDismissCallback: (BuildContext) {
-            Navigator.pushReplacementNamed(context, Dashboard.routeName);
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
           },
           context: context,
           animType: AnimType.scale,
           dialogType: DialogType.success,
-          title: "Update farmer profile",
+          title: "Update Profile",
           desc: "Successfully Updated",
           btnOkOnPress: () {
-            Navigator.pushReplacementNamed(context, Dashboard.routeName);
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+            // print(_selectedProvince);
           },
         ).show();
 
@@ -480,8 +479,15 @@ class _MyProfileState extends State<MyProfile> {
         //   _currentStep += 1;
         // });
       }
+    } on HttpException catch (error) {
+      // print(error);
+      showError(error.toString());
     } catch (error) {
-      print(error);
+      if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
     }
   }
 
@@ -489,38 +495,238 @@ class _MyProfileState extends State<MyProfile> {
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    print("here");
+    // print("here");
     //getProfile();
-    getPH();
+    // getPH();
   }
 
-  getProfile()async{
-           SharedPreferences sharedPreferences;
+  getProfile() async {
+    // SharedPreferences sharedPreferences;
 
-    sharedPreferences = await SharedPreferences.getInstance();
+    // sharedPreferences = await SharedPreferences.getInstance();
 
-    final extractedUserData =
-        json.decode(sharedPreferences.getString('userData')!)
-            as Map<String, dynamic>;
-    final data = extractedUserData['data']['user'] as Map<String, dynamic>;
-    print(data);
+    // final extractedUserData =
+    //     json.decode(sharedPreferences.getString('userData')!) as Map;
+    // if (extractedUserData['data']['user'] != null) {
+    //   setState(() {
+    //     txtFirstName.text =
+    //         extractedUserData['data']['user']['first_name'] == null
+    //             ? ''
+    //             : extractedUserData['data']['user']['first_name'];
+    //     txtMiddleName.text =
+    //         extractedUserData['data']['user']['middle_name'] == null
+    //             ? ''
+    //             : extractedUserData['data']['user']['middle_name'];
+    //     txtLastName.text =
+    //         extractedUserData['data']['user']['last_name'] == null
+    //             ? ''
+    //             : extractedUserData['data']['user']['last_name'];
+    //     txtEmailAddress.text =
+    //         extractedUserData['data']['user']['email'] == null
+    //             ? ''
+    //             : extractedUserData['data']['user']['email'];
+    //     txtPhoneNumber.text =
+    //         extractedUserData['data']['user']['mobile_no'] == null
+    //             ? ''
+    //             : extractedUserData['data']['user']['mobile_no'];
+    //   });
+    // } else {
+    //   setState(() {
+    //     txtFirstName.text = extractedUserData['data']['first_name'] == null
+    //         ? ''
+    //         : extractedUserData['data']['first_name'];
+    //     txtMiddleName.text = extractedUserData['data']['middle_name'] == null
+    //         ? ''
+    //         : extractedUserData['data']['middle_name'];
+    //     txtLastName.text = extractedUserData['data']['last_name'] == null
+    //         ? ''
+    //         : extractedUserData['data']['last_name'];
+    //     txtEmailAddress.text = extractedUserData['data']['email'] == null
+    //         ? ''
+    //         : extractedUserData['data']['email'];
+    //     txtPhoneNumber.text = extractedUserData['data']['mobile_no'] == null
+    //         ? ''
+    //         : extractedUserData['data']['mobile_no'];
+    //   });
+    // }
 
-    setState(() {
-              txtFirstName.text = data['first_name'] ?? '';
-    txtMiddleName.text = data['middle_name'] ?? '';
-    txtLastName.text = data['last_name'] ?? '';
-    txtEmailAddress.text = data['email'] ?? '';
-    txtPhoneNumber.text = data['mobile_no'] ?? '';
-    });
+    txtFirstName.text =
+        myProfile['first_name'] == null ? '' : myProfile['first_name'];
+    txtMiddleName.text =
+        myProfile['middle_name'] == null ? '' : myProfile['middle_name'];
+    txtLastName.text =
+        myProfile['last_name'] == null ? '' : myProfile['last_name'];
+    txtEmailAddress.text = myProfile['email'] == null ? '' : myProfile['email'];
+    txtPhoneNumber.text =
+        myProfile['mobile_no'] == null ? '' : myProfile['mobile_no'];
+    txtCompleteAddress.text =
+        myProfile['address'] == null ? '' : myProfile['address'];
+  }
 
+  Future<void> getMyProfile() async {
+    var errorMessage;
+    provinces = [];
+    _province = [];
+    try {
+      //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
+      var prof = await Provider.of<ProfileProvider>(context, listen: false)
+          .getProfile();
+      setState(() {
+        myProfile = prof['data'];
+        getProfile();
+        // print(myProfile);
+      });
+    } on HttpException catch (error) {
+      // print(error);
+      showError(error.toString());
+    } catch (error) {
+      // showError(error.toString());
+      if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+    }
+  }
+
+  Future<void> getProvinces() async {
+    var errorMessage;
+    provinces = [];
+    _province = [];
+    try {
+      //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
+      var province = await Provider.of<ProfileProvider>(context, listen: false)
+          .getProvince();
+      setState(() {
+        var userProv = '';
+        var userProvCode = '';
+        provinces = province['data'];
+        provinces.forEach((element) {
+          _province.add(element['provDesc']);
+          if (myProfile['provCode'] != null) {
+            if (myProfile['provCode'] == element['provCode']) {
+              userProv = element['provDesc'];
+              userProvCode = element['provCode'];
+            }
+          }
+        });
+        // print(_province);
+        _selectedProvince = userProv == '' ? _province[0] : userProv;
+        _provsId = myProfile['provCode'] == null
+            ? provinces[0]['provCode'].toString()
+            : myProfile['provCode'];
+            if(!firstLoad){
+              getMunicipalities(_provsId);
+            }else{
+              getMunicipalities(provinces[0]['provCode'].toString());
+            }
+      });
+    } on HttpException catch (error) {
+      // print(error);
+      showError(error.toString());
+    } catch (error) {
+      if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+    }
+  }
+
+  Future<void> getMunicipalities(code) async {
+    // print(code);
+    var errorMessage;
+    municipalities = [];
+    _municipality = [];
+    try {
+      //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
+      var municipality =
+          await Provider.of<ProfileProvider>(context, listen: false)
+              .getCity(code);
+      setState(() {
+        var userMun = '';
+        var userMunCode = '';
+        municipalities = municipality['data'];
+        municipalities.forEach((element) {
+          _municipality.add(element['citymunDesc']);
+          if (myProfile['citymunCode'] != null) {
+            if (myProfile['citymunCode'] == element['citymunCode']) {
+              userMun = element['citymunDesc'];
+              _selectedMunicipality = element['citymunCode'];
+            }
+          }
+        });
+        _selectedMunicipality = userMun == '' ? _municipality[0] : userMun;
+        _munId = myProfile['citymunCode'] == null
+            ? municipalities[0]['citymunCode'].toString()
+            : myProfile['citymunCode'];
+        if (!firstLoad) {
+          getBarangays(_munId);
+        } else {
+          getBarangays(municipalities[0]['citymunCode'].toString());
+        }
+      });
+    } on HttpException catch (error) {
+      // print(error);
+      showError(error.toString());
+    } catch (error) {
+      if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+    }
+  }
+
+  Future<void> getBarangays(munCode) async {
+    var errorMessage;
+    barangays = [];
+    _barangay = [];
+    try {
+      setState(() {
+        isLoading = false;
+      });
+      //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
+      var barangay = await Provider.of<ProfileProvider>(context, listen: false)
+          .getBarangay(_provsId, munCode);
+      setState(() {
+        var userBrgy = '';
+        var userBrgyCode = '';
+        barangays = barangay['data'];
+        barangays.forEach((element) {
+          _barangay.add(element['brgyDesc']);
+          if (myProfile['brgyCode'] != null) {
+            if (myProfile['brgyCode'] == element['brgyCode']) {
+              userBrgy = element['brgyDesc'];
+              userBrgyCode = element['brgyCode'];
+            }
+          }
+        });
+        _selectedBarangay = userBrgy == '' ? _barangay[0] : userBrgy;
+        _brgyId = myProfile['brgyCode'] == null
+            ? barangays[0]['brgyCode']
+            : myProfile['brgyCode'];
+        isLoading = false;
+      });
+    } on HttpException catch (error) {
+      // print(error);
+      showError(error.toString());
+    } catch (error) {
+      if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+    }
   }
 
   @override
   void initState() {
     super.initState();
     //getUser();
-    editStatus = false;
-    getProfile();
+    // editStatus = false;
+    // getProfile();
+    loadData();
     // txtFirstName.text = 'John';
     // txtMiddleName.text = 'Black';
     // txtLastName.text = 'Doe';
@@ -528,8 +734,24 @@ class _MyProfileState extends State<MyProfile> {
     // txtPhoneNumber.text = '09123456789';
   }
 
+  loadData() async {
+    await getMyProfile();
+    await getProvinces();
+  }
+
   @override
   void dispose() {
+    txtFirstName.dispose();
+    txtMiddleName.dispose();
+    txtLastName.dispose();
+    txtEmailAddress.dispose();
+    txtPhoneNumber.dispose();
+    txtCompleteAddress.dispose();
+    fNameFocus.dispose();
+    mNameFocus.dispose();
+    lNameFocus.dispose();
+    addressFocus.dispose();
+    phoneFocus.dispose();
     super.dispose();
   }
 
@@ -558,14 +780,30 @@ class _MyProfileState extends State<MyProfile> {
               elevation: 0,
               color: Colors.blueGrey.withAlpha(40),
               child: TextFormField(
+                // controller: txtCodeController,
                 autofocus: true,
                 minLines: 1,
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.all(10),
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.all(10),
                   border: InputBorder.none,
                   labelText: 'Voucher Code',
                   //prefixIcon: Icon(Icons.code),
+                  errorStyle: GoogleFonts.poppins(
+                    textStyle: TextStyle(
+                      fontSize: 10,
+                      color: Colors.redAccent[200],
+                    ),
+                  ),
                 ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter voucher code';
+                  }
+                  // if (!value.contains('@')) {
+                  //   return 'Invalid username';
+                  // }
+                  return null;
+                },
               ),
             ),
             const SizedBox(
@@ -615,20 +853,20 @@ class _MyProfileState extends State<MyProfile> {
             backgroundColor: const Color.fromARGB(255, 55, 57, 175),
             leading: Builder(builder: (BuildContext context) {
               return IconButton(
-                  icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
+                  icon: const Icon(Icons.keyboard_arrow_left,
+                      color: Colors.white),
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, Dashboard.routeName);
+                    Navigator.pushReplacementNamed(
+                        context, Dashboard.routeName);
                   } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
             }),
             automaticallyImplyLeading: false,
             title: Text('My Profile',
                 style: GoogleFonts.poppins(
-                  fontSize: useMobileLayout ? 16 : 18,
-                  color: Colors.white
-                )),
+                    fontSize: useMobileLayout ? 16 : 18, color: Colors.white)),
           ),
           body: isLoading
-              ? Container(child: const Text("Loading..."))
+              ? Center(child: CircularProgressIndicator())
               : Form(
                   key: _formKey1,
                   child: Column(
@@ -637,8 +875,8 @@ class _MyProfileState extends State<MyProfile> {
                         child: SingleChildScrollView(
                             child: Container(
                           color: Colors.white,
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 15),
                           child: Column(
                             children: <Widget>[
                               // CustomFormField(
@@ -657,12 +895,16 @@ class _MyProfileState extends State<MyProfile> {
                               //   },
                               //   initialValue: '',
                               // ),
+                              SizedBox(
+                                height: 15,
+                              ),
                               CustomFormField(
                                 status: editStatus,
                                 label: 'First Name',
                                 controller: txtFirstName,
                                 onFieldSubmitted: (_) {
-                                  FocusScope.of(context).requestFocus(mNameFocus);
+                                  FocusScope.of(context)
+                                      .requestFocus(mNameFocus);
                                 },
                                 validator: (value) {
                                   if (value.isEmpty) {
@@ -682,7 +924,8 @@ class _MyProfileState extends State<MyProfile> {
                                 },
                                 initialValue: '',
                                 onFieldSubmitted: (_) {
-                                  FocusScope.of(context).requestFocus(lNameFocus);
+                                  FocusScope.of(context)
+                                      .requestFocus(lNameFocus);
                                 },
                               ),
                               const SizedBox(height: 4),
@@ -708,7 +951,8 @@ class _MyProfileState extends State<MyProfile> {
                                 label: 'Email Address',
                                 controller: txtEmailAddress,
                                 onFieldSubmitted: (_) {
-                                  FocusScope.of(context).requestFocus(phoneFocus);
+                                  FocusScope.of(context)
+                                      .requestFocus(phoneFocus);
                                 },
                                 validator: (value) {
                                   if (value.isEmpty) {
@@ -725,7 +969,7 @@ class _MyProfileState extends State<MyProfile> {
                                 controller: txtPhoneNumber,
                                 onFieldSubmitted: (_) {
                                   FocusScope.of(context)
-                                      .requestFocus(educationalFocus);
+                                      .requestFocus(addressFocus);
                                 },
                                 validator: (value) {
                                   if (value.isEmpty) {
@@ -741,7 +985,8 @@ class _MyProfileState extends State<MyProfile> {
                                 label: 'Address',
                                 controller: txtCompleteAddress,
                                 onFieldSubmitted: (_) {
-                                  FocusScope.of(context).requestFocus(phoneFocus);
+                                  FocusScope.of(context)
+                                      .requestFocus(phoneFocus);
                                 },
                                 validator: (value) {
                                   if (value.isEmpty) {
@@ -789,41 +1034,39 @@ class _MyProfileState extends State<MyProfile> {
                               const SizedBox(
                                 height: 4,
                               ),
+                              // CustomDropDown(
+                              //   status: editStatus,
+                              //   value: _selectedRegion,
+                              //   items: _region,
+                              //   title: "Region",
+                              //   onChanged: (value) {
+                              //     setState(() {
+                              //       _selectedRegion = value.toString();
+                              //       _regionId =
+                              //           _regionsId[_region.indexOf(value)];
+                              //       changeRegion();
+                              //     });
+                              //     return null;
+                              //   },
+                              //   validator: (value) {
+                              //     if (value == null) {
+                              //       return 'Please choose your region';
+                              //     }
+                              //     return null;
+                              //   },
+                              // ),
+                              // const SizedBox(
+                              //   height: 4,
+                              // ),
                               CustomDropDown(
                                 status: editStatus,
-                                value: _selectedRegion,
-                                items: _region,
-                                title: "Region",
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedRegion = value.toString();
-                                    _regionId =
-                                        _regionsId[_region.indexOf(value)];
-                                    changeRegion();
-                                  });
-                                  return null;
-                                },
-                                validator: (value) {
-                                  if (value == null) {
-                                    return 'Please choose your region';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(
-                                height: 4,
-                              ),
-                              CustomDropDown(
-                                 status: editStatus,
                                 value: _selectedProvince,
                                 items: _province,
                                 title: "Province",
                                 onChanged: (value) {
                                   setState(() {
-                                    print(_selectedProvince);
                                     _selectedProvince = value.toString();
                                     changeProvince();
-                                    print(value);
                                   });
                                   return null;
                                 },
@@ -838,14 +1081,22 @@ class _MyProfileState extends State<MyProfile> {
                                 height: 4,
                               ),
                               CustomDropDown(
-                                 status: editStatus,
+                                status: editStatus,
                                 value: _selectedMunicipality,
                                 items: _municipality,
                                 title: "Municipality",
                                 onChanged: (value) {
                                   setState(() {
                                     _selectedMunicipality = value.toString();
-                                    getBarangay();
+                                    var munCode;
+                                    municipalities.forEach((element) {
+                                      if (_selectedMunicipality ==
+                                          element['citymunDesc']) {
+                                        munCode = element['citymunCode'];
+                                        _munId = element['citymunCode'];
+                                      }
+                                    });
+                                    getBarangays(munCode);
                                   });
                                   return null;
                                 },
@@ -860,7 +1111,7 @@ class _MyProfileState extends State<MyProfile> {
                                 height: 4,
                               ),
                               CustomDropDown(
-                                 status: editStatus,
+                                status: editStatus,
                                 value: _selectedBarangay,
                                 items: _barangay,
                                 title: "Barangay",
@@ -868,6 +1119,12 @@ class _MyProfileState extends State<MyProfile> {
                                   setState(() {
                                     _selectedBarangay = value.toString();
                                     //_brgyId = (_barangay.indexOf(value) + 1).toString();
+                                    barangays.forEach((element) {
+                                      if (_selectedBarangay ==
+                                          element['brgyDesc']) {
+                                        _brgyId = element['brgyCode'];
+                                      }
+                                    });
                                   });
                                   return null;
                                 },
@@ -878,53 +1135,57 @@ class _MyProfileState extends State<MyProfile> {
                                   return null;
                                 },
                               ),
-      
-                              Container(
-                                // height:  150,
-                                //width: double.infinity,
-                                width: useMobileLayout ? 600 : 700,
-      
-                                //height: useMobileLayout ? 90 : 150,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 30, horizontal: 15),
-                                child: Container(
-                                  child: SizedBox(
-                                    width: useMobileLayout ? 130 : 180,
-                                    height: 50,
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.white, shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(50.0),
-                                        ),
-                                        backgroundColor: const Color.fromARGB(
-                                            255, 55, 57, 175), // foreground
-                                      ),
-                                      onPressed: () {
-                                        enterVoucherCode();
-                                      },
-                                      child: Text(
-                                        //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
-                                        "VOUCHER CODE",
-                                        style: GoogleFonts.poppins(
-                                          textStyle: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: useMobileLayout ? 14 : 25,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                      // color: Colors.white,
-                                      // textColor: Colors.black,
-                                      // splashColor: Colors.yellowAccent[800],
-                                    ),
-                                  ),
-                                ),
-                              ),
+
+                              // Container(
+                              //   // height:  150,
+                              //   //width: double.infinity,
+                              //   width: useMobileLayout ? 600 : 700,
+
+                              //   //height: useMobileLayout ? 90 : 150,
+                              //   decoration: BoxDecoration(
+                              //     borderRadius: BorderRadius.circular(10),
+                              //     color: Colors.white,
+                              //   ),
+                              //   padding: const EdgeInsets.symmetric(
+                              //       vertical: 30, horizontal: 15),
+                              //   child: Container(
+                              //     child: SizedBox(
+                              //       width: useMobileLayout ? 130 : 180,
+                              //       height: 50,
+                              //       child: ElevatedButton(
+                              //         style: ElevatedButton.styleFrom(
+                              //           foregroundColor: Colors.white,
+                              //           shape: RoundedRectangleBorder(
+                              //             borderRadius:
+                              //                 BorderRadius.circular(50.0),
+                              //           ),
+                              //           backgroundColor: const Color.fromARGB(
+                              //               255, 55, 57, 175), // foreground
+                              //         ),
+                              //         onPressed: () {
+                              //           // enterVoucherCode();
+                              //           Navigator.of(context)
+                              //             .pushReplacementNamed(
+                              //                 UploadPicture.routeName);
+                              //         },
+                              //         child: Text(
+                              //           //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
+                              //           "VOUCHER CODE",
+                              //           style: GoogleFonts.poppins(
+                              //             textStyle: TextStyle(
+                              //               color: Colors.white,
+                              //               fontSize: useMobileLayout ? 14 : 25,
+                              //               fontWeight: FontWeight.w600,
+                              //             ),
+                              //           ),
+                              //         ),
+                              //         // color: Colors.white,
+                              //         // textColor: Colors.black,
+                              //         // splashColor: Colors.yellowAccent[800],
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
                         )),
@@ -932,72 +1193,78 @@ class _MyProfileState extends State<MyProfile> {
                     ],
                   ),
                 ),
-          bottomNavigationBar: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5),
-            height: 50,
-            width: double.infinity,
-            child: Row(
-              children: <Widget>[
-                const SizedBox(
-                  width: 5,
-                ),
-                editStatus == false
-                    ? Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              editStatus = true;
-                            });
-                            // _formKey1.currentState.validate();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white, backgroundColor: Color.fromARGB(255, 55, 57, 175), // foreground
-                            //                color: Colors.yellow,
-                            // textColor: Colors.black,
-                            // splashColor: Colors.yellowAccent[800],
-                          ),
-                          child: Text(
-                            "EDIT PROFILE",
-                            style: GoogleFonts.poppins(
-                              textStyle: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          // color: Colors.green,
-                          // textColor: Colors.black,
-                          // splashColor: Colors.yellowAccent[800],
-                        ),
-                      )
-                    : Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // _formKey1.currentState.validate();
-                            proceed();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white, backgroundColor: Color.fromARGB(255, 55, 57, 175), // foreground
-                            //                color: Colors.yellow,
-                            // textColor: Colors.black,
-                            // splashColor: Colors.yellowAccent[800],
-                          ),
-                          child: Text(
-                            "UPDATE",
-                            style: GoogleFonts.poppins(
-                              textStyle: TextStyle(
-                                color: Colors.yellowAccent,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
+          bottomNavigationBar: !isLoading
+              ? Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  height: 50,
+                  width: double.infinity,
+                  child: Row(
+                    children: <Widget>[
+                      const SizedBox(
+                        width: 5,
                       ),
-              ],
-            ),
-          ),
+                      editStatus == false
+                          ? Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    editStatus = true;
+                                  });
+                                  // _formKey1.currentState.validate();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: Color.fromARGB(
+                                      255, 55, 57, 175), // foreground
+                                  //                color: Colors.yellow,
+                                  // textColor: Colors.black,
+                                  // splashColor: Colors.yellowAccent[800],
+                                ),
+                                child: Text(
+                                  "EDIT PROFILE",
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                // color: Colors.green,
+                                // textColor: Colors.black,
+                                // splashColor: Colors.yellowAccent[800],
+                              ),
+                            )
+                          : Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  // _formKey1.currentState.validate();
+                                  proceed();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: Color.fromARGB(
+                                      255, 55, 57, 175), // foreground
+                                  //                color: Colors.yellow,
+                                  // textColor: Colors.black,
+                                  // splashColor: Colors.yellowAccent[800],
+                                ),
+                                child: Text(
+                                  "UPDATE",
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      color: Colors.yellowAccent,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                    ],
+                  ),
+                )
+              : Container(),
         ),
       ),
     );

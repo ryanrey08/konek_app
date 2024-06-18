@@ -7,15 +7,16 @@ import 'package:konek_app/content/provider/pos.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 import '../config/httpexception.dart';
 
 import 'provider/voucher.dart';
 
 class NotificationList extends StatefulWidget {
   const NotificationList({super.key});
-    static final GlobalKey<NavigatorState> navigatorKey =
+  static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
-    static const routeName = '/notification';
+  static const routeName = '/notification';
 
   @override
   State<NotificationList> createState() => _NotificationListState();
@@ -27,24 +28,24 @@ class _NotificationListState extends State<NotificationList> {
 
   List<String> data = [];
   bool isLoading = false;
-  var voucherData;
+  var voucherData = [];
   var notificationData;
 
-    @override
+  @override
   void initState() {
     super.initState();
     getVoucherData();
     // getNotification();
   }
 
-    Future<void> getNotification() async {
+  Future<void> getNotification() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey('notificationData')) {
       notificationData = [];
     } else {
-      final extracteduserData =
-          json.decode(prefs.getString('notificationData')!) as Map<String, dynamic>;
-      print(extracteduserData);
+      final extracteduserData = json
+          .decode(prefs.getString('notificationData')!) as Map<String, dynamic>;
+      // print(extracteduserData);
       setState(() {
         notificationData = extracteduserData;
       });
@@ -55,32 +56,49 @@ class _NotificationListState extends State<NotificationList> {
     });
   }
 
-
   Future<void> getVoucherData() async {
     var errorMessage;
+    voucherData = [];
     // setState(() {
     //   isLoading = true;
     // });
 
     try {
-            setState(() {
+      setState(() {
         isLoading = false;
       });
       //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
-            var voucher = await Provider.of<POSProvider>(context, listen: false)
+      var voucher = await Provider.of<POSProvider>(context, listen: false)
           .getAllPaymentStatus();
-      print(voucher);
+      // print(voucher);
       setState(() {
-        voucherData = voucher['data'];
+        voucher['data'].forEach((item) {
+          if (item['payment_status'] == 'completed') {
+            var nowDate = DateTime.parse(item['payment_completion_at']);
+            var toDate = nowDate.add(
+                Duration(days: int.parse(item['subscription']['duration'])));
+            var diff = toDate.difference(nowDate).inSeconds;
+            if (diff <= 0) {
+              voucherData.add(item);
+            }
+          }
+        });
+        // print(voucherData);
         isLoading = true;
       });
-
     } on HttpException catch (error) {
-      print(error);
+      // print(error);
       showError(error.toString());
     } catch (error) {
       // showError(error.toString());
-      showError('something went wrong');
+      if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+      setState(() {
+        isLoading = true;
+      });
     }
     // setState(() {
     //   isLoading = true;
@@ -99,6 +117,15 @@ class _NotificationListState extends State<NotificationList> {
     );
   }
 
+  getTimeText(time, duration) {
+    var nowDate = DateTime.parse(time);
+    var toDate = nowDate.add(Duration(days: int.parse(duration)));
+    // int interval = toDate.difference(nowDate).inSeconds;
+    return DateFormat("yyyy-MM-dd hh:mm").format(nowDate).toString() +
+        " - " +
+        DateFormat("yyyy-MM-dd hh:mm").format(toDate).toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
@@ -113,7 +140,8 @@ class _NotificationListState extends State<NotificationList> {
           backgroundColor: const Color.fromARGB(255, 55, 57, 175),
           leading: Builder(builder: (BuildContext context) {
             return IconButton(
-                icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
+                icon:
+                    const Icon(Icons.keyboard_arrow_left, color: Colors.white),
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, Dashboard.routeName);
                 } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
@@ -121,54 +149,78 @@ class _NotificationListState extends State<NotificationList> {
           automaticallyImplyLeading: false,
           title: Text('Notifications',
               style: GoogleFonts.poppins(
-                fontSize: useMobileLayout ? 16 : 18,
-                color: Colors.white
-              )),
+                  fontSize: useMobileLayout ? 16 : 18, color: Colors.white)),
         ),
-        body: isLoading ? RefreshIndicator(
-          key: _refreshIndicatorKey,
-          color: Colors.white,
-          backgroundColor: Colors.blue,
-          strokeWidth: 4.0,
-          onRefresh: getVoucherData,
-          child: ListView.builder(
-            itemCount: voucherData.length,
-            itemBuilder: (BuildContext context, int index) {
-                   return Column(
-                    children: <Widget>[
-                      ListTile(
-                        title: Text(
-                          voucherData[index]['subscription']['duration'] +
-                              " " +
-                              voucherData[index]['subscription']
-                                  ['duration_unit'] +
-                              "/s Unlimited Data",
-                          style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                        // subtitle: Text(voucherData[index]['created_at'] + " - " + (voucherData[index]['expire_date'])),
-                        subtitle: Text(
-                          voucherData[index]['created_at'],
-                          style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Divider(), //
-                    ],
-                  );
-            },
-          ),
-        ) : Container(child: Center(child: CircularProgressIndicator())),
+        body: isLoading
+            ? RefreshIndicator(
+                key: _refreshIndicatorKey,
+                color: Colors.white,
+                backgroundColor: Colors.blue,
+                strokeWidth: 4.0,
+                onRefresh: getVoucherData,
+                child: voucherData.length > 0
+                    ? ListView.builder(
+                        itemCount: voucherData.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Column(
+                            children: <Widget>[
+                              ListTile(
+                                title: Text(
+                                  'Your ' +
+                                      voucherData[index]['subscription']
+                                          ['duration'] +
+                                      " " +
+                                      voucherData[index]['subscription']
+                                          ['duration_unit'] +
+                                      "/s Unlimited Data has been expired",
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                                // subtitle: Text(voucherData[index]['created_at'] + " - " + (voucherData[index]['expire_date'])),
+                                subtitle: Text(
+                                  getTimeText(
+                                      voucherData[index]
+                                          ['payment_completion_at'],
+                                      voucherData[index]['subscription']
+                                          ['duration']),
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Divider(), //
+                            ],
+                          );
+                        },
+                      )
+                    : Center(
+                        child: SingleChildScrollView(
+                            physics: AlwaysScrollableScrollPhysics(),
+                            child: Column(children: <Widget>[
+                              Container(
+                                child: Text(
+                                  'No Record Found',
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ]))),
+              )
+            : Container(child: Center(child: CircularProgressIndicator())),
       ),
     );
   }
