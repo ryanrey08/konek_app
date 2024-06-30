@@ -59,7 +59,6 @@ class _AccountRegisterState extends State<AccountRegister> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  // final txtrsbsanumber = TextEditingController();
   final txtFirstName = TextEditingController();
   final txtMiddleName = TextEditingController();
   final txtLastName = TextEditingController();
@@ -68,30 +67,13 @@ class _AccountRegisterState extends State<AccountRegister> {
   final txtContactNumber = TextEditingController();
   final txtPassword = TextEditingController();
   final txtConfirmPassword = TextEditingController();
-  // final txtOTP = TextEditingController();
-  // final txtCompanyName = TextEditingController();
 
   final fNameFocus = FocusNode();
   final mNameFocus = FocusNode();
   final lastNameFocus = FocusNode();
   final emailFocus = FocusNode();
-  // final companyName = FocusNode();
-  // final uNameFocus = FocusNode();
-  // final contactFocus = FocusNode();
-  // final passwordFocus = FocusNode();
-  // final afiFocus = FocusNode();
-  // final bdayFocus = FocusNode();
-  // final civilFocus = FocusNode();
-  // final genderFocus = FocusNode();
-  // final homeAFocus = FocusNode();
-  // final provinceFocus = FocusNode();
-  // final cityFocus = FocusNode();
-  // final brgyFocus = FocusNode();
-  // final zipFocus = FocusNode();
-  // final spiritualBdate = FocusNode();
 
   var _selectedUserType;
-  final _userType = ['FARMER', 'SUPPLIER'];
 
   final List<dynamic> _region = [];
   final List<dynamic> _province = [];
@@ -114,10 +96,8 @@ class _AccountRegisterState extends State<AccountRegister> {
   var maskTextInputFormatter = MaskTextInputFormatter(
       mask: "##########", filter: {"#": RegExp(r'[0-9]')});
 
-  var userStatus = ['CBBC USER', 'ADMIN'];
 
   var userInfo = User(
-    rsbsa_no: "",
     last_name: "",
     first_name: "",
     middleName: "",
@@ -147,16 +127,6 @@ class _AccountRegisterState extends State<AccountRegister> {
   void initState() {
     super.initState();
 
-    // _selectedUserType = 'FARMER';
-    // getMyMac();
-    // initPlatformState();
-    //  SimNumber.listenPhonePermission((isPermissionGranted) {
-    //   print("isPermissionGranted : " + isPermissionGranted.toString());
-    //   if (isPermissionGranted) {
-    //     initPlatformState();
-    //   } else {}
-    // });
-    // initPlatformState();
 
     initDeviceId();
   }
@@ -229,53 +199,6 @@ class _AccountRegisterState extends State<AccountRegister> {
       fontSize: 13.0,
     );
   }
-
-//   Future<void> proceed() async {
-//     var errorMessage;
-//     bool isValidUser = false;
-//     final isValid = _form.currentState!.validate();
-
-//     var number;
-// //     var user = {
-// //       'rsbsa_no': "",
-// //       'last_name': "",
-// //       'first_name': "",
-// // //       'middle_name': "",
-// //       'birthdate': "",
-// //       'contact_number': "",
-// // //       'password': "",
-// // //       'password_confirmation': "",
-// //     };
-//     try {
-//       _form.currentState!.save();
-
-//       var user = {
-//         'rsbsa_no': txtrsbsanumber.text,
-//         'last_name': txtLastName.text,
-//         'first_name': txtFirstName.text,
-// //                     'middle_name': txtMiddleName.text,
-//         'birthdate': txtBirthday.text,
-//         'contact_number': txtContactNumber.text,
-//         'user_type': _selectedUserType.toString(),
-// //                     'password': txtPassword.text,
-//       };
-
-//       // print(user);
-//       await Provider.of<Auth>(context, listen: false).register(user);
-//       final sharedPreferences = await SharedPreferences.getInstance();
-
-//       if (sharedPreferences.containsKey('userData')) {
-//         Navigator.of(context).pushReplacementNamed(Dashboard.routeName);
-//       } else {}
-//     } on HttpException catch (error) {
-//       // print('here');
-//       showError(error.toString());
-//     } catch (error) {
-//       showError('something went wrong');
-//     }
-
-//     // print(errorMessage);
-//   }
 
   final String _token = 'Click the below button to generate token';
   bool badgeVisible = true;
@@ -457,39 +380,12 @@ class _AccountRegisterState extends State<AccountRegister> {
           body: SizedBox(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
-            // decoration: BoxDecoration(
-            //   image: DecorationImage(
-            //     image: AssetImage('assets/images/eaggro-bg.jpg'),
-            //     fit: BoxFit.cover,
-            //     // colorFilter: ColorFilter.mode(
-            //     //   Colors.black.withOpacity(0.2),
-            //     //   BlendMode.dstATop,
-            //     // ),
-            //   ),
-            //   gradient: LinearGradient(
-            //     begin: Alignment.topCenter,
-            //     end: Alignment.bottomCenter,
-            //     stops: [0.1, 0.8],
-            //     colors: [Colors.green.shade300],
-            //   ),
-            // ),
             child: SingleChildScrollView(
               child: Container(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    // Container(
-                    //   width: useMobileLayout ? 280 : 400,
-                    //   height: useMobileLayout ? 280 : 400,
-                    //   // width: 250,
-                    //   // height: 250,
-                    //   decoration: BoxDecoration(
-                    //     image: DecorationImage(
-                    //       image: AssetImage('assets/images/eaggro-1.png'),
-                    //     ),
-                    //   ),
-                    // ),
                     Container(
                       alignment: Alignment.bottomCenter,
                       //  height: MediaQuery.of(context).size.height / 1.65,
@@ -912,9 +808,6 @@ class _AccountRegisterState extends State<AccountRegister> {
               ),
               validator: validate,
               onChanged: (value) {
-                // if (hintTextP.contains("RSBSA Number")) {
-                //   validateRSBA(value, useMobileLayout);
-                // }
               },
             ),
           ),
@@ -1217,187 +1110,6 @@ class _AccountRegisterState extends State<AccountRegister> {
               _determinePosition();
               // _getMacAddress();
 
-              // Alert(
-              //     context: context,
-              //     title: "",
-              //     content: Container(
-              //       padding: EdgeInsets.symmetric(horizontal: 15),
-              //       child: Column(
-              //         children: <Widget>[
-              //           Container(
-              //             width: useMobileLayout ? 200 : 300,
-              //             height: useMobileLayout ? 200 : 300,
-              //             decoration: BoxDecoration(
-              //               image: DecorationImage(
-              //                 image: AssetImage('assets/images/eaggro-1.png'),
-              //               ),
-              //             ),
-              //           ),
-              //           Text(
-              //             'The OTP password was sent to the following recipient:',
-              //             textAlign: TextAlign.center,
-              //             style: GoogleFonts.poppins(
-              //               color: Colors.black,
-              //               fontSize: 16,
-              //               fontWeight: FontWeight.w500,
-              //             ),
-              //           ),
-              //           SizedBox(
-              //             height: 10,
-              //           ),
-              //           Container(
-              //             margin: EdgeInsets.only(bottom: 5),
-              //             child: Row(
-              //               mainAxisAlignment: MainAxisAlignment.center,
-              //               crossAxisAlignment: CrossAxisAlignment.center,
-              //               children: <Widget>[
-              //                 Expanded(
-              //                   child: TextFormField(
-              //                     controller: txtOTP,
-              //                     style: GoogleFonts.poppins(
-              //                       textStyle: TextStyle(
-              //                         fontSize: 16,
-              //                         color: Colors.black,
-              //                       ),
-              //                     ),
-              //                     decoration: InputDecoration(
-              //                       contentPadding:
-              //                           EdgeInsets.symmetric(horizontal: 20),
-              //                       floatingLabelBehavior:
-              //                           FloatingLabelBehavior.auto,
-              //                       border: OutlineInputBorder(
-              //                         borderRadius: BorderRadius.circular(50),
-              //                         borderSide: BorderSide(
-              //                           color: Colors.green,
-              //                           width: 1,
-              //                         ),
-              //                       ),
-              //                       enabledBorder: OutlineInputBorder(
-              //                         borderRadius: BorderRadius.circular(50),
-              //                         borderSide: BorderSide(
-              //                           color: Colors.grey.shade400,
-              //                           width: 1,
-              //                         ),
-              //                       ),
-              //                       disabledBorder: OutlineInputBorder(
-              //                         borderRadius: BorderRadius.circular(50),
-              //                         borderSide: BorderSide(
-              //                           color: Colors.grey.shade400,
-              //                           width: 1,
-              //                         ),
-              //                       ),
-              //                       errorBorder: OutlineInputBorder(
-              //                         borderRadius: BorderRadius.circular(50),
-              //                         borderSide: BorderSide(
-              //                           color: Colors.redAccent,
-              //                           width: 1,
-              //                         ),
-              //                       ),
-              //                       focusedBorder: OutlineInputBorder(
-              //                         borderRadius: BorderRadius.circular(50),
-              //                         borderSide: BorderSide(
-              //                           color: Colors.grey.shade400,
-              //                           width: 1,
-              //                         ),
-              //                       ),
-              //                       enabled: true,
-              //                       hintText: 'Enter OTP code',
-              //                       hintStyle: GoogleFonts.poppins(
-              //                         textStyle: TextStyle(
-              //                           fontSize: 14,
-              //                           color: Colors.grey,
-              //                         ),
-              //                       ),
-              //                       errorStyle: GoogleFonts.poppins(
-              //                         textStyle: TextStyle(
-              //                           fontSize: 12,
-              //                           color: Colors.redAccent[700],
-              //                         ),
-              //                       ),
-              //                       fillColor: Colors.grey[200],
-              //                       filled: true,
-              //                     ),
-              //                     validator: (value) {
-              //                       if (value == null) {
-              //                         return 'Please enter the OTP code';
-              //                       }
-              //                       return null;
-              //                     },
-              //                   ),
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //         ],
-              //       ),
-              //     ),
-              //     buttons: [
-              //       DialogButton(
-              //         color: Colors.green,
-              //         onPressed: () async {
-              //           // Navigator.of(context)
-              //           //     .pushReplacementNamed(Dashboard.routeName);
-
-              //           try {
-              //             _formKey.currentState!.save();
-
-              //             var user = {
-              //               'rsbsa_no': _selectedUserType == 'FARMER'
-              //                   ? txtrsbsanumber.text
-              //                   : '',
-              //               'last_name': txtLastName.text,
-              //               'first_name': txtFirstName.text,
-              //               'birthdate': txtBirthday.text,
-              //               'farmer_contact_number': txtContactNumber.text,
-              //               'g-recaptcha-response': true,
-              //               'user_type': _selectedUserType.toString(),
-              //               'supplier_type': "1",
-              //               'company_name': _selectedUserType == 'SUPPLIER'
-              //                   ? txtCompanyName.text
-              //                   : ''
-              //             };
-
-              //             print(user);
-              //             await Provider.of<Auth>(context, listen: false)
-              //                 .register(user);
-              //             final sharedPreferences =
-              //                 await SharedPreferences.getInstance();
-
-              //             if (sharedPreferences.containsKey('userData')) {
-              //               //          Navigator.of(context)
-              //               // .pushReplacementNamed(RegisterSuccessScreen.routeName);
-
-              //               // Navigator.pushAndRemoveUntil(
-              //               //   context,
-              //               //   MaterialPageRoute(
-              //               //     builder: (BuildContext context) =>
-              //               //         RegisterSuccessScreen(),
-              //               //   ),
-              //               //   (route) => false,
-              //               // );
-              //               //   Navigator.pushAndRemoveUntil(
-              //               // context,
-              //               // MaterialPageRoute(
-              //               //     builder: (context) =>
-              //               //         MySplashScreen(Dashboard())),
-              //               // ModalRoute.withName("/dashboard"));
-              //             } else {}
-              //           } on HttpException catch (error) {
-              //             print('here');
-              //             txtOTP.clear();
-              //             Navigator.of(context).pop();
-              //             showError(error.toString());
-              //           } catch (error) {
-              //             showError('Something went wrong.');
-              //           }
-              //         },
-              //         child: Text(
-              //           "Verify",
-              //           style: TextStyle(color: Colors.white, fontSize: 16),
-              //         ),
-              //       )
-              //     ]
-              // ).show();
             }
           }, // your tap handler moved here
           builder: (context, onTap) {

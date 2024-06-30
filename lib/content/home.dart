@@ -43,7 +43,6 @@ class _HomePageState extends State<HomePage> {
   );
 
   var user;
-  var farmer;
   bool isLoading = false;
   var voucherData;
 
@@ -345,20 +344,6 @@ class _HomePageState extends State<HomePage> {
   //   // });
   // }
 
-  void getUser() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final extracteduserData =
-        json.decode(prefs.getString('userData')!) as Map<String, Object>;
-    setState(() {
-      if (extracteduserData['data'] == null) {
-        farmer = extracteduserData;
-      } else {
-        farmer = extracteduserData['data'];
-        // print(farmer);
-      }
-      isLoading = true;
-    });
-  }
 
   void enterVoucherCode() {
     late AwesomeDialog dialog;

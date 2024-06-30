@@ -36,13 +36,6 @@ class _MyProfileState extends State<MyProfile> {
 
   bool editStatus = false;
 
-  Uint8List? signature;
-
-  var _selectedCivilStatus;
-  final _civilStatus = ["single", "married", "widowed", "divorced"];
-
-  var _selectedSex;
-  final _sex = ["male", "female"];
 
   final _formKey1 = GlobalKey<FormState>();
   final _formKey2 = GlobalKey<FormState>();
@@ -51,35 +44,7 @@ class _MyProfileState extends State<MyProfile> {
 
   bool isLoading = true;
 
-  bool isPhoto = false;
-  bool isESignature = false;
-  bool isGovID = false;
-
-  bool isCheckPhoto = false;
-  bool isCheckPhotoGov = false;
-  bool isCheckSignature = false;
-  bool isCheckGov = false;
-
-  bool isImageLoad = false;
-
-  // PickedFile? _imageFileProfilePhoto;
-  // PickedFile? _imageFileESignature;
-  // PickedFile? _imageFileGovID;
-  // AssetImage? retrieveImageProfile;
-
-  bool hasPhoto = false;
-  bool hasSignature = false;
-  bool hasGovID = false;
   String? _retrieveDataError;
-
-  var user;
-  var farmer;
-  var token;
-  var profiling;
-
-  String? _imageFileCamera;
-  String? _imageFileSignature;
-  String? _imageFileGovIDPath;
 
   var _jsonResult;
 
@@ -302,62 +267,8 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
-  void getUser() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final extracteduserData =
-        json.decode(prefs.getString('userData')!) as Map<String, Object>;
-    setState(() {
-      farmer = extracteduserData['data'];
-      token = extracteduserData['token'];
-      if (extracteduserData['token'] == null) {
-        token = farmer['token'];
-      } else {
-        token = extracteduserData['token'];
-      }
-
-      if (extracteduserData['data'] == null) {
-        farmer = extracteduserData;
-      } else {
-        farmer = extracteduserData['data'];
-      }
-
-      // txtRSBSANumber.text = farmer['rsbsa_no'];
-      // txtFirstName.text = farmer['first_name'];
-      // txtMiddleName.text = farmer['middle_name'];
-      // txtLastName.text = farmer['last_name'];
-      // txtPhoneNumber.text = farmer['contact_number'];
-      // txtBirthDate.text = farmer['birthdate'];
-      // txtPlaceOfBirth.text = farmer['place_of_birth'];
-      // _selectedSex = farmer['gender'];
-      // _selectedCivilStatus = farmer['civil_status'];
-      // txtTINnumber.text = farmer['tin_no'];
-      // txtEducational.text = farmer['educational_attainment'];
-      // txtDegree.text = farmer['degree_course'];
-      // txtCompleteAddress.text = farmer['address'];
-
-      // txtFamLastName.text = farmer['farmer_family_member_last_name'];
-      // txtFamFirstName.text = farmer['farmer_family_member_first_name'];
-      // txtFamMiddleName.text = farmer['farmer_family_member_middle_name'];
-      // txtFamBirthDate.text = farmer['farmer_family_member_date_of_birth'];
-      // txtFamPhoneNumber.text = farmer['farmer_family_member_contact_number'];
-      // txtFamOccupation.text = farmer['farmer_family_member_occupation'];
-      // txtFamEducational.text =
-      //     farmer['farmer_family_member_educational_attainment'];
-      // txtBankName.text = farmer['farmer_bank_information_bank_name'];
-      // txtAccountName.text = farmer['farmer_bank_information_account_name'];
-      // txtAccountNumber.text = farmer['farmer_bank_information_account_number'];
-
-      // txtAccountName.text = farmer['first_name'] + ' ' + farmer['last_name'];
-      isLoading = true;
-    });
-    // isLoading = false;
-
-    // print(token);
-    // print(extracteduserData);
-  }
 
 //Personal Information
-  final txtRSBSANumber = TextEditingController();
   final txtFirstName = TextEditingController();
   final txtMiddleName = TextEditingController();
   final txtLastName = TextEditingController();
@@ -391,39 +302,6 @@ class _MyProfileState extends State<MyProfile> {
     initialPage: _currentPage,
   );
 
-  // @override
-  //  void didChangeDependencies() {
-  //   print("update");
-  //   if (!_isInit) {
-  //   // SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   //       final extractedUserData =
-  //   //     json.decode(prefs.getString('userData')) as Map<String, Object>;
-  //     profiling = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
-  //     print(profiling);
-  //     if (profiling != null) {
-  //       assignDataBasicInfo(profiling['farmer']);
-  //     }
-
-  //     setState(() {
-  //       _isInit = true;
-  //     });
-  //     //print(businessApplication['info']['basic_info']);
-
-  //     print(businessApplication);
-  //   }
-  //   super.didChangeDependencies();
-  // }
-
-  //   void assignDataBasicInfo(Map<String, dynamic> basinInfo) {
-  //   if (basinInfo['first_name'] != null) {
-  //     txtFirstName.text = basinInfo['first_name'];
-  //   }
-  //   if (basinInfo['middle_name'] != null) {
-  //     txtMiddleName.text = basinInfo['middle_name'];
-  //   }
-
-  // }
-
   String getImageName(filePath, ext) {
     var fileName = (filePath.path).split('/').last;
     if (fileName.contains('pdf')) {
@@ -445,10 +323,10 @@ class _MyProfileState extends State<MyProfile> {
     };
 
     // print(userInfo);
-    updateFarmerProfile(userInfo);
+    updateMyProfile(userInfo);
   }
 
-  void updateFarmerProfile(Map<String, dynamic> userInfo) async {
+  void updateMyProfile(Map<String, dynamic> userInfo) async {
     try {
       bool isSaved = await Provider.of<ProfileProvider>(context, listen: false)
           .updateProfile(userInfo);
@@ -499,55 +377,6 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   getProfile() async {
-    // SharedPreferences sharedPreferences;
-
-    // sharedPreferences = await SharedPreferences.getInstance();
-
-    // final extractedUserData =
-    //     json.decode(sharedPreferences.getString('userData')!) as Map;
-    // if (extractedUserData['data']['user'] != null) {
-    //   setState(() {
-    //     txtFirstName.text =
-    //         extractedUserData['data']['user']['first_name'] == null
-    //             ? ''
-    //             : extractedUserData['data']['user']['first_name'];
-    //     txtMiddleName.text =
-    //         extractedUserData['data']['user']['middle_name'] == null
-    //             ? ''
-    //             : extractedUserData['data']['user']['middle_name'];
-    //     txtLastName.text =
-    //         extractedUserData['data']['user']['last_name'] == null
-    //             ? ''
-    //             : extractedUserData['data']['user']['last_name'];
-    //     txtEmailAddress.text =
-    //         extractedUserData['data']['user']['email'] == null
-    //             ? ''
-    //             : extractedUserData['data']['user']['email'];
-    //     txtPhoneNumber.text =
-    //         extractedUserData['data']['user']['mobile_no'] == null
-    //             ? ''
-    //             : extractedUserData['data']['user']['mobile_no'];
-    //   });
-    // } else {
-    //   setState(() {
-    //     txtFirstName.text = extractedUserData['data']['first_name'] == null
-    //         ? ''
-    //         : extractedUserData['data']['first_name'];
-    //     txtMiddleName.text = extractedUserData['data']['middle_name'] == null
-    //         ? ''
-    //         : extractedUserData['data']['middle_name'];
-    //     txtLastName.text = extractedUserData['data']['last_name'] == null
-    //         ? ''
-    //         : extractedUserData['data']['last_name'];
-    //     txtEmailAddress.text = extractedUserData['data']['email'] == null
-    //         ? ''
-    //         : extractedUserData['data']['email'];
-    //     txtPhoneNumber.text = extractedUserData['data']['mobile_no'] == null
-    //         ? ''
-    //         : extractedUserData['data']['mobile_no'];
-    //   });
-    // }
-
     txtFirstName.text =
         myProfile['first_name'] == null ? '' : myProfile['first_name'];
     txtMiddleName.text =
@@ -869,22 +698,6 @@ class _MyProfileState extends State<MyProfile> {
                               vertical: 10, horizontal: 15),
                           child: Column(
                             children: <Widget>[
-                              // CustomFormField(
-                              //   // initialValue: user['farmer']['rsbsa_no'],
-                              //   status: editStatus,
-                              //   label: 'RSBSA Number',
-                              //   controller: txtRSBSANumber,
-                              //   onFieldSubmitted: (_) {
-                              //     FocusScope.of(context).requestFocus(fNameFocus);
-                              //   },
-                              //   validator: (value) {
-                              //     if (value.isEmpty) {
-                              //       return 'Please enter your first name';
-                              //     }
-                              //     return null;
-                              //   },
-                              //   initialValue: '',
-                              // ),
                               SizedBox(
                                 height: 15,
                               ),

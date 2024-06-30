@@ -25,33 +25,6 @@ class Auth with ChangeNotifier {
     return '';
   }
 
-  // Future<void> login(String contact_number, String password) async {
-  //   Map data = {'contact_number': contact_number, 'password': password};
-  //   Map<String, dynamic> jsonResponse;
-  //   var responseCode;
-  //   try {
-  //     var response = await http.post(config.pre_url + config.auth_route + "/login", body: data);
-  //     var jsonResponse = json.decode(response.body);
-  //     print(jsonResponse);
-  //     if (jsonResponse['success'] == true) {
-  //       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  //       sharedPreferences.setString('userData', json.encode(jsonResponse));
-  //       final extracteduserData = json.decode(sharedPreferences.getString('userData')) as Map<String, dynamic>;
-  //       getItemMasterList();
-
-  //      print(extracteduserData['system_access_id']);
-
-  //     } else {
-  //       print(jsonResponse['message']);
-  //       throw HttpException(jsonResponse['message']);
-  //     }
-  //   } catch (error) {
-  //     print(error);
-  //     // print(responseCode);
-  //     throw (error);
-  //   }
-  // }
-
   Future<void> login(String contactNumber, String password) async {
     Map data = {'mobile_number': contactNumber, 'password': password};
     Map<String, dynamic> jsonResponse;
@@ -110,14 +83,6 @@ class Auth with ChangeNotifier {
        Uri.parse("${config.pre_url}/register-v2"),
         body: userInfo,
       );
-
-      // final validateRSBSA  = await http.post(
-      //   config.pre_url + config.auth_validate_rsba,
-      //   body: userInfo,
-      // );
-
-      // jsonResponseRSBSA = json.decode(validateRSBSA.body);
-      // print(jsonResponseRSBSA['message']);
 
       jsonResponse = json.decode(response.body);
       // print(jsonResponse);

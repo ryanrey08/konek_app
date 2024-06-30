@@ -39,9 +39,6 @@ class _DashboardState extends State<Dashboard> {
     const UploadPicture(),
     const Transaction()
     // const MyNetwork(),
-    // ReportPage(),
-    // MiscPage(),
-    // ComponentsPage()
   ];
 
   var pageTitle = ["Home", "Scan/Upload QR", "Transaction"];
@@ -489,22 +486,6 @@ class _DashboardState extends State<Dashboard> {
                                         ),
                                       ),
                                     )
-                                    // isLoading
-                                    //     ?
-                                    //     Text(
-                                    //    '',
-                                    //         style: GoogleFonts.poppins(
-                                    //           textStyle: TextStyle(
-                                    //             fontSize: 14,
-                                    //             color: Color(0xFF255946),
-                                    //             fontWeight: FontWeight.w600,
-                                    //           ),
-                                    //         ),
-                                    //       )
-                                    //     : Container(),
-                                    // isLoading
-                                    //     ? Text(farmer['rsbsa_no'] == null ? "---" : farmer['rsbsa_no'])
-                                    //     : Container(),
                                   ],
                                 ),
                               ),
@@ -519,16 +500,6 @@ class _DashboardState extends State<Dashboard> {
                                 horizontal: 15, vertical: 10),
                             child: Wrap(
                               children: <Widget>[
-                                // DrawerOptions(
-                                //   dense: true,
-                                //   title: "BACOOR.GOV.PH",
-                                //   useMobileLayout: useMobileLayout,
-                                //   iconData: Icons.pageview,
-                                //   onTapFunc: () {
-                                //     _launchInBrowser('https://bacoor.gov.ph/');
-                                //   },
-                                // ),
-                                // Divider(),
                                 DrawerOptions(
                                   dense: true,
                                   title: "View Profile",

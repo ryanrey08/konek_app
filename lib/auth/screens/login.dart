@@ -35,8 +35,6 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
-    // txtUsernameController.text = 'blitzdev';
-    // txtPasswordController.text = '12345678';
     // TODO: implement initState
     super.initState();
   }
@@ -261,19 +259,6 @@ class _LoginState extends State<Login> {
                                           ],
                                         ),
                                       ),
-                                      // Container(
-                                      //   alignment: Alignment.bottomRight,
-                                      //   child: Text(
-
-                                      //     'v.1-staging',
-                                      //     style: GoogleFonts.poppins(
-                                      //       textStyle: TextStyle(
-                                      //         // fontSize: useMobileLayout ? 13 : 18,
-                                      //         fontSize: 12,
-                                      //       ),
-                                      //     ),
-                                      //   ),
-                                      // )
                                     ],
                                   ),
                                 ),

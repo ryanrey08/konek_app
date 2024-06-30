@@ -137,17 +137,6 @@ class _SplashScreenState extends State<SplashScreen> {
                           height: widget.useMobileLayout ? 300 : 350,
                         ),
                       ),
-                      // Text(
-                      //   "FARMER'S ASSISTANCE PROGRAM",
-                      //   textAlign: TextAlign.center,
-                      //   style: GoogleFonts.poppins(
-                      //     textStyle: TextStyle(
-                      //       fontSize: 20,
-                      //       color: Colors.white,
-                      //       fontWeight: FontWeight.w500,
-                      //     ),
-                      //   ),
-                      // ),
 
                       const SizedBox(height: 40),
                       Container(
