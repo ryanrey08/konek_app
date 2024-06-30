@@ -35,7 +35,11 @@ class SplashScreen extends StatefulWidget {
   final dynamic navigateAfterSeconds;
   final bool useMobileLayout;
 
-  const SplashScreen({super.key, required this.seconds, this.navigateAfterSeconds, required this.useMobileLayout});
+  const SplashScreen(
+      {super.key,
+      required this.seconds,
+      this.navigateAfterSeconds,
+      required this.useMobileLayout});
 
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -51,9 +55,11 @@ class _SplashScreenState extends State<SplashScreen> {
         // named route component
         Navigator.of(context).pushReplacementNamed(widget.navigateAfterSeconds);
       } else if (widget.navigateAfterSeconds is Widget) {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => widget.navigateAfterSeconds));
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (BuildContext context) => widget.navigateAfterSeconds));
       } else {
-        throw ArgumentError('widget.navigateAfterSeconds must either be a String or Widget');
+        throw ArgumentError(
+            'widget.navigateAfterSeconds must either be a String or Widget');
       }
     });
   }
@@ -114,10 +120,22 @@ class _SplashScreenState extends State<SplashScreen> {
                       //   ),
                       // ),
                       //  SizedBox(height: 10),
-                      Image.asset(
-                        'assets/images/swak-img.png',
-                        width: widget.useMobileLayout ? 300 : 350,
-                        height: widget.useMobileLayout ? 300 : 350,
+                      Container(
+                        padding: EdgeInsets.only(left: 5, right: 5),
+                        decoration: const BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          // image: DecorationImage(
+                          //   scale: 7.5,
+                          //   image: AssetImage(
+                          //       'assets/images/move_mandaue_swak.png'),
+                          // ),
+                        ),
+                        child: Image.asset(
+                          'assets/images/move_mandaue_swak.png',
+                          width: widget.useMobileLayout ? 300 : 350,
+                          height: widget.useMobileLayout ? 300 : 350,
+                        ),
                       ),
                       // Text(
                       //   "FARMER'S ASSISTANCE PROGRAM",
@@ -130,8 +148,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       //     ),
                       //   ),
                       // ),
-                     
-                      
+
                       const SizedBox(height: 40),
                       Container(
                         alignment: Alignment.bottomCenter,

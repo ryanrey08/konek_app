@@ -523,10 +523,12 @@ class _HomePageState extends State<HomePage> {
               Container(
                 width: useMobileLayout ? 300 : 350,
                 height: useMobileLayout ? 130 : 180,
+                margin: EdgeInsets.only(top: 15),
                 decoration: const BoxDecoration(
-                  //  color: Colors.white,
+                   color: Colors.grey,
+                   borderRadius: BorderRadius.all(Radius.circular(30)),
                   image: DecorationImage(
-                    image: AssetImage('assets/images/swak-img.png'),
+                    image: AssetImage('assets/images/move_mandaue_swak.png'),
                   ),
                 ),
                 child: const Column(children: [
