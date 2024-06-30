@@ -10,15 +10,15 @@ import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 
 //my local
 //final String pre_url = "http://192.168.42.88:8000";
-const String pre_url = "http://165.22.253.81:1904/api/v1/auth";
-const String pre_url_voucher = "http://165.22.253.81:1904/api/v1/voucher";
-const String pre_url_subscription = "http://165.22.253.81:1904/api/v1/subscriptions";
-const String pre_url_ads = "http://165.22.253.81:1904/api/v1/quick-links-and-ads";
+const String pre_url = "http://113.19.24.196:443//api/v1/auth";
+const String pre_url_voucher = "http://113.19.24.196:443//api/v1/voucher";
+const String pre_url_subscription = "http://113.19.24.196:443//api/v1/subscriptions";
+const String pre_url_ads = "http://113.19.24.196:443//api/v1/quick-links-and-ads";
 const String img_url = "http://192.168.42.88:8000/storage/";
-const String file_storage = "http://165.22.253.81:1904/storage/";
-const String hit_pay = "http://165.22.253.81:1904/api/v1/hitpay/";
-const String my_address = "http://165.22.253.81:1904/api/v1/utilities/";
-const String auth_update_profile = "http://165.22.253.81:1904/api/v1/account/";
+const String file_storage = "http://113.19.24.196:443//storage/";
+const String hit_pay = "http://113.19.24.196:443//api/v1/hitpay/";
+const String my_address = "http://113.19.24.196:443//api/v1/utilities/";
+const String auth_update_profile = "http://113.19.24.196:443//api/v1/account/";
 
 
 String throwErrorAuth(String error) {

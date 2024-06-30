@@ -7,6 +7,6 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@mipmap/swak_img" />
+            android:src="@mipmap/move_mandaue_swak" />
     </item>
 </layer-list>
