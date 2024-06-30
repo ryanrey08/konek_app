@@ -15,29 +15,20 @@ class ProfileProvider with ChangeNotifier {
   ProfileProvider(this._token);
 
   Future<bool> updateProfile(
-      // String status, Map<String, dynamic> basicInfo, Map<String, dynamic> businessDetails, Map<String, dynamic> req, int id) async {
       Map<String, dynamic> userData) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var userInfo = json.decode(sharedPreferences.getString('userData')!)
         as Map<String, dynamic>;
     var token = userInfo['data']['token'];
 
-    //  Map data ={'token': ftoken,'data': json.encode(farmerInfo) as Map<String, dynamic>};
-    // Map data = farmerInfo;
-    // print(token);
     Map<String, dynamic> jsonResponse;
     try {
-      //  Route::post('/farmer/update-profile', 'FarmerController@updateProfile
       var response = await http.post(
           Uri.parse("${config.auth_update_profile}update-profile"),
           body: userData,
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
-// Map<String, dynamic> data = new Map<String, dynamic>.from(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
       if (jsonResponse['success'] == true) {
-        // SharedPreferences sharedPreferences =
-        //     await SharedPreferences.getInstance();
-        // sharedPreferences.setString('userData', json.encode(userInfo));
         return jsonResponse['success'];
       } else {
         throw HttpException(jsonResponse['message']);
@@ -107,7 +98,6 @@ class ProfileProvider with ChangeNotifier {
   }
 
     Future<Map<String, dynamic>> getBarangay(provCode, munCode) async {
-      print(provCode + " " + munCode);
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var userInfo = json.decode(sharedPreferences.getString('userData')!)
         as Map<String, dynamic>;
@@ -124,7 +114,6 @@ class ProfileProvider with ChangeNotifier {
           Uri.parse("${config.my_address}get-brgy/" + provCode + "/" + munCode),
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       var jsonResponse = json.decode(response.body);
-      print(jsonResponse);
       notifyListeners();
       return jsonResponse;
     } catch (error) {

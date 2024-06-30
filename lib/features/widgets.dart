@@ -391,7 +391,7 @@ class _CustomDropDownState extends State<CustomDropDown> {
             .toList(),
         style: GoogleFonts.poppins(
           textStyle: TextStyle(
-            fontSize: 15,
+            fontSize: 16,
             color: Colors.black,
           ),
         ),

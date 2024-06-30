@@ -39,9 +39,6 @@ class _DashboardState extends State<Dashboard> {
     const UploadPicture(),
     const Transaction()
     // const MyNetwork(),
-    // ReportPage(),
-    // MiscPage(),
-    // ComponentsPage()
   ];
 
   var pageTitle = ["Home", "Scan/Upload QR", "Transaction"];
@@ -467,14 +464,18 @@ class _DashboardState extends State<Dashboard> {
                                       height: 90,
                                       width: 180,
                                       decoration: const BoxDecoration(
+                                        color: Colors.grey,
+                                        borderRadius: BorderRadius.all(Radius.circular(30)),
                                         image: DecorationImage(
+                                          scale: 5,
                                           image: AssetImage(
-                                              'assets/images/swak-img.png'),
+                                              'assets/images/move_mandaue_swak.png'),
                                         ),
                                         // border: Border.all(color: Colors.grey),
                                         // borderRadius: BorderRadius.circular(50),
                                       ),
                                     ),
+                                    SizedBox(height: 5,),
                                     Text(
                                       fullName.toString(),
                                       style: GoogleFonts.poppins(
@@ -485,22 +486,6 @@ class _DashboardState extends State<Dashboard> {
                                         ),
                                       ),
                                     )
-                                    // isLoading
-                                    //     ?
-                                    //     Text(
-                                    //    '',
-                                    //         style: GoogleFonts.poppins(
-                                    //           textStyle: TextStyle(
-                                    //             fontSize: 14,
-                                    //             color: Color(0xFF255946),
-                                    //             fontWeight: FontWeight.w600,
-                                    //           ),
-                                    //         ),
-                                    //       )
-                                    //     : Container(),
-                                    // isLoading
-                                    //     ? Text(farmer['rsbsa_no'] == null ? "---" : farmer['rsbsa_no'])
-                                    //     : Container(),
                                   ],
                                 ),
                               ),
@@ -515,16 +500,6 @@ class _DashboardState extends State<Dashboard> {
                                 horizontal: 15, vertical: 10),
                             child: Wrap(
                               children: <Widget>[
-                                // DrawerOptions(
-                                //   dense: true,
-                                //   title: "BACOOR.GOV.PH",
-                                //   useMobileLayout: useMobileLayout,
-                                //   iconData: Icons.pageview,
-                                //   onTapFunc: () {
-                                //     _launchInBrowser('https://bacoor.gov.ph/');
-                                //   },
-                                // ),
-                                // Divider(),
                                 DrawerOptions(
                                   dense: true,
                                   title: "View Profile",

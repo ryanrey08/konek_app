@@ -3,7 +3,6 @@
 /* <======= END =======>*/
 
 class User {
-  final String rsbsa_no;
   final String first_name;
   final String last_name;
   final String middleName;
@@ -15,7 +14,6 @@ class User {
   final String birthdate;
 
   User({
-    required this.rsbsa_no,
     required this.first_name,
     required this.middleName,
     required this.last_name,

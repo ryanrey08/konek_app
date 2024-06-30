@@ -35,8 +35,6 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
-    // txtUsernameController.text = 'blitzdev';
-    // txtPasswordController.text = '12345678';
     // TODO: implement initState
     super.initState();
   }
@@ -143,14 +141,27 @@ class _LoginState extends State<Login> {
                                           ),
                                         ),
                                       ),
+                                      SizedBox(height: 5,),
                                       SizedBox(
-                                          width: 100,
-                                          height: 100,
-                                          child: const Image(
-                                            // image: NetworkImage(
-                                            //     'assets/images/novulutions.png'),
-                                            image: AssetImage(
-                                                'assets/images/swak-img.png'),
+                                          width: 120,
+                                          height: 80,
+                                          child: Container(
+                                            decoration: const BoxDecoration(
+                                              color: Colors.grey,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(30)),
+                                              image: DecorationImage(
+                                                scale: 7.5,
+                                                image: AssetImage(
+                                                    'assets/images/move_mandaue_swak.png'),
+                                              ),
+                                            ),
+                                            // child: const Image(
+                                            //   // image: NetworkImage(
+                                            //   //     'assets/images/novulutions.png'),
+                                            //   image: AssetImage(
+                                            //       'assets/images/move_mandaue_swak.png'),
+                                            // ),
                                           )),
                                       const SizedBox(
                                         height: 15,
@@ -248,19 +259,6 @@ class _LoginState extends State<Login> {
                                           ],
                                         ),
                                       ),
-                                      // Container(
-                                      //   alignment: Alignment.bottomRight,
-                                      //   child: Text(
-
-                                      //     'v.1-staging',
-                                      //     style: GoogleFonts.poppins(
-                                      //       textStyle: TextStyle(
-                                      //         // fontSize: useMobileLayout ? 13 : 18,
-                                      //         fontSize: 12,
-                                      //       ),
-                                      //     ),
-                                      //   ),
-                                      // )
                                     ],
                                   ),
                                 ),
@@ -587,7 +585,8 @@ class _LoginState extends State<Login> {
       }
     } on HttpException catch (error) {
       if (error.toString() == 'The provided mobile number does not exist.') {
-        Navigator.of(context).pushReplacementNamed(AccountRegister.routeName, arguments: txtUsernameController.text);
+        Navigator.of(context).pushReplacementNamed(AccountRegister.routeName,
+            arguments: txtUsernameController.text);
       }
       showError(error.toString());
     } catch (error) {
