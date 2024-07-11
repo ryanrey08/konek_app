@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../config/httpexception.dart';
 
 // Config and Providers
 import '../../../Config/Config.dart' as config;
@@ -32,6 +33,41 @@ class ProfileProvider with ChangeNotifier {
         return jsonResponse['success'];
       } else {
         throw HttpException(jsonResponse['message']);
+      }
+    } catch (error) {
+      // print(responseCode);
+      rethrow;
+    }
+  }
+
+    Future<bool> updatePassword(
+      Map<String, dynamic> userData) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userInfo = json.decode(sharedPreferences.getString('userData')!)
+        as Map<String, dynamic>;
+    var token = userInfo['data']['token'];
+
+    Map<String, dynamic> jsonResponse;
+    try {
+      var response = await http.post(
+          Uri.parse("${config.auth_update_profile}update-password"),
+          body: userData,
+          headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
+      var jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      if (jsonResponse['success'] == true) {
+        return jsonResponse['success'];
+      } else {
+        if(jsonResponse['data']['current_password'] != null){
+          throw HttpException(jsonResponse['data']['current_password'][0].toString());
+        }else if(jsonResponse['data']['new_password'] != null){
+          throw HttpException(jsonResponse['data']['new_password'][0].toString());
+        }else if(jsonResponse['data']['confirm_password'] != null){
+          throw HttpException(jsonResponse['data']['confirm_password'][0].toString());
+        }else{
+          throw HttpException('something went wrong');
+        }
+        // throw HttpException(jsonResponse['message']);
       }
     } catch (error) {
       // print(responseCode);

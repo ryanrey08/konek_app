@@ -344,7 +344,6 @@ class _HomePageState extends State<HomePage> {
   //   // });
   // }
 
-
   void enterVoucherCode() {
     late AwesomeDialog dialog;
     dialog = AwesomeDialog(
@@ -449,7 +448,7 @@ class _HomePageState extends State<HomePage> {
     return remainingInSeconds > 86400 ? true : false;
   }
 
-    computeRemainingSeconds(currentDate, sDate, duration, duration_unit) {
+  computeRemainingSeconds(currentDate, sDate, duration, duration_unit) {
     var nowDate = DateTime.parse(currentDate);
     var startDate = DateTime.parse(sDate);
     var expDate;
@@ -506,20 +505,159 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: <Widget>[
               Container(
-                width: useMobileLayout ? 300 : 350,
-                height: useMobileLayout ? 130 : 180,
-                margin: EdgeInsets.only(top: 15),
-                decoration: const BoxDecoration(
-                   color: Colors.grey,
-                   borderRadius: BorderRadius.all(Radius.circular(30)),
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/move_mandaue_swak.png'),
-                  ),
+                width: double.infinity,
+                // height: useMobileLayout ? 130 : 180,
+                // margin: EdgeInsets.only(top: 15),
+                // decoration: const BoxDecoration(
+                //   //  color: Colors.grey,
+                //   //  borderRadius: BorderRadius.all(Radius.circular(30)),
+                //   image: DecorationImage(
+                //     image: AssetImage('assets/images/move_mandaue_swak.png'),
+                //   ),
+                // ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  // color: Colors.white,
                 ),
-                child: const Column(children: [
-                  SizedBox(
-                    height: 45,
-                  ),
+                child: Column(children: [
+                  // SizedBox(
+                  //   height: 45,
+                  // ),
+                  isLoading
+                      ? Card(
+                          elevation: 4,
+                          color: const Color.fromARGB(255, 55, 57, 175),
+                          margin: EdgeInsets.all(16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: SizedBox(
+                            // height:  150,
+                            width: double.infinity,
+                            //width: useMobileLayout ? 600 : 700,
+
+                            //height: useMobileLayout ? 90 : 150,
+                            // decoration: BoxDecoration(
+                            //   borderRadius: BorderRadius.circular(10),
+                            //   color: Colors.white,
+                            // ),
+                            // padding:
+                            //     EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                            child: Column(children: [
+                              // Container(
+                              //   height: 100,
+                              //   decoration: BoxDecoration(
+                              //     // color: Colors.grey[200],
+
+                              //     image: DecorationImage(
+                              //       image:
+                              //           const AssetImage('assets/images/move_mandaue.jpg'),
+                              //       fit: BoxFit.cover,
+                              //       // colorFilter: ColorFilter.mode(
+                              //       //   Colors.black.withOpacity(0.2),
+                              //       //   BlendMode.dstATop,
+                              //       // ),
+                              //     ),
+                              //   ),
+                              // ),
+                              SizedBox(height: 20,),
+                              Container(
+                                height: 100,
+                                decoration: const BoxDecoration(
+                                  //  color: Colors.grey,
+                                  //  borderRadius: BorderRadius.all(Radius.circular(30)),
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                        'assets/images/move_mandaue_swak.png'),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 20,),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ads.isNotEmpty
+                                    ? CarouselSlider(
+                                        options: CarouselOptions(
+                                            autoPlay: true,
+                                            aspectRatio: 2.0,
+                                            // enlargeCenterPage: true,
+                                            viewportFraction: 1.0,
+                                            height: 100,
+                                            enlargeStrategy:
+                                                CenterPageEnlargeStrategy
+                                                    .height,
+                                            scrollPhysics:
+                                                const NeverScrollableScrollPhysics()),
+                                        items: ads.map((i) {
+                                          return Builder(
+                                            builder: (BuildContext context) {
+                                              return Container(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                // margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                                decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          i['image_url']),
+                                                      fit: BoxFit.fitHeight),
+                                                ),
+                                                // child: Text(i['description']),
+                                              );
+                                            },
+                                          );
+                                        }).toList(),
+                                      )
+                                    : Center(
+                                        child: Text(
+                                          "NO CURRENT ADS",
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              color: Colors.red,
+                                              fontSize:
+                                                  useMobileLayout ? 14 : 25,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              // Container(
+                              //   width: double.infinity,
+                              //   child: CarouselSlider(
+                              //     options: CarouselOptions(
+                              //       autoPlay: true,
+                              //       aspectRatio: 2.0,
+                              //       // enlargeCenterPage: true,
+                              //       viewportFraction: 1.0,
+                              //       height: 100,
+                              //       enlargeStrategy:
+                              //           CenterPageEnlargeStrategy.height,
+                              //     ),
+                              //     items: imgLists.map((i) {
+                              //       return Builder(
+                              //         builder: (BuildContext context) {
+                              //           return Container(
+                              //             width: MediaQuery.of(context).size.width,
+                              //             // margin: EdgeInsets.symmetric(horizontal: 5.0),
+                              //             decoration: BoxDecoration(
+                              //               image: DecorationImage(
+                              //                   image: AssetImage(i['image']),
+                              //                   fit: BoxFit.fitWidth),
+                              //             ),
+                              //           );
+                              //         },
+                              //       );
+                              //     }).toList(),
+                              //   ),
+                              // )
+                            ]),
+                          ),
+                        )
+                      : Container()
                   // Expanded(
                   //   child: Text(
                   //     "WELCOME",
@@ -541,301 +679,6 @@ class _HomePageState extends State<HomePage> {
                 child: isLoading
                     ? Column(
                         children: <Widget>[
-                          PreferenceBuilder<String>(
-                              preference: globalVoucherData,
-                              builder: (context, vouchData) {
-                                var newVoucherData = json.decode(vouchData);
-                                return Container(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Card(
-                                    elevation: 4,
-                                    color: Colors.white.withOpacity(0.8),
-                                    margin: const EdgeInsets.all(8),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Container(
-                                      // height:  150,
-                                      //width: double.infinity,
-                                      width: useMobileLayout ? null : 700,
-                                      //width: 500,
-                                      height: useMobileLayout ? 150 : 190,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: const Color.fromARGB(
-                                              255, 55, 57, 175)),
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 5, horizontal: 15),
-                                      child: Row(
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                const SizedBox(height: 10),
-                                                Expanded(
-                                                  child: Text(
-                                                    'MY ACCOUNT',
-                                                    textAlign: TextAlign.center,
-                                                    style: GoogleFonts.poppins(
-                                                      textStyle: TextStyle(
-                                                        fontSize:
-                                                            useMobileLayout
-                                                                ? 12
-                                                                : 18,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                isLoading ? Expanded(
-                                                  child: newVoucherData["status"] == 'completed' ? (isRemainingHours(
-                                                          newVoucherData[
-                                                                  "current_date"]
-                                                              .toString(),
-                                                          newVoucherData[
-                                                                  "payment_request_at"]
-                                                              .toString(),
-                                                          newVoucherData[
-                                                                  "duration"]
-                                                              .toString(),
-                                                          newVoucherData[
-                                                                  "duration_unit"]
-                                                              .toString())
-                                                      ? Text(
-                                                          "${(computeRemaining(newVoucherData["current_date"].toString(), newVoucherData["payment_request_at"].toString(), newVoucherData["duration"].toString(), newVoucherData["duration_unit"].toString()))} ${newVoucherData["duration_unit"].toString() == 'days' ? 'Day/s' : 'Hour/s'}",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: GoogleFonts
-                                                              .poppins(
-                                                            textStyle:
-                                                                TextStyle(
-                                                              fontSize:
-                                                                  useMobileLayout
-                                                                      ? 16
-                                                                      : 28,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                          ),
-                                                        )
-                                                      : TimerCountdown(
-                                                          format: CountDownTimerFormat
-                                                              .hoursMinutesSeconds,
-                                                          spacerWidth: 5,
-                                                          timeTextStyle:
-                                                              GoogleFonts.poppins(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize:
-                                                                      useMobileLayout
-                                                                          ? 16
-                                                                          : 28,
-                                                                  color: Colors
-                                                                      .white),
-                                                          enableDescriptions:
-                                                              false,
-                                                          colonsTextStyle:
-                                                              GoogleFonts.poppins(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize:
-                                                                      useMobileLayout
-                                                                          ? 16
-                                                                          : 28,
-                                                                  color: Colors
-                                                                      .white),
-                                                          endTime:
-                                                              DateTime.now()
-                                                                  .add(
-                                                            Duration(
-                                                              days: 0,
-                                                              // days: 5,
-                                                              hours: 0,
-                                                              minutes: 0,
-                                                              seconds: computeRemainingSeconds(newVoucherData["current_date"].toString(), newVoucherData["payment_request_at"].toString(), newVoucherData["duration"].toString(), newVoucherData["duration_unit"].toString()),
-                                                            ),
-                                                          ),
-                                                          onEnd: () {
-                                                            print(
-                                                                "Timer finished");
-                                                          },
-                                                        )) : Text(
-                                                          "0 Day/s",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: GoogleFonts
-                                                              .poppins(
-                                                            textStyle:
-                                                                TextStyle(
-                                                              fontSize:
-                                                                  useMobileLayout
-                                                                      ? 16
-                                                                      : 28,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                ) : Container(),
-                                                Expanded(
-                                                  child: AutoSizeText(
-                                                      'Remaining',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                        textStyle: TextStyle(
-                                                          fontSize:
-                                                              useMobileLayout
-                                                                  ? 16
-                                                                  : 28,
-                                                          fontWeight:
-                                                              FontWeight.w800,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                      minFontSize: 12,
-                                                      maxLines: 1,
-                                                      overflow: TextOverflow
-                                                          .ellipsis),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          // Expanded(
-                                          //   child: Column(
-                                          //     mainAxisAlignment:
-                                          //         MainAxisAlignment.start,
-                                          //     crossAxisAlignment:
-                                          //         CrossAxisAlignment.start,
-                                          //     children: <Widget>[
-                                          //       SizedBox(height: 10),
-                                          //       SizedBox(
-                                          //         height: 40,
-                                          //       ),
-                                          //       Expanded(
-                                          //         child: Text(
-                                          //           (isLoading
-                                          //               ? "13.26 GB"
-                                          //               : ""),
-                                          //           textAlign: TextAlign.center,
-                                          //           style: GoogleFonts.poppins(
-                                          //             textStyle: TextStyle(
-                                          //               fontSize:
-                                          //                   useMobileLayout
-                                          //                       ? 16
-                                          //                       : 28,
-                                          //               fontWeight:
-                                          //                   FontWeight.w800,
-                                          //               color: Colors.white,
-                                          //             ),
-                                          //           ),
-                                          //         ),
-                                          //       ),
-                                          //       Expanded(
-                                          //         child: Text(
-                                          //           'Data Spent',
-                                          //           textAlign: TextAlign.center,
-                                          //           style: GoogleFonts.poppins(
-                                          //             textStyle: TextStyle(
-                                          //               fontSize:
-                                          //                   useMobileLayout
-                                          //                       ? 16
-                                          //                       : 28,
-                                          //               fontWeight:
-                                          //                   FontWeight.w800,
-                                          //               color: Colors.white,
-                                          //             ),
-                                          //           ),
-                                          //         ),
-                                          //       ),
-                                          //     ],
-                                          //   ),
-                                          // ),
-                                          Container(
-                                            alignment: Alignment.centerLeft,
-                                            child: Column(children: [
-                                              const SizedBox(
-                                                height: 40,
-                                              ),
-                                              Icon(
-                                                Icons.wifi,
-                                                size: useMobileLayout ? 55 : 65,
-                                                color: isLoading
-                                                    ? (newVoucherData[
-                                                                'status'] ==
-                                                            'completed'
-                                                        ? Colors.greenAccent
-                                                        : Colors.redAccent)
-                                                    : Colors.greenAccent,
-                                              ),
-                                              Container(
-                                                child: Row(children: [
-                                                  AutoSizeText("Status: ",
-                                                      style: GoogleFonts.poppins(
-                                                          fontSize:
-                                                              useMobileLayout
-                                                                  ? 16
-                                                                  : 28,
-                                                          color: Colors.white),
-                                                      minFontSize: 12,
-                                                      maxLines: 1,
-                                                      overflow: TextOverflow
-                                                          .ellipsis),
-                                                  AutoSizeText(
-                                                      isLoading
-                                                          ? (newVoucherData[
-                                                                      'status'] ==
-                                                                  'completed'
-                                                              ? "Online"
-                                                              : "Offline")
-                                                          : 'Offline',
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                        fontSize:
-                                                            useMobileLayout
-                                                                ? 16
-                                                                : 28,
-                                                        color: isLoading
-                                                            ? (newVoucherData[
-                                                                        'status'] ==
-                                                                    'completed'
-                                                                ? Colors
-                                                                    .greenAccent
-                                                                : Colors
-                                                                    .redAccent)
-                                                            : Colors
-                                                                .greenAccent,
-                                                      ),
-                                                      minFontSize: 12,
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis)
-                                                ]),
-                                              ),
-                                            ]),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
                           PreferenceBuilder<String>(
                               preference: globalVoucherData,
                               builder: (context, vouchData) {
@@ -911,7 +754,7 @@ class _HomePageState extends State<HomePage> {
                                                                       shape:
                                                                           RoundedRectangleBorder(
                                                                         borderRadius:
-                                                                            BorderRadius.circular(50.0),
+                                                                            BorderRadius.circular(10.0),
                                                                       ),
                                                                       backgroundColor: const Color
                                                                           .fromARGB(
@@ -1093,14 +936,14 @@ class _HomePageState extends State<HomePage> {
                           //   ),
                           // ),
                           Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(15),
                             alignment: Alignment.center,
                             //        decoration: BoxDecoration(
                             //   borderRadius: BorderRadius.circular(10),
                             //   color: Colors.white,
                             // ),
                             child: Card(
-                              // elevation: 4,
+                              elevation: 4,
                               color: Colors.white,
                               //margin: EdgeInsets.all(8),
                               // shape: RoundedRectangleBorder(
@@ -1207,125 +1050,312 @@ class _HomePageState extends State<HomePage> {
                       )),
               ),
               isLoading
-                  ? Card(
-                      elevation: 4,
-                      color: Colors.white.withOpacity(0.8),
-                      //margin: EdgeInsets.all(8),
-                      shape: const RoundedRectangleBorder(
-                          // borderRadius: BorderRadius.circular(10),
-                          ),
-                      child: SizedBox(
-                        // height:  150,
-                        width: double.infinity,
-                        //width: useMobileLayout ? 600 : 700,
-
-                        //height: useMobileLayout ? 90 : 150,
-                        // decoration: BoxDecoration(
-                        //   borderRadius: BorderRadius.circular(10),
-                        //   color: Colors.white,
-                        // ),
-                        // padding:
-                        //     EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                        child: Column(children: [
-                          // Container(
-                          //   height: 100,
-                          //   decoration: BoxDecoration(
-                          //     // color: Colors.grey[200],
-
-                          //     image: DecorationImage(
-                          //       image:
-                          //           const AssetImage('assets/images/move_mandaue.jpg'),
-                          //       fit: BoxFit.cover,
-                          //       // colorFilter: ColorFilter.mode(
-                          //       //   Colors.black.withOpacity(0.2),
-                          //       //   BlendMode.dstATop,
-                          //       // ),
-                          //     ),
-                          //   ),
-                          // ),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ads.isNotEmpty
-                                ? CarouselSlider(
-                                    options: CarouselOptions(
-                                        autoPlay: true,
-                                        aspectRatio: 2.0,
-                                        // enlargeCenterPage: true,
-                                        viewportFraction: 1.0,
-                                        height: 100,
-                                        enlargeStrategy:
-                                            CenterPageEnlargeStrategy.height,
-                                        scrollPhysics:
-                                            const NeverScrollableScrollPhysics()),
-                                    items: ads.map((i) {
-                                      return Builder(
-                                        builder: (BuildContext context) {
-                                          return Container(
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            // margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                            decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                                  image: NetworkImage(
-                                                      i['image_url']),
-                                                  fit: BoxFit.fitWidth),
+                  ? PreferenceBuilder<String>(
+                      preference: globalVoucherData,
+                      builder: (context, vouchData) {
+                        var newVoucherData = json.decode(vouchData);
+                        return Container(
+                          padding: const EdgeInsets.all(10),
+                          child: Card(
+                            elevation: 4,
+                            // color: Colors.white.withOpacity(0.8),
+                            color: const Color.fromARGB(255, 55, 57, 175),
+                            margin: const EdgeInsets.all(8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  // height:  150,
+                                  //width: double.infinity,
+                                  width: useMobileLayout ? 500 : 700,
+                                  //width: 500,
+                                  height: useMobileLayout ? 150 : 190,
+                                  decoration: BoxDecoration(
+                                      // borderRadius:
+                                      //     BorderRadius.circular(10),
+                                      // color: const Color.fromARGB(
+                                      //     255, 55, 57, 175)
+                                      ),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 5, horizontal: 15),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            const SizedBox(height: 10),
+                                            Expanded(
+                                              child: Text(
+                                                'MY ACCOUNT',
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    fontSize: useMobileLayout
+                                                        ? 12
+                                                        : 18,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                            // child: Text(i['description']),
-                                          );
-                                        },
-                                      );
-                                    }).toList(),
-                                  )
-                                : Center(
-                                    child: Text(
-                                      "NO CURRENT ADS",
-                                      style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
-                                          color: Colors.red,
-                                          fontSize: useMobileLayout ? 14 : 25,
-                                          fontWeight: FontWeight.w600,
+                                            isLoading
+                                                ? Expanded(
+                                                    child: newVoucherData[
+                                                                "status"] ==
+                                                            'completed'
+                                                        ? (isRemainingHours(
+                                                                newVoucherData[
+                                                                        "current_date"]
+                                                                    .toString(),
+                                                                newVoucherData[
+                                                                        "payment_request_at"]
+                                                                    .toString(),
+                                                                newVoucherData[
+                                                                        "duration"]
+                                                                    .toString(),
+                                                                newVoucherData[
+                                                                        "duration_unit"]
+                                                                    .toString())
+                                                            ? Text(
+                                                                "${(computeRemaining(newVoucherData["current_date"].toString(), newVoucherData["payment_request_at"].toString(), newVoucherData["duration"].toString(), newVoucherData["duration_unit"].toString()))} ${newVoucherData["duration_unit"].toString() == 'days' ? 'Day/s' : 'Hour/s'}",
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .poppins(
+                                                                  textStyle:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        useMobileLayout
+                                                                            ? 16
+                                                                            : 28,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w800,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            : TimerCountdown(
+                                                                format: CountDownTimerFormat
+                                                                    .hoursMinutesSeconds,
+                                                                spacerWidth: 5,
+                                                                timeTextStyle: GoogleFonts.poppins(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        useMobileLayout
+                                                                            ? 16
+                                                                            : 28,
+                                                                    color: Colors
+                                                                        .white),
+                                                                enableDescriptions:
+                                                                    false,
+                                                                colonsTextStyle: GoogleFonts.poppins(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        useMobileLayout
+                                                                            ? 16
+                                                                            : 28,
+                                                                    color: Colors
+                                                                        .white),
+                                                                endTime: DateTime
+                                                                        .now()
+                                                                    .add(
+                                                                  Duration(
+                                                                    days: 0,
+                                                                    // days: 5,
+                                                                    hours: 0,
+                                                                    minutes: 0,
+                                                                    seconds: computeRemainingSeconds(
+                                                                        newVoucherData["current_date"]
+                                                                            .toString(),
+                                                                        newVoucherData["payment_request_at"]
+                                                                            .toString(),
+                                                                        newVoucherData["duration"]
+                                                                            .toString(),
+                                                                        newVoucherData["duration_unit"]
+                                                                            .toString()),
+                                                                  ),
+                                                                ),
+                                                                onEnd: () {
+                                                                  print(
+                                                                      "Timer finished");
+                                                                },
+                                                              ))
+                                                        : Text(
+                                                            "0 Day/s",
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: GoogleFonts
+                                                                .poppins(
+                                                              textStyle:
+                                                                  TextStyle(
+                                                                fontSize:
+                                                                    useMobileLayout
+                                                                        ? 16
+                                                                        : 28,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w800,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                  )
+                                                : Container(),
+                                            Expanded(
+                                              child: AutoSizeText('Remaining',
+                                                  textAlign: TextAlign.center,
+                                                  style: GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                      fontSize: useMobileLayout
+                                                          ? 16
+                                                          : 28,
+                                                      fontWeight:
+                                                          FontWeight.w800,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                  minFontSize: 12,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ),
+                                      // Expanded(
+                                      //   child: Column(
+                                      //     mainAxisAlignment:
+                                      //         MainAxisAlignment.start,
+                                      //     crossAxisAlignment:
+                                      //         CrossAxisAlignment.start,
+                                      //     children: <Widget>[
+                                      //       SizedBox(height: 10),
+                                      //       SizedBox(
+                                      //         height: 40,
+                                      //       ),
+                                      //       Expanded(
+                                      //         child: Text(
+                                      //           (isLoading
+                                      //               ? "13.26 GB"
+                                      //               : ""),
+                                      //           textAlign: TextAlign.center,
+                                      //           style: GoogleFonts.poppins(
+                                      //             textStyle: TextStyle(
+                                      //               fontSize:
+                                      //                   useMobileLayout
+                                      //                       ? 16
+                                      //                       : 28,
+                                      //               fontWeight:
+                                      //                   FontWeight.w800,
+                                      //               color: Colors.white,
+                                      //             ),
+                                      //           ),
+                                      //         ),
+                                      //       ),
+                                      //       Expanded(
+                                      //         child: Text(
+                                      //           'Data Spent',
+                                      //           textAlign: TextAlign.center,
+                                      //           style: GoogleFonts.poppins(
+                                      //             textStyle: TextStyle(
+                                      //               fontSize:
+                                      //                   useMobileLayout
+                                      //                       ? 16
+                                      //                       : 28,
+                                      //               fontWeight:
+                                      //                   FontWeight.w800,
+                                      //               color: Colors.white,
+                                      //             ),
+                                      //           ),
+                                      //         ),
+                                      //       ),
+                                      //     ],
+                                      //   ),
+                                      // ),
+                                      Container(
+                                        alignment: Alignment.centerLeft,
+                                        child: Column(children: [
+                                          const SizedBox(
+                                            height: 40,
+                                          ),
+                                          Icon(
+                                            Icons.wifi,
+                                            size: useMobileLayout ? 55 : 65,
+                                            color: isLoading
+                                                ? (newVoucherData['status'] ==
+                                                        'completed'
+                                                    ? Colors.greenAccent
+                                                    : Colors.redAccent)
+                                                : Colors.greenAccent,
+                                          ),
+                                          Container(
+                                            child: Row(children: [
+                                              AutoSizeText("Status: ",
+                                                  style: GoogleFonts.poppins(
+                                                      fontSize: useMobileLayout
+                                                          ? 16
+                                                          : 28,
+                                                      color: Colors.white),
+                                                  minFontSize: 12,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis),
+                                              AutoSizeText(
+                                                  isLoading
+                                                      ? (newVoucherData[
+                                                                  'status'] ==
+                                                              'completed'
+                                                          ? "Online"
+                                                          : "Offline")
+                                                      : 'Offline',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: useMobileLayout
+                                                        ? 16
+                                                        : 28,
+                                                    color: isLoading
+                                                        ? (newVoucherData[
+                                                                    'status'] ==
+                                                                'completed'
+                                                            ? Colors.greenAccent
+                                                            : Colors.redAccent)
+                                                        : Colors.greenAccent,
+                                                  ),
+                                                  minFontSize: 12,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis)
+                                            ]),
+                                          ),
+                                        ]),
+                                      )
+                                    ],
                                   ),
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          // Container(
-                          //   width: double.infinity,
-                          //   child: CarouselSlider(
-                          //     options: CarouselOptions(
-                          //       autoPlay: true,
-                          //       aspectRatio: 2.0,
-                          //       // enlargeCenterPage: true,
-                          //       viewportFraction: 1.0,
-                          //       height: 100,
-                          //       enlargeStrategy:
-                          //           CenterPageEnlargeStrategy.height,
-                          //     ),
-                          //     items: imgLists.map((i) {
-                          //       return Builder(
-                          //         builder: (BuildContext context) {
-                          //           return Container(
-                          //             width: MediaQuery.of(context).size.width,
-                          //             // margin: EdgeInsets.symmetric(horizontal: 5.0),
-                          //             decoration: BoxDecoration(
-                          //               image: DecorationImage(
-                          //                   image: AssetImage(i['image']),
-                          //                   fit: BoxFit.fitWidth),
-                          //             ),
-                          //           );
-                          //         },
-                          //       );
-                          //     }).toList(),
-                          //   ),
-                          // )
-                        ]),
-                      ),
-                    )
-                  : Container()
+                        );
+                      })
+                  : Container(),
             ],
           ),
         ),

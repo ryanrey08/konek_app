@@ -22,6 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:signature/signature.dart';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
+import '../../config/httpexception.dart';
 
 class MyProfile extends StatefulWidget {
   static const routeName = '/myprofile';
@@ -275,6 +276,7 @@ class _MyProfileState extends State<MyProfile> {
   final txtCompleteAddress = TextEditingController();
   final txtPhoneNumber = TextEditingController();
   final txtSex = TextEditingController();
+  final txtOldPassword = TextEditingController();
   final txtNewPassword = TextEditingController();
   final txtConfirmPassword = TextEditingController();
   final txtEmailAddress = TextEditingController();
@@ -366,6 +368,55 @@ class _MyProfileState extends State<MyProfile> {
       }
     }
   }
+
+    void updateMyPassword() async {
+          var userInfo = {
+      'current_password': txtOldPassword.text,
+      'new_password': txtNewPassword.text,
+      'confirm_password': txtConfirmPassword.text,
+    };
+    try {
+      bool isSaved = await Provider.of<ProfileProvider>(context, listen: false)
+          .updatePassword(userInfo);
+      if (isSaved) {
+        setState(() {
+          isLoadingSend = false;
+        });
+        Navigator.of(context).pop();
+        AwesomeDialog(
+          dismissOnBackKeyPress: false,
+          dismissOnTouchOutside: false,
+          onDismissCallback: (BuildContext) {
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+          },
+          context: context,
+          animType: AnimType.scale,
+          dialogType: DialogType.success,
+          title: "Update Password",
+          desc: "Successfully Updated",
+          btnOkOnPress: () {
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+            // print(_selectedProvince);
+          },
+        ).show();
+
+        // setState(() {
+        //   _currentStep += 1;
+        // });
+      }
+    } on HttpException catch (error) {
+      // print(error);
+      showError(error.toString());
+    } catch (error) {
+      print(error);
+            if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+    }
+  }
+
 
   @override
   void didChangeDependencies() {
@@ -1003,6 +1054,334 @@ class _MyProfileState extends State<MyProfile> {
                   width: double.infinity,
                   child: Row(
                     children: <Widget>[
+                      Expanded(
+                  child: ElevatedButton(
+                    child: Text(
+                      "CHANGE PASSWORD",
+                      style: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    onPressed: () {
+                      //_formKey1.currentState!.validate();
+                      Alert(
+                          context: context,
+                          title: "",
+                          content: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 15),
+                            child: Column(
+                              children: <Widget>[
+                                // Text(
+                                //   'The OTP password was sent to the following recipient:',
+                                //   textAlign: TextAlign.center,
+                                //   style: GoogleFonts.poppins(
+                                //     color: Colors.black,
+                                //     fontSize: 16,
+                                //     fontWeight: FontWeight.w500,
+                                //   ),
+                                // ),
+                                // SizedBox(
+                                //   height: 10,
+                                // ),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: txtOldPassword,
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            floatingLabelBehavior:
+                                                FloatingLabelBehavior.auto,
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.green,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            disabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            errorBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.redAccent,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            enabled: true,
+                                            hintText: 'Enter Old Password',
+                                            hintStyle: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            errorStyle: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.redAccent[700],
+                                              ),
+                                            ),
+                                            fillColor: Colors.grey[200],
+                                            filled: true,
+                                          ),
+                                          validator: (value) {
+                                            if (value == null) {
+                                              return 'Please enter old password';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: txtNewPassword,
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            floatingLabelBehavior:
+                                                FloatingLabelBehavior.auto,
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.green,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            disabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            errorBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.redAccent,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            enabled: true,
+                                            hintText: 'Enter New Password',
+                                            hintStyle: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            errorStyle: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.redAccent[700],
+                                              ),
+                                            ),
+                                            fillColor: Colors.grey[200],
+                                            filled: true,
+                                          ),
+                                          validator: (value) {
+                                            if (value == null) {
+                                              return 'Please enter the password';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: txtConfirmPassword,
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            floatingLabelBehavior:
+                                                FloatingLabelBehavior.auto,
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.green,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            disabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            errorBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.redAccent,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            enabled: true,
+                                            hintText: 'Enter Confirm Password',
+                                            hintStyle: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            errorStyle: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.redAccent[700],
+                                              ),
+                                            ),
+                                            fillColor: Colors.grey[200],
+                                            filled: true,
+                                          ),
+                                          validator: (value) {
+                                            if (value == null) {
+                                              return 'Please enter confirm password';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          buttons: [
+                            DialogButton(
+                              color: Color.fromARGB(255, 55, 57, 175),
+                              onPressed: () async {
+                                // Navigator.of(context)
+                                //     .pushReplacementNamed(Dashboard.routeName);
+                                  updateMyPassword();
+                              },
+                              child: Text(
+                                "Change Password",
+                                style:
+                                    TextStyle(color: Colors.white, fontSize: 16),
+                              ),
+                            )
+                          ]).show();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Color.fromARGB(255, 55, 57, 175), // background
+                      onPrimary: Colors.white, // foreground
+                      //                color: Colors.yellow,
+                      // textColor: Colors.black,
+                      // splashColor: Colors.yellowAccent[800],
+                    ),
+                    // color: Colors.green,
+                    // textColor: Colors.black,
+                    // splashColor: Colors.yellowAccent[800],
+                  ),
+                ),
                       const SizedBox(
                         width: 5,
                       ),

@@ -96,7 +96,6 @@ class _AccountRegisterState extends State<AccountRegister> {
   var maskTextInputFormatter = MaskTextInputFormatter(
       mask: "##########", filter: {"#": RegExp(r'[0-9]')});
 
-
   var userInfo = User(
     last_name: "",
     first_name: "",
@@ -126,7 +125,6 @@ class _AccountRegisterState extends State<AccountRegister> {
   @override
   void initState() {
     super.initState();
-
 
     initDeviceId();
   }
@@ -290,7 +288,7 @@ class _AccountRegisterState extends State<AccountRegister> {
         'first_name': txtFirstName.text,
         'middle_name': txtMiddleName.text,
         'last_name': txtLastName.text,
-        'email': txtEmail.text,
+        'address': txtEmail.text,
         'mobile_number': txtContactNumber.text,
         'password': txtPassword.text,
         'confirm_password': txtConfirmPassword.text,
@@ -420,7 +418,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                               // height: 250,
 
                               decoration: const BoxDecoration(
-                                color: Colors.grey,
+                                // color: Colors.grey,
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(30)),
                                 image: DecorationImage(
@@ -473,7 +471,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                             ),
                             customTextField(
                                 TextInputType.text,
-                                'Middle Name',
+                                'Middle Initial | Age',
                                 txtMiddleName,
                                 useMobileLayout,
                                 'Please enter your Middle Name', (value) {
@@ -519,8 +517,8 @@ class _AccountRegisterState extends State<AccountRegister> {
                             //   height: 15,
                             // ),
                             customTextField(
-                                TextInputType.emailAddress,
-                                'Email',
+                                TextInputType.text,
+                                'Brgy Address',
                                 txtEmail,
                                 useMobileLayout,
                                 'Please enter your Email', (value) {
@@ -528,10 +526,17 @@ class _AccountRegisterState extends State<AccountRegister> {
                                 return 'Please enter your Email Address';
                               }
 
-                              if (!RegExp(
-                                      r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$')
+                              // if (!RegExp(
+                              //         r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$')
+                              //     .hasMatch(value)) {
+                              //   return 'Invalid Email Address';
+                              // }
+                              if (!RegExp(r"^[\p{L} ,.'-]*$",
+                                      caseSensitive: false,
+                                      unicode: true,
+                                      dotAll: true)
                                   .hasMatch(value)) {
-                                return 'Invalid Email Address';
+                                return 'Invalid Input';
                               }
                               return null;
                             }),
@@ -551,10 +556,10 @@ class _AccountRegisterState extends State<AccountRegister> {
                               }
                               return null;
                             }),
-                            // mypassword('', Icons.password, txtPassword,
-                            //     useMobileLayout),
-                            // confirmpassword("", Icons.password,
-                            //     txtConfirmPassword, useMobileLayout),
+                            mypassword('', Icons.password, txtPassword,
+                                useMobileLayout),
+                            confirmpassword("", Icons.password,
+                                txtConfirmPassword, useMobileLayout),
                             Container(
                                 child: Row(
                               children: [
@@ -737,35 +742,35 @@ class _AccountRegisterState extends State<AccountRegister> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.green,
                     width: 1,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
                   ),
                 ),
                 disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
                   ),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.redAccent,
                     width: 1,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
@@ -807,8 +812,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                     : null,
               ),
               validator: validate,
-              onChanged: (value) {
-              },
+              onChanged: (value) {},
             ),
           ),
         ],
@@ -839,35 +843,35 @@ class _AccountRegisterState extends State<AccountRegister> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.green,
                     width: 1,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
                   ),
                 ),
                 disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
                   ),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.redAccent,
                     width: 1,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
@@ -962,35 +966,35 @@ class _AccountRegisterState extends State<AccountRegister> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.green,
                     width: 1,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
                   ),
                 ),
                 disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
                   ),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.redAccent,
                     width: 1,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
@@ -1109,7 +1113,6 @@ class _AccountRegisterState extends State<AccountRegister> {
 
               _determinePosition();
               // _getMacAddress();
-
             }
           }, // your tap handler moved here
           builder: (context, onTap) {
@@ -1118,7 +1121,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                 foregroundColor: Colors.white,
                 backgroundColor: Color.fromARGB(255, 255, 255, 0), // foreground
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50.0),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
               ),
 

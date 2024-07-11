@@ -33,9 +33,9 @@ class Auth with ChangeNotifier {
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       var response =
-          await http.post(Uri.parse("${config.pre_url}/login-via-mobile"), body: data);
+          await http.post(Uri.parse("${config.pre_url}/login"), body: data);
       var jsonResponse = json.decode(response.body);
-      // print(jsonResponse);
+      print(jsonResponse);
       if (jsonResponse['success'] == true) {
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
@@ -49,7 +49,12 @@ class Auth with ChangeNotifier {
         }
       } else {
         // print("exp" + jsonResponse['message']);
-        throw HttpException(jsonResponse['data']['mobile_number'][0].toString());
+        if(jsonResponse['message'] == 'Unauthorised.'){
+          throw HttpException('Invalid mobile number or password');
+        }else{
+          throw HttpException('something went wrong');
+        }
+        // throw HttpException(jsonResponse['data']['mobile_number'][0].toString());
       }
     } catch (error) {
       // print('error');
@@ -80,7 +85,7 @@ class Auth with ChangeNotifier {
 
     try {
       final response = await http.post(
-       Uri.parse("${config.pre_url}/register-v2"),
+       Uri.parse("${config.pre_url}/register"),
         body: userInfo,
       );
 

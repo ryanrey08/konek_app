@@ -189,12 +189,12 @@ class POSProvider with ChangeNotifier {
           "duration_unit": jsonResponse["data"]['subscription']['duration_unit'],
           "description": "",
           "amount": 0,
-          "claimed_date": jsonResponse["data"]['subscription']['start_date'],
-          "expire_date": jsonResponse["data"]['subscription']['end_date'],
+          // "claimed_date": jsonResponse["data"]['subscription']['start_date'],
+          // "expire_date": jsonResponse["data"]['subscription']['end_date'],
           "payment_request_at": jsonResponse["data"]['payment_request_at'],
           "current_date": jsonResponse["current_date"],
           "status": jsonResponse["data"]['payment_status'],
-          // "status": 'completed',
+          // "status": 'pending',
           "url": jsonResponse['redirect_url'] == null ? '' : jsonResponse['redirect_url']
         };
       } else {
@@ -211,7 +211,7 @@ class POSProvider with ChangeNotifier {
       notifyListeners();
       return responseData;
     } catch (error) {
-      // print(responseCode);
+      // print(error);
       rethrow;
     }
   }

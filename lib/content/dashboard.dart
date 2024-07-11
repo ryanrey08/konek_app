@@ -464,7 +464,7 @@ class _DashboardState extends State<Dashboard> {
                                       height: 90,
                                       width: 180,
                                       decoration: const BoxDecoration(
-                                        color: Colors.grey,
+                                        // color: Colors.grey,
                                         borderRadius: BorderRadius.all(Radius.circular(30)),
                                         image: DecorationImage(
                                           scale: 5,

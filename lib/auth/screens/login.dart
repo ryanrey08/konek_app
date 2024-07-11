@@ -102,8 +102,8 @@ class _LoginState extends State<Login> {
                       margin: EdgeInsets.zero,
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30)),
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10)),
                       ),
                       child: Container(
                         height: MediaQuery.of(context).size.height / 2 + 100,
@@ -126,42 +126,42 @@ class _LoginState extends State<Login> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
                                       // SizedBox(height: 20),
-                                      Container(
-                                        alignment: Alignment.topCenter,
-                                        child: Text(
-                                          "SIGN IN",
-                                          textAlign: TextAlign.left,
-                                          style: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize:
-                                                  useMobileLayout ? 18 : 30,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                      // Container(
+                                      //   alignment: Alignment.topCenter,
+                                      //   child: Text(
+                                      //     "SIGN IN",
+                                      //     textAlign: TextAlign.left,
+                                      //     style: GoogleFonts.poppins(
+                                      //       textStyle: TextStyle(
+                                      //         color: Colors.white,
+                                      //         fontWeight: FontWeight.w500,
+                                      //         fontSize:
+                                      //             useMobileLayout ? 18 : 30,
+                                      //       ),
+                                      //     ),
+                                      //   ),
+                                      // ),
                                       SizedBox(height: 5,),
                                       SizedBox(
                                           width: 120,
                                           height: 80,
                                           child: Container(
                                             decoration: const BoxDecoration(
-                                              color: Colors.grey,
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(30)),
-                                              image: DecorationImage(
-                                                scale: 7.5,
-                                                image: AssetImage(
-                                                    'assets/images/move_mandaue_swak.png'),
-                                              ),
+                                              // color: Colors.grey,
+                                              // borderRadius: BorderRadius.all(
+                                              //     Radius.circular(30)),
+                                              // image: DecorationImage(
+                                              //   scale: 7.5,
+                                              //   image: AssetImage(
+                                              //       'assets/images/move_mandaue_swak.png'),
+                                              // ),
                                             ),
-                                            // child: const Image(
-                                            //   // image: NetworkImage(
-                                            //   //     'assets/images/novulutions.png'),
-                                            //   image: AssetImage(
-                                            //       'assets/images/move_mandaue_swak.png'),
-                                            // ),
+                                            child: const Image(
+                                              // image: NetworkImage(
+                                              //     'assets/images/novulutions.png'),
+                                              image: AssetImage(
+                                                  'assets/images/move_mandaue_swak.png'),
+                                            ),
                                           )),
                                       const SizedBox(
                                         height: 15,
@@ -174,11 +174,11 @@ class _LoginState extends State<Login> {
                                       const SizedBox(
                                         height: 10,
                                       ),
-                                      // loginFields("", Icons.lock,
-                                      //     txtPasswordController, useMobileLayout),
-                                      // SizedBox(
-                                      //   height: 10,
-                                      // ),
+                                      loginFields("", Icons.lock,
+                                          txtPasswordController, useMobileLayout),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
                                       // Column(
                                       //   mainAxisAlignment: MainAxisAlignment.end,
                                       //   crossAxisAlignment:
@@ -326,35 +326,35 @@ class _LoginState extends State<Login> {
                 // focusedErrorBorder: _textFormBorder(),
                 // focusedBorder: _textFormBorder(),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Color.fromARGB(255, 55, 57, 175),
                     width: 1,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: CupertinoColors.systemGrey,
                     width: 1,
                   ),
                 ),
                 disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: CupertinoColors.systemGrey,
                     width: 1,
                   ),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.redAccent,
                     width: 1,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
@@ -414,35 +414,35 @@ class _LoginState extends State<Login> {
           contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           floatingLabelBehavior: FloatingLabelBehavior.auto,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: Colors.green,
               width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: CupertinoColors.systemGrey,
               width: 1,
             ),
           ),
           disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: CupertinoColors.systemGrey,
               width: 1,
             ),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: Colors.redAccent,
               width: 1,
             ),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: CupertinoColors.systemGrey,
               width: 1,
@@ -524,7 +524,7 @@ class _LoginState extends State<Login> {
               style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50.0),
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                   textStyle: const TextStyle(
                     color: Colors.green,
