@@ -93,6 +93,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
     // final data = extractedUserData['data']['user'] as Map<String, dynamic>;
     final extractedUserData =
         json.decode(sharedPreferences.getString('userData')!) as Map;
+    print(extractedUserData['data']);
     if (extractedUserData['data']['user'] != null) {
       setState(() {
         email = extractedUserData['data']['user']['email'] ?? '';
@@ -131,7 +132,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
       setState(() {
         requestPaymentDataUrl = subscriptionsData['url'];
       });
-      await UrlLauncher.launch("http://10.44.77.253:2060/ext_login?username=3MFREE&password=3MFREE&next_url=$requestPaymentDataUrl");
+      await UrlLauncher.launch("http://10.44.77.240:2060/ext_login?username=sjz6xa&password=sjz6xa&next_url=$requestPaymentDataUrl&groupid=63770&validity=5&user_type=cloud_voucher");
       // await UrlLauncher.launch(requestPaymentDataUrl);
       var vouchData;
 

@@ -42,7 +42,7 @@ import '/auth/providers/auth.dart';
 import '/config/HttpException.dart';
 import 'Splashscreen.dart';
 
-const String CAPTCHA_SITE_KEY = "6LcSiSQdAAAAAOyoKM6G5CeLAPE-P5ApqwNMUQaV";
+const String CAPTCHA_SITE_KEY = "6LeVSg4qAAAAAHK97rol9rhvDkGwQdSdpJDqJrQm";
 
 class AccountRegister extends StatefulWidget {
   static const routeName = '/register';
@@ -63,7 +63,7 @@ class _AccountRegisterState extends State<AccountRegister> {
   final txtMiddleName = TextEditingController();
   final txtLastName = TextEditingController();
   final txtEmail = TextEditingController();
-  // final txtBirthday = TextEditingController();
+  final txtBrgyAddress = TextEditingController();
   final txtContactNumber = TextEditingController();
   final txtPassword = TextEditingController();
   final txtConfirmPassword = TextEditingController();
@@ -203,7 +203,7 @@ class _AccountRegisterState extends State<AccountRegister> {
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> _openReCaptcha() async {
     Grecaptcha()
-        .verifyWithRecaptcha('6LcSiSQdAAAAAOyoKM6G5CeLAPE-P5ApqwNMUQaV')
+        .verifyWithRecaptcha('6LeVSg4qAAAAAHK97rol9rhvDkGwQdSdpJDqJrQm')
         .then((result) {
       // print(result);
       if (result != '') {
@@ -227,60 +227,60 @@ class _AccountRegisterState extends State<AccountRegister> {
   }
 
   Future<void> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+    // bool serviceEnabled;
+    // LocationPermission permission;
 
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
+    // // Test if location services are enabled.
+    // serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    // if (!serviceEnabled) {
+    //   // Location services are not enabled don't continue
+    //   // accessing the position and request users of the
+    //   // App to enable the location services.
+    //   return Future.error('Location services are disabled.');
+    // }
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
+    // permission = await Geolocator.checkPermission();
+    // if (permission == LocationPermission.denied) {
+    //   permission = await Geolocator.requestPermission();
+    //   if (permission == LocationPermission.denied) {
+    //     // Permissions are denied, next time you could try
+    //     // requesting permissions again (this is also where
+    //     // Android's shouldShowRequestPermissionRationale
+    //     // returned true. According to Android guidelines
+    //     // your App should show an explanatory UI now.
+    //     return Future.error('Location permissions are denied');
+    //   }
+    // }
 
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      showDialog<String>(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text('Cannot Acess Location'),
-          content: const Text('Location permissions are denied'),
-          actions: <Widget>[
-            // TextButton(
-            //   onPressed: () => Navigator.pop(context, 'Cancel'),
-            //   child: const Text('Cancel'),
-            // ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, 'OK'),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
+    // if (permission == LocationPermission.deniedForever) {
+    //   // Permissions are denied forever, handle appropriately.
+    //   showDialog<String>(
+    //     context: context,
+    //     builder: (BuildContext context) => AlertDialog(
+    //       title: const Text('Cannot Acess Location'),
+    //       content: const Text('Location permissions are denied'),
+    //       actions: <Widget>[
+    //         // TextButton(
+    //         //   onPressed: () => Navigator.pop(context, 'Cancel'),
+    //         //   child: const Text('Cancel'),
+    //         // ),
+    //         TextButton(
+    //           onPressed: () => Navigator.pop(context, 'OK'),
+    //           child: const Text('OK'),
+    //         ),
+    //       ],
+    //     ),
+    //   );
+    //   return Future.error(
+    //       'Location permissions are permanently denied, we cannot request permissions.');
+    // }
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     //return await Geolocator.getCurrentPosition();
     String? errorMessage;
     try {
-      Position position = await Geolocator.getCurrentPosition();
+      // Position position = await Geolocator.getCurrentPosition();
       // print(position.latitude.toString());
       // print(position.longitude.toString());
 
@@ -288,14 +288,16 @@ class _AccountRegisterState extends State<AccountRegister> {
         'first_name': txtFirstName.text,
         'middle_name': txtMiddleName.text,
         'last_name': txtLastName.text,
-        'address': txtEmail.text,
+        'email': txtEmail.text,
+        'address': txtBrgyAddress.text,
         'mobile_number': txtContactNumber.text,
         'password': txtPassword.text,
         'confirm_password': txtConfirmPassword.text,
-        'location': json.encode({
-          'longitude': position.longitude.toString(),
-          'latitude': position.latitude.toString()
-        }),
+        // 'location': json.encode({
+        //   'longitude': position.longitude.toString(),
+        //   'latitude': position.latitude.toString()
+        // }),
+        'location': 'n/a',
         'mac_address': _deviceId
       };
 
@@ -349,6 +351,7 @@ class _AccountRegisterState extends State<AccountRegister> {
     txtMiddleName.dispose();
     txtContactNumber.dispose();
     txtEmail.dispose();
+    txtBrgyAddress.dispose();
     txtPassword.dispose();
     txtConfirmPassword.dispose();
     super.dispose();
@@ -366,7 +369,7 @@ class _AccountRegisterState extends State<AccountRegister> {
     bool hideConfirmPassword = true;
 
     final format = DateFormat("MM/dd/yyyy");
-    HCaptcha.init(siteKey: '6LcSiSQdAAAAAOyoKM6G5CeLAPE-P5ApqwNMUQaV');
+    HCaptcha.init(siteKey: '6LeVSg4qAAAAAHK97rol9rhvDkGwQdSdpJDqJrQm');
 
     //getToken();
 
@@ -516,14 +519,38 @@ class _AccountRegisterState extends State<AccountRegister> {
                             // SizedBox(
                             //   height: 15,
                             // ),
-                            customTextField(
+                                               customTextField(
                                 TextInputType.text,
-                                'Brgy Address',
+                                'Email Address',
                                 txtEmail,
                                 useMobileLayout,
                                 'Please enter your Email', (value) {
                               if (value!.isEmpty) {
                                 return 'Please enter your Email Address';
+                              }
+
+                              if (!RegExp(
+                                      r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$')
+                                  .hasMatch(value)) {
+                                return 'Invalid Email Address';
+                              }
+                              // if (!RegExp(r"^[\p{L} ,.'-]*$",
+                              //         caseSensitive: false,
+                              //         unicode: true,
+                              //         dotAll: true)
+                              //     .hasMatch(value)) {
+                              //   return 'Invalid Input';
+                              // }
+                              return null;
+                            }),
+                            customTextField(
+                                TextInputType.text,
+                                'Brgy Address',
+                                txtBrgyAddress,
+                                useMobileLayout,
+                                'Please enter your Email', (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter your Brgy Address';
                               }
 
                               // if (!RegExp(

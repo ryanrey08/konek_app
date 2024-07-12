@@ -130,13 +130,14 @@ class POSProvider with ChangeNotifier {
     var userInfo = json.decode(sharedPreferences.getString('userData')!)
         as Map<String, dynamic>;
     var token = userInfo['data']['token'];
+  print(data);
     var responseCode;
     try {
       var response = await http.post(
           Uri.parse("${config.hit_pay}send-payment-request"),
           body: data,
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
-      // print(json.decode(response.body));
+      print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
@@ -145,7 +146,7 @@ class POSProvider with ChangeNotifier {
       notifyListeners();
       return jsonResponse;
     } catch (error) {
-      // print(responseCode);
+      print(error);
       rethrow;
     }
   }

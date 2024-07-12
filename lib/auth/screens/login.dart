@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:konek_app/auth/screens/forgot_password.dart';
 //import 'package:konek_app/auth/providers/auth.dart';
 import 'package:konek_app/auth/screens/register.dart';
 // import 'package:konek_app/config/httpexception.dart';
@@ -141,21 +142,23 @@ class _LoginState extends State<Login> {
                                       //     ),
                                       //   ),
                                       // ),
-                                      SizedBox(height: 5,),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
                                       SizedBox(
                                           width: 120,
                                           height: 80,
                                           child: Container(
                                             decoration: const BoxDecoration(
-                                              // color: Colors.grey,
-                                              // borderRadius: BorderRadius.all(
-                                              //     Radius.circular(30)),
-                                              // image: DecorationImage(
-                                              //   scale: 7.5,
-                                              //   image: AssetImage(
-                                              //       'assets/images/move_mandaue_swak.png'),
-                                              // ),
-                                            ),
+                                                // color: Colors.grey,
+                                                // borderRadius: BorderRadius.all(
+                                                //     Radius.circular(30)),
+                                                // image: DecorationImage(
+                                                //   scale: 7.5,
+                                                //   image: AssetImage(
+                                                //       'assets/images/move_mandaue_swak.png'),
+                                                // ),
+                                                ),
                                             child: const Image(
                                               // image: NetworkImage(
                                               //     'assets/images/novulutions.png'),
@@ -174,43 +177,46 @@ class _LoginState extends State<Login> {
                                       const SizedBox(
                                         height: 10,
                                       ),
-                                      loginFields("", Icons.lock,
-                                          txtPasswordController, useMobileLayout),
+                                      loginFields(
+                                          "",
+                                          Icons.lock,
+                                          txtPasswordController,
+                                          useMobileLayout),
                                       SizedBox(
                                         height: 10,
                                       ),
-                                      // Column(
-                                      //   mainAxisAlignment: MainAxisAlignment.end,
-                                      //   crossAxisAlignment:
-                                      //       CrossAxisAlignment.end,
-                                      //   children: <Widget>[
-                                      //     Container(
-                                      //       child: GestureDetector(
-                                      //         child: Text(
-                                      //           'Forgot password?',
-                                      //           style: GoogleFonts.poppins(
-                                      //             textStyle: TextStyle(
-                                      //                 fontSize: 15,
-                                      //                 // decoration: TextDecoration.underline,
-                                      //                 color: Colors.grey),
-                                      //           ),
-                                      //         ),
-                                      //         onTap: () {
-                                      //           // Navigator.push(
-                                      //           //   context,
-                                      //           //   MaterialPageRoute(
-                                      //           //       builder: (context) => ForgotPassword()),
-                                      //           // );\
-                                      //         },
-                                      //       ),
-                                      //     ),
-                                      //   ],
-                                      // ),
                                       const SizedBox(
                                         height: 10,
                                       ),
                                       loginButton(useMobileLayout),
-                                      const SizedBox(height: 5),
+                                      const SizedBox(height: 20),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: <Widget>[
+                                          Container(
+                                            child: GestureDetector(
+                                              child: Text(
+                                                'Forgot password?',
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                      fontSize: 15,
+                                                      // decoration: TextDecoration.underline,
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                              onTap: () {
+                                                   Navigator.of(context)
+                                                      .pushReplacementNamed(
+                                                    ForgotPassword.routeName,
+                                                  );
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                       Container(
                                         alignment: Alignment.center,
                                         width: useMobileLayout ? null : 500,

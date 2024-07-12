@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:konek_app/auth/screens/forgot_password.dart';
 import 'package:konek_app/config/checkconnection.dart';
 import 'package:konek_app/config/notification.dart';
 import 'package:konek_app/content/notification.dart';
@@ -176,6 +177,7 @@ class _MyAppPageState extends State<MyApp> {
               Dashboard.routeName: (context) => const Dashboard(),
               //Login
               Login.routeName: (context) => const Login(),
+              ForgotPassword.routeName: (context) => const ForgotPassword(),
               // ignore: equal_keys_in_map
               //Registration
               AccountRegister.routeName: (context) => AccountRegister(),

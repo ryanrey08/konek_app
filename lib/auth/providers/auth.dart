@@ -40,18 +40,18 @@ class Auth with ChangeNotifier {
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
         sharedPreferences.setString('userData', json.encode(jsonResponse));
-        if(jsonResponse['activePromo'] != null){
-                sharedPreferences.setString(
-          'swakPaymentRefNo', json.encode({"reference_number" : jsonResponse['activePromo']}));
-        }else{
+        if (jsonResponse['activePromo'] != null) {
+          sharedPreferences.setString('swakPaymentRefNo',
+              json.encode({"reference_number": jsonResponse['activePromo']}));
+        } else {
           sharedPreferences.setString(
-          'swakPaymentRefNo', json.encode({"reference_number" : '00000'}));
+              'swakPaymentRefNo', json.encode({"reference_number": '00000'}));
         }
       } else {
         // print("exp" + jsonResponse['message']);
-        if(jsonResponse['message'] == 'Unauthorised.'){
+        if (jsonResponse['message'] == 'Unauthorised.') {
           throw HttpException('Invalid mobile number or password');
-        }else{
+        } else {
           throw HttpException('something went wrong');
         }
         // throw HttpException(jsonResponse['data']['mobile_number'][0].toString());
@@ -69,8 +69,7 @@ class Auth with ChangeNotifier {
     if (!prefs.containsKey('userData')) {
       return false;
     }
-    final extractedUserData =
-        json.decode(prefs.getString('userData')!) as Map;
+    final extractedUserData = json.decode(prefs.getString('userData')!) as Map;
     // print(expiryDate);
 
     _token = extractedUserData['data']['token'];
@@ -82,10 +81,9 @@ class Auth with ChangeNotifier {
     // print(userInfo);
     Map<String, dynamic> jsonResponse;
 
-
     try {
       final response = await http.post(
-       Uri.parse("${config.pre_url}/register"),
+        Uri.parse("${config.pre_url}/register"),
         body: userInfo,
       );
 
@@ -100,18 +98,20 @@ class Auth with ChangeNotifier {
         sharedPreferences.setString('userData', userData);
         notifyListeners();
       } else {
-        if(jsonResponse['data']['email'] != null){
+        if (jsonResponse['data']['email'] != null) {
           throw HttpException(jsonResponse['data']['email'][0].toString());
-        }else if(jsonResponse['data']['mobile_number'] != null){
-          throw HttpException(jsonResponse['data']['mobile_number'][0].toString());
-        }else if(jsonResponse['data']['first_name'] != null){
+        } else if (jsonResponse['data']['mobile_number'] != null) {
+          throw HttpException(
+              jsonResponse['data']['mobile_number'][0].toString());
+        } else if (jsonResponse['data']['first_name'] != null) {
           throw HttpException(jsonResponse['data']['first_name'][0].toString());
-        }else if(jsonResponse['data']['middle_name'] != null){
-          throw HttpException(jsonResponse['data']['middle_name'][0].toString());
-        }else if(jsonResponse['data']['last_name'] != null){
+        } else if (jsonResponse['data']['middle_name'] != null) {
+          throw HttpException(
+              jsonResponse['data']['middle_name'][0].toString());
+        } else if (jsonResponse['data']['last_name'] != null) {
           throw HttpException(jsonResponse['data']['last_name'][0].toString());
-        }else{
-           throw HttpException('something went wrong');
+        } else {
+          throw HttpException('something went wrong');
         }
       }
 
@@ -123,9 +123,66 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-    Future<void> logout() async {
+  Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('userData');
     prefs.remove('swakPaymentRefNo');
+  }
+
+  Future<Map<String, dynamic>> checkUserExists(String number) async {
+    int id = 0;
+    var jsonResponse;
+    try {
+      final response = await http.post(
+        Uri.parse("${config.pre_url}/check-number"),
+        body: {'mobile_number': number},
+      );
+      jsonResponse = json.decode(response.body);
+      print(response.body);
+      if (jsonResponse['success']) {
+        jsonResponse = json.decode(response.body);
+        return jsonResponse;
+      } else {
+        jsonResponse = json.decode(response.body);
+        return jsonResponse;
+        // throw HttpException(jsonResponse['message']);
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  Future<bool> changePassword(Map<String, dynamic> userData) async {
+    // SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    // var userInfo = json.decode(sharedPreferences.getString('userData')!)
+    //     as Map<String, dynamic>;
+    // var token = userInfo['data']['token'];
+    print(userData);
+
+    Map<String, dynamic> jsonResponse;
+    try {
+      var response = await http.post(
+          Uri.parse("${config.pre_url}/reset-password"),
+          body: userData);
+      var jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      if (jsonResponse['success'] == true) {
+        return jsonResponse['success'];
+      } else {
+        if (jsonResponse['data']['new_password'] != null) {
+          throw HttpException(
+              jsonResponse['data']['new_password'][0].toString());
+        } else if (jsonResponse['data']['confirm_password'] != null) {
+          throw HttpException(
+              jsonResponse['data']['confirm_password'][0].toString());
+        } else {
+          throw HttpException('something went wrong');
+        }
+        // throw HttpException(jsonResponse['message']);
+      }
+    } catch (error) {
+      // print(responseCode);
+      rethrow;
+    }
   }
 }

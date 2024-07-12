@@ -1117,7 +1117,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             enabledBorder: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(50),
+                                                  BorderRadius.circular(10),
                                               borderSide: BorderSide(
                                                 color: Colors.grey.shade400,
                                                 width: 1,
@@ -1125,7 +1125,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             disabledBorder: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(50),
+                                                  BorderRadius.circular(10),
                                               borderSide: BorderSide(
                                                 color: Colors.grey.shade400,
                                                 width: 1,
@@ -1133,7 +1133,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             errorBorder: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(50),
+                                                  BorderRadius.circular(10),
                                               borderSide: BorderSide(
                                                 color: Colors.redAccent,
                                                 width: 1,
@@ -1141,7 +1141,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             focusedBorder: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(50),
+                                                  BorderRadius.circular(10),
                                               borderSide: BorderSide(
                                                 color: Colors.grey.shade400,
                                                 width: 1,
@@ -1197,7 +1197,7 @@ class _MyProfileState extends State<MyProfile> {
                                                 FloatingLabelBehavior.auto,
                                             border: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(50),
+                                                  BorderRadius.circular(10),
                                               borderSide: BorderSide(
                                                 color: Colors.green,
                                                 width: 1,
@@ -1205,7 +1205,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             enabledBorder: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(50),
+                                                  BorderRadius.circular(10),
                                               borderSide: BorderSide(
                                                 color: Colors.grey.shade400,
                                                 width: 1,
@@ -1213,7 +1213,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             disabledBorder: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(50),
+                                                  BorderRadius.circular(10),
                                               borderSide: BorderSide(
                                                 color: Colors.grey.shade400,
                                                 width: 1,
@@ -1221,7 +1221,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             errorBorder: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(50),
+                                                  BorderRadius.circular(10),
                                               borderSide: BorderSide(
                                                 color: Colors.redAccent,
                                                 width: 1,
@@ -1229,7 +1229,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             focusedBorder: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(50),
+                                                  BorderRadius.circular(10),
                                               borderSide: BorderSide(
                                                 color: Colors.grey.shade400,
                                                 width: 1,
@@ -1293,7 +1293,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             enabledBorder: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(50),
+                                                  BorderRadius.circular(10),
                                               borderSide: BorderSide(
                                                 color: Colors.grey.shade400,
                                                 width: 1,
@@ -1301,7 +1301,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             disabledBorder: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(50),
+                                                  BorderRadius.circular(10),
                                               borderSide: BorderSide(
                                                 color: Colors.grey.shade400,
                                                 width: 1,
@@ -1309,7 +1309,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             errorBorder: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(50),
+                                                  BorderRadius.circular(10),
                                               borderSide: BorderSide(
                                                 color: Colors.redAccent,
                                                 width: 1,
@@ -1317,7 +1317,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             focusedBorder: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(50),
+                                                  BorderRadius.circular(10),
                                               borderSide: BorderSide(
                                                 color: Colors.grey.shade400,
                                                 width: 1,

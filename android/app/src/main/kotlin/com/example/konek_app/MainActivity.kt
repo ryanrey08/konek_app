@@ -1,4 +1,4 @@
-package com.example.konek_app
+package com.synetcom.konek_app
 
 import io.flutter.embedding.android.FlutterActivity
 
