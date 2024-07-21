@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:konek_app/auth/screens/forgot_password.dart';
 //import 'package:konek_app/auth/providers/auth.dart';
@@ -13,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tap_debouncer/tap_debouncer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:mobile_device_identifier/mobile_device_identifier.dart';
 import '/config/HttpException.dart';
 import '../providers/auth.dart';
 
@@ -34,10 +36,32 @@ class _LoginState extends State<Login> {
   final txtPasswordController = TextEditingController();
   double appBarHeight = AppBar().preferredSize.height;
 
+    String _deviceId = 'Unknown';
+  final _mobileDeviceIdentifierPlugin = MobileDeviceIdentifier();
+  
+
   @override
   void initState() {
+    initDeviceId();
     // TODO: implement initState
     super.initState();
+  }
+
+    Future<void> initDeviceId() async {
+    String deviceId;
+    try {
+      deviceId = await _mobileDeviceIdentifierPlugin.getDeviceId() ??
+          'Unknown platform version';
+    } on PlatformException {
+      deviceId = 'Failed to get platform version.';
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _deviceId = deviceId;
+
+      // print(_deviceId);
+    });
   }
 
   @override
@@ -582,7 +606,7 @@ class _LoginState extends State<Login> {
     try {
       //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
       await Provider.of<Auth>(context, listen: false)
-          .login(txtUsernameController.text, txtPasswordController.text);
+          .login(txtUsernameController.text, txtPasswordController.text, _deviceId);
       // SharedPreferences prefs = await SharedPreferences.getInstance();
       SharedPreferences prefs = await SharedPreferences.getInstance();
       if (prefs.containsKey('userData')) {

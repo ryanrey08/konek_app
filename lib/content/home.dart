@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 // import 'package:flutter_slidable/flutter_slidable.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 //Widget
@@ -229,6 +230,19 @@ class _HomePageState extends State<HomePage> {
       var adsData = await Provider.of<Content>(context, listen: false).getAds();
       setState(() {
         ads = adsData;
+        // showDialog(
+        //     context: context,
+        //     barrierDismissible: true,
+        //     useSafeArea: true,
+        //     builder: (context) => Center(
+        //       child: Container(
+        //           width: MediaQuery.of(context).size.width - 40,
+        //           height: MediaQuery.of(context).size.height - 150,
+        //           child: WebView(
+        //             initialUrl: 'http://10.44.77.240:2060/ext_login?username=sjz6xa&password=sjz6xa&next_url=https://www.youtube.com&groupid=63770&validity=5&user_type=cloud_voucher',
+        //           )),
+        //     ));
+
         //isLoading = false;
         // print(ads);
       });
@@ -464,6 +478,78 @@ class _HomePageState extends State<HomePage> {
     return remainingInSeconds;
   }
 
+  confirmFree(String id, String name) {
+    AwesomeDialog(
+            dismissOnBackKeyPress: false,
+            dismissOnTouchOutside: false,
+            onDismissCallback: (_) {
+              //Navigator.of(context).pop();
+            },
+            context: context,
+            animType: AnimType.scale,
+            dialogType: DialogType.warning,
+            title: "Confirm",
+            desc: "Are you sure you want to claim " + name + "?",
+            btnOkOnPress: () {
+              claimFree(id);
+            },
+            btnCancelOnPress: () {
+              // Navigator.of(context).pop();
+            })
+        .show();
+  }
+
+  void claimFree(String id) async {
+    setState(() {
+      isLoading = false;
+    });
+    try {
+      var subscriptionsData =
+          await Provider.of<POSProvider>(context, listen: false)
+              .getMyFreePromo(id);
+
+      // await UrlLauncher.launch("http://10.44.77.240:2060/ext_login?username=sjz6xa&password=sjz6xa&next_url=$requestPaymentDataUrl&groupid=63770&validity=5&user_type=cloud_voucher");
+      // await UrlLauncher.launch(requestPaymentDataUrl);
+      await UrlLauncher.launch(subscriptionsData['url']);
+
+      var vouchData;
+
+      try {
+        //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
+        vouchData = await Provider.of<POSProvider>(context, listen: false)
+            .getMyPaymentStatus();
+        // SharedPreferences prefs = await SharedPreferences.getInstance();
+        // if (vouchData['status'] == 'completed') {
+        //   prefs.setString('swakPaymentRefNo', json.encode(vouchData));
+        //   // prefs.setString('swakUrl', vouchData['url']);
+        // }
+      } on HttpException catch (error) {
+        // print(error);
+        showError(error.toString());
+      } catch (error) {
+        showError(error.toString());
+      }
+
+      Future.delayed(const Duration(milliseconds: 3000), () {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const Dashboard()),
+          (Route<dynamic> route) => false,
+        );
+        // Navigator.pushReplacementNamed(context, Dashboard.routeName,
+        //     arguments: vouchData['url']);
+      });
+    } on HttpException catch (error) {
+      showError(error.toString());
+    } catch (error) {
+      showError('something went wrong');
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -560,7 +646,9 @@ class _HomePageState extends State<HomePage> {
                               //     ),
                               //   ),
                               // ),
-                              SizedBox(height: 20,),
+                              SizedBox(
+                                height: 20,
+                              ),
                               Container(
                                 height: 100,
                                 decoration: const BoxDecoration(
@@ -572,7 +660,9 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 20,),
+                              SizedBox(
+                                height: 20,
+                              ),
                               SizedBox(
                                 width: double.infinity,
                                 child: ads.isNotEmpty
@@ -765,13 +855,21 @@ class _HomePageState extends State<HomePage> {
                                                                     ),
                                                                     onPressed:
                                                                         () {
-                                                                      Navigator.pushReplacementNamed(
-                                                                          context,
-                                                                          POS.routeName,
-                                                                          arguments: {
-                                                                            'subscription':
-                                                                                subscriptions[x]
-                                                                          });
+                                                                      if (subscriptions[x]
+                                                                              [
+                                                                              'is_free'] ==
+                                                                          true) {
+                                                                        confirmFree(
+                                                                            subscriptions[x]['id'].toString(),
+                                                                            subscriptions[x]['name'].toString());
+                                                                      } else {
+                                                                        Navigator.pushReplacementNamed(
+                                                                            context,
+                                                                            POS.routeName,
+                                                                            arguments: {
+                                                                              'subscription': subscriptions[x]
+                                                                            });
+                                                                      }
                                                                     },
                                                                     child: Text(
                                                                       //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",

@@ -25,24 +25,25 @@ class Auth with ChangeNotifier {
     return '';
   }
 
-  Future<void> login(String contactNumber, String password) async {
-    Map data = {'mobile_number': contactNumber, 'password': password};
+  Future<void> login(String contactNumber, String password, String deviceId) async {
+    Map data = {'mobile_number': contactNumber, 'password': password, 'mac_address': deviceId};
     Map<String, dynamic> jsonResponse;
     var responseCode;
+    // print(deviceId);
     try {
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       var response =
           await http.post(Uri.parse("${config.pre_url}/login"), body: data);
       var jsonResponse = json.decode(response.body);
-      print(jsonResponse);
+      // print(jsonResponse);
       if (jsonResponse['success'] == true) {
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
         sharedPreferences.setString('userData', json.encode(jsonResponse));
-        if (jsonResponse['activePromo'] != null) {
+        if (jsonResponse['data']['subcription'] != null) {
           sharedPreferences.setString('swakPaymentRefNo',
-              json.encode({"reference_number": jsonResponse['activePromo']}));
+              json.encode({"reference_number": jsonResponse['data']['subcription']['ref_no']}));
         } else {
           sharedPreferences.setString(
               'swakPaymentRefNo', json.encode({"reference_number": '00000'}));
@@ -50,15 +51,20 @@ class Auth with ChangeNotifier {
       } else {
         // print("exp" + jsonResponse['message']);
         if (jsonResponse['message'] == 'Unauthorised.') {
-          throw HttpException('Invalid mobile number or password');
-        } else {
+          if(jsonResponse['data']['error'] == 'Device record mismatched'){
+            throw HttpException('Device record mismatched');
+          }else{
+            throw HttpException('Invalid mobile number or password');
+          }
+        }
+         else {
           throw HttpException('something went wrong');
         }
         // throw HttpException(jsonResponse['data']['mobile_number'][0].toString());
       }
     } catch (error) {
       // print('error');
-      // print(error);
+      print(error);
       // print(responseCode);
       rethrow;
     }

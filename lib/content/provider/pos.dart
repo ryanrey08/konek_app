@@ -130,14 +130,14 @@ class POSProvider with ChangeNotifier {
     var userInfo = json.decode(sharedPreferences.getString('userData')!)
         as Map<String, dynamic>;
     var token = userInfo['data']['token'];
-  print(data);
+  // print(data);
     var responseCode;
     try {
       var response = await http.post(
           Uri.parse("${config.hit_pay}send-payment-request"),
           body: data,
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
-      print(json.decode(response.body));
+      // print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
@@ -146,7 +146,7 @@ class POSProvider with ChangeNotifier {
       notifyListeners();
       return jsonResponse;
     } catch (error) {
-      print(error);
+      // print(error);
       rethrow;
     }
   }
@@ -163,7 +163,7 @@ class POSProvider with ChangeNotifier {
     } else {
       paymentData = {'reference_number': '00000'};
     }
-    // print(paymentData['reference_number']);
+    print(paymentData['reference_number']);
     var token = userInfo['data']['token'];
     var responseCode;
     try {
@@ -172,7 +172,7 @@ class POSProvider with ChangeNotifier {
               paymentData['reference_number']),
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},);
       // print(response.statusCode);
-      // print(json.decode(response.body));
+      print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
       var responseData = {
         "voucher_code": '',
@@ -185,18 +185,18 @@ class POSProvider with ChangeNotifier {
       };
       if (response.statusCode == 200) {
         responseData = {
-          "voucher_code": jsonResponse["data"]['subscription']['id'],
+          "voucher_code": jsonResponse["data"]['subscription']['promo']['promo_code'],
           "duration": jsonResponse["data"]['subscription']['duration'],
           "duration_unit": jsonResponse["data"]['subscription']['duration_unit'],
           "description": "",
-          "amount": 0,
+          "amount": jsonResponse["data"]['amount'],
           // "claimed_date": jsonResponse["data"]['subscription']['start_date'],
           // "expire_date": jsonResponse["data"]['subscription']['end_date'],
-          "payment_request_at": jsonResponse["data"]['payment_request_at'],
+          "payment_request_at": jsonResponse["data"]['payment_completion_at'],
           "current_date": jsonResponse["current_date"],
           "status": jsonResponse["data"]['payment_status'],
           // "status": 'pending',
-          "url": jsonResponse['redirect_url'] == null ? '' : jsonResponse['redirect_url']
+          // "url": jsonResponse['redirect_url'] == null ? '' : jsonResponse['redirect_url']
         };
       } else {
         responseData = {
@@ -212,7 +212,71 @@ class POSProvider with ChangeNotifier {
       notifyListeners();
       return responseData;
     } catch (error) {
-      // print(error);
+      print(error);
+      rethrow;
+    }
+  }
+
+    Future<Map<String, dynamic>> getMyFreePromo(String subscription_id) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userInfo = json.decode(sharedPreferences.getString('userData')!)
+        as Map<String, dynamic>;
+    Map<String, dynamic> paymentData;
+    // print(paymentData['reference_number']);
+    var token = userInfo['data']['token'];
+    var responseCode;
+    try {
+      var response = await http.get(
+          Uri.parse("${config.pre_url_voucher}claim-free/" +
+              subscription_id),
+          headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},);
+      // print(response.statusCode);
+      print(json.decode(response.body));
+      var jsonResponse = json.decode(response.body);
+      var responseData = {
+        "voucher_code": '',
+        "duration": '',
+        "description": "",
+        "amount": 0,
+        "claimed_date": '',
+        "expire_date": '',
+        "status": ''
+      };
+      if (response.statusCode == 200) {
+        responseData = {
+          "voucher_code": jsonResponse["data"]['subscription']['promo']['promo_code'],
+          "duration": jsonResponse["data"]['subscription']['duration'],
+          "duration_unit": jsonResponse["data"]['subscription']['duration_unit'],
+          "description": "",
+          "amount": jsonResponse["data"]['amount'],
+          // "claimed_date": jsonResponse["data"]['subscription']['start_date'],
+          // "expire_date": jsonResponse["data"]['subscription']['end_date'],
+          "payment_request_at": jsonResponse["data"]['payment_completion_at'],
+          "current_date": jsonResponse["current_date"],
+          "status": jsonResponse['data']['payment_status'],
+          // "status": 'pending',
+          "url": jsonResponse['redirect_url'] == null ? '' : jsonResponse['redirect_url']
+        };
+        var refNo = {'reference_number': jsonResponse['data']['ref_no']};
+        SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+      sharedPreferences.setString(
+          'swakPaymentRefNo', json.encode(refNo));
+      } else {
+        responseData = {
+          "voucher_code": '',
+          "duration": '',
+          "description": "",
+          "amount": 0,
+          "claimed_date": '',
+          "expire_date": '',
+          "status": ''
+        };
+      }
+      notifyListeners();
+      return responseData;
+    } catch (error) {
+      print(error);
       rethrow;
     }
   }

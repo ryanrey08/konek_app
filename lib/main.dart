@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:konek_app/auth/screens/forgot_password.dart';
@@ -21,7 +23,16 @@ import './content/dashboard.dart';
 import 'auth/screens/splashscreen.dart';
 import 'content/pos.dart';
 
+ class MyHttpOverrides extends HttpOverrides{
+  @override
+  HttpClient createHttpClient(SecurityContext? context){
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
+  }
+}
+
 void main() async {
+  HttpOverrides.global = MyHttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationController.initializeLocalNotifications();
   await NotificationController.initializeIsolateReceivePort();

@@ -49,16 +49,20 @@ class FileRequirements extends StatelessWidget {
 
 class CustomFormField extends StatelessWidget {
   final String label;
+  final TextInputType inputType;
   final TextEditingController controller;
-  final Function validator;
+  final Function(dynamic) validator;
+  final Function(dynamic) onChange;
   final Function(String) onFieldSubmitted;
   final String initialValue;
   final bool status;
 
   const CustomFormField(
       {super.key, required this.label,
+      required this.inputType,
       required this.controller,
       required this.validator,
+      required this.onChange,
       required this.onFieldSubmitted,
       required this.initialValue,
       required this.status});
@@ -71,7 +75,7 @@ class CustomFormField extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: useMobileLayout ? 3 : 10),
       child: TextFormField(
         enabled: status,
-
+        keyboardType: inputType,
         style: GoogleFonts.poppins(fontSize: useMobileLayout ? 16 : 18, color: status ? Colors.black : Colors.grey),
         // decoration: InputDecoration(
         //   border: OutlineInputBorder(),
@@ -83,35 +87,35 @@ class CustomFormField extends StatelessWidget {
           // OutlineInputBorder
           // UnderlineInputBorder
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
               color: Colors.grey.shade400,
               width: 1,
             ),
           ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
               color: Colors.grey.shade400,
               width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
               color: Colors.grey.shade400,
               width: 1,
             ),
           ),
           disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
               color: Colors.grey.shade400,
               width: 1,
             ),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: Colors.redAccent,
               width: 1,
@@ -139,7 +143,8 @@ class CustomFormField extends StatelessWidget {
         ),
         controller: controller,
         onFieldSubmitted: onFieldSubmitted,
-        validator: (_) => validator(),
+        validator: (value) => validator(value),
+        onChanged: onChange,
       ),
     );
   }
@@ -402,35 +407,35 @@ class _CustomDropDownState extends State<CustomDropDown> {
           // OutlineInputBorder
           // UnderlineInputBorder
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
               color: widget.value != null ? Colors.black : Colors.grey.shade400,
               width: 1,
             ),
           ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
               color: widget.value != null ? Colors.grey.shade400 : Colors.grey.shade400,
               width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
               color: widget.value != null ? Colors.grey.shade400 : Colors.grey.shade400,
               width: 1,
             ),
           ),
           disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
               color: widget.value != null ? Colors.grey.shade400 : Colors.grey.shade400,
               width: 1,
             ),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: Colors.redAccent,
               width: 1,
