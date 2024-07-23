@@ -704,48 +704,48 @@ class _AccountRegisterState extends State<AccountRegister> {
                                     : Container())
                                 : Container(),
 
-                            Card(
-                              elevation: 5,
-                              child: SizedBox(
-                                height: 100,
-                                child: Row(
-                                  children: <Widget>[
-                                    Checkbox(
-                                        value: isNotARobot,
-                                        onChanged: (bool? value) {
-                                          _openReCaptcha();
-                                        }),
-                                    const Expanded(
-                                      child: Text("I'm not a robot"),
-                                    ),
-                                    const SizedBox(
-                                      width: 5,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.centerRight,
-                                      child: Image.asset(
-                                        'assets/images/captcha.jpg',
-                                        width: 80,
-                                        height: 80,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            isCheckedLoad
-                                ? (!isNotARobot
-                                    ? Text(
-                                        "Please check not a robot",
-                                        style: GoogleFonts.poppins(
-                                          textStyle: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.redAccent[200],
-                                          ),
-                                        ),
-                                      )
-                                    : Container())
-                                : Container(),
+                            // Card(
+                            //   elevation: 5,
+                            //   child: SizedBox(
+                            //     height: 100,
+                            //     child: Row(
+                            //       children: <Widget>[
+                            //         Checkbox(
+                            //             value: isNotARobot,
+                            //             onChanged: (bool? value) {
+                            //               _openReCaptcha();
+                            //             }),
+                            //         const Expanded(
+                            //           child: Text("I'm not a robot"),
+                            //         ),
+                            //         const SizedBox(
+                            //           width: 5,
+                            //         ),
+                            //         Container(
+                            //           alignment: Alignment.centerRight,
+                            //           child: Image.asset(
+                            //             'assets/images/captcha.jpg',
+                            //             width: 80,
+                            //             height: 80,
+                            //           ),
+                            //         ),
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
+                            // isCheckedLoad
+                            //     ? (!isNotARobot
+                            //         ? Text(
+                            //             "Please check not a robot",
+                            //             style: GoogleFonts.poppins(
+                            //               textStyle: TextStyle(
+                            //                 fontSize: 12,
+                            //                 color: Colors.redAccent[200],
+                            //               ),
+                            //             ),
+                            //           )
+                            //         : Container())
+                            //     : Container(),
                             const SizedBox(
                               height: 10,
                             ),

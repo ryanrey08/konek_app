@@ -43,6 +43,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   bool isOtpValid = false;
 
+  bool isCheckNumber = false;
+
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
@@ -86,6 +88,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   }
 
   Future<void> checkUserExists() async {
+    setState(() {
+      isCheckNumber = true;
+    });
     var data;
     try {
       data = await Provider.of<Auth>(context, listen: false)
@@ -212,6 +217,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           },
         ).show();
       }
+
+      setState(() {
+        isCheckNumber = false;
+      });
     } on HttpException catch (error) {
       var message = "Error";
       if (error.toString().contains('User not found')) {
@@ -622,17 +631,19 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                               color: Colors.green,
                               decorationColor: Colors.black,
                             )),
-                        onPressed: () {
-                          if (!_form.currentState!.validate()) {
-                            return;
-                          } else {
-                            setState(() {
-                              _otpcode.text = '';
-                              isOtpValid = false;
-                            });
-                            checkUserExists();
-                          }
-                        },
+                        onPressed: isCheckNumber
+                            ? null
+                            : () {
+                                if (!_form.currentState!.validate()) {
+                                  return;
+                                } else {
+                                  setState(() {
+                                    _otpcode.text = '';
+                                    isOtpValid = false;
+                                  });
+                                  checkUserExists();
+                                }
+                              },
                         child: Text(
                           "Proceed".toUpperCase(),
                           style: GoogleFonts.nunito(
