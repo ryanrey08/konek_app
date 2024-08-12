@@ -3,7 +3,7 @@ import 'dart:io';
 // import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 // import 'package:flutter/foundation.dart';
-// import 'package:intl/intl.dart';
+import 'package:intl/intl.dart';
 // import 'package:konek_app/Config/Config.dart';
 import 'package:konek_app/content/uploadpic.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -272,6 +272,7 @@ class _MyProfileState extends State<MyProfile> {
   final txtMiddleName = TextEditingController();
   final txtAge = TextEditingController();
   final txtLastName = TextEditingController();
+  final txtBirthday = TextEditingController();
   final txtCompleteAddress = TextEditingController();
   final txtPhoneNumber = TextEditingController();
   final txtSex = TextEditingController();
@@ -434,6 +435,9 @@ class _MyProfileState extends State<MyProfile> {
     txtAge.text = myProfile['age'] == null ? '' : myProfile['age'].toString();
     txtLastName.text =
         myProfile['last_name'] == null ? '' : myProfile['last_name'];
+    final f = new DateFormat('MMMM dd, yyyy');
+         txtBirthday.text =
+        myProfile['date_of_birth'] == null ? '' : f.format(DateTime.parse(myProfile['date_of_birth'])).toString();
     txtEmailAddress.text = myProfile['email'] == null ? '' : myProfile['email'];
     txtPhoneNumber.text =
         myProfile['mobile_no'] == null ? '' : myProfile['mobile_no'];
@@ -805,7 +809,7 @@ class _MyProfileState extends State<MyProfile> {
                                     ),
                                     Expanded(
                                       child: CustomFormField(
-                                        status: editStatus,
+                                        status: false,
                                         inputType: TextInputType.number,
                                         label: 'Age',
                                         controller: txtAge,
@@ -854,6 +858,50 @@ class _MyProfileState extends State<MyProfile> {
                                 initialValue: '',
                               ),
                               const SizedBox(height: 4),
+                               CustomDateTimeProfile(
+                              title: "",
+                              controller: txtBirthday,
+                              onFieldSubmitted: (value) {
+                                setState(() {
+                                  // final f = new DateFormat('yyyy-MM-dd');
+                                  final f = new DateFormat('MMMM dd, yyyy');
+                                  txtBirthday.text = f.format(value).toString();
+                                  // print(value);
+                                  // return txtEnterDate.text;
+                                });
+                                // FocusScope.of(context)
+                                //     .requestFocus(ctcNumberFocus);
+                              },
+                              onChanged: (value) {
+                                if (value != null) {
+                                  DateTime now = DateTime.now();
+                                  Duration age = now.difference(value!);
+                                  int years = age.inDays ~/ 365;
+                                  setState(() {
+                                    txtAge.text = years.toString();
+                                  });
+                                }
+                              },
+                              onSaved: (val) {
+                                setState(() {
+                                  // final f = new DateFormat('yyyy-MM-dd');
+                                  final f = new DateFormat('MMMM dd, yyyy');
+                                  // txtBirthday.text = val.toString();
+                                  txtBirthday.text = f.format(val).toString();
+                                  // print("ONSAVE" +
+                                  //     txtBirthday.text);
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null && txtBirthday.text.isEmpty) {
+                                  // print(txtEnterDateFrom.text);
+                                  return 'Please enter date';
+                                }
+                                return null;
+                              },
+                              focusNode: phoneFocus, status: editStatus, label: '',
+                            ),
+                              // const SizedBox(height: 4),
                               CustomFormField(
                                 status: editStatus,
                                 inputType: TextInputType.emailAddress,

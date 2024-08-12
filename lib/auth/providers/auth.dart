@@ -94,7 +94,7 @@ class Auth with ChangeNotifier {
       );
 
       jsonResponse = json.decode(response.body);
-      // print(jsonResponse);
+      print(jsonResponse);
 
       if (jsonResponse['success']) {
         final userData = json.encode(jsonResponse);
@@ -133,6 +133,30 @@ class Auth with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('userData');
     prefs.remove('swakPaymentRefNo');
+  }
+
+    Future<Map<String, dynamic>> sendOTP(String number) async {
+    int id = 0;
+    var jsonResponse;
+    try {
+      final response = await http.post(
+        Uri.parse("${config.pre_url}/send-otp"),
+        body: {'mobile_number': number},
+      );
+      jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      if (jsonResponse['success']) {
+        jsonResponse = json.decode(response.body);
+        return jsonResponse;
+      } else {
+        jsonResponse = json.decode(response.body);
+        return jsonResponse;
+        // throw HttpException(jsonResponse['message']);
+      }
+    } catch (error) {
+      print(error);
+      throw error;
+    }
   }
 
   Future<Map<String, dynamic>> checkUserExists(String number) async {

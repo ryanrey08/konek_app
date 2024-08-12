@@ -1,4 +1,6 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
 import 'package:konek_app/auth/providers/auth.dart';
 import 'package:konek_app/auth/screens/login.dart';
 //import 'package:konek_app/Screen/RegisterSuccesScreen.dart';
@@ -65,11 +67,13 @@ class _AccountRegisterState extends State<AccountRegister> {
   final txtMiddleName = TextEditingController();
   final txtAge = TextEditingController();
   final txtLastName = TextEditingController();
+  final txtBirthday = TextEditingController();
   final txtEmail = TextEditingController();
   final txtBrgyAddress = TextEditingController();
   final txtContactNumber = TextEditingController();
   final txtPassword = TextEditingController();
   final txtConfirmPassword = TextEditingController();
+  TextEditingController _otpcode = TextEditingController();
 
   final fNameFocus = FocusNode();
   final mNameFocus = FocusNode();
@@ -111,6 +115,8 @@ class _AccountRegisterState extends State<AccountRegister> {
     status: '',
   );
 
+  // var data;
+
   bool isCheckedLoad = false;
   bool isChecked = false;
 
@@ -125,10 +131,16 @@ class _AccountRegisterState extends State<AccountRegister> {
   String _deviceId = 'Unknown';
   final _mobileDeviceIdentifierPlugin = MobileDeviceIdentifier();
 
+  var data;
+  bool isOtpValid = false;
+  var otpTimer;
+  bool isOTPExpire = false;
+  bool isResend = false;
+
   @override
   void initState() {
     super.initState();
-
+    txtBirthday.text = 'January 01, 1990';
     initDeviceId();
   }
 
@@ -242,6 +254,333 @@ class _AccountRegisterState extends State<AccountRegister> {
     });
   }
 
+  Future<void> sendOTP(BuildContext context1) async {
+    try {
+      data = await Provider.of<Auth>(context, listen: false)
+          .sendOTP(txtContactNumber.text);
+      // setState(() {
+      //   data = dataOTP;
+      // });
+      if (data['success']) {
+        setState(() {
+          isOTPExpire = true;
+          _isLoading = false;
+        });
+        // ignore: use_build_context_synchronously
+        Alert(
+            context: context,
+            onWillPopActive: true,
+            title:
+                "Verify Your Mobile Number \n Please enter the One-Time Password (OTP) sent to your mobile number " +
+                    txtContactNumber.text +
+                    ". This OTP is valid for 10 minutes.",
+            style: AlertStyle(
+                titleStyle:
+                    GoogleFonts.poppins(fontSize: 14, color: Colors.black)),
+            content: StatefulBuilder(
+              builder: (BuildContext context1, StateSetter setState) {
+                return Container(
+                  margin: EdgeInsets.only(top: 10),
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        // margin: EdgeInsets.only(bottom: 5),
+                        height: 200,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Expanded(
+                              child: TextFormField(
+                                  controller: _otpcode,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                  ),
+                                  decoration: InputDecoration(
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    helperText: "Enter OTP Code",
+                                    helperStyle: TextStyle(
+                                      color: Colors.transparent,
+                                      fontSize: 10,
+                                    ),
+                                    fillColor: Colors.white,
+                                    filled: true,
+                                    hintText: '- - - - - -',
+                                    hintStyle: TextStyle(
+                                        color: Colors.grey, fontSize: 50),
+                                    errorText:
+                                        isOtpValid ? 'Invalid Code' : null,
+                                    errorStyle: TextStyle(fontSize: 12),
+                                  ),
+                                  autocorrect: false,
+                                  // inputFormatters: [maskTextInputFormatter],
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    print(value.length);
+                                    if (value.length >= 6) {
+                                      setState(() {
+                                        value = value.substring(0, 6);
+                                        _otpcode.text = value;
+                                      });
+                                    }
+                                  }),
+                            ),
+                            Text(
+                              "Didn't receive the OTP?",
+                              style: GoogleFonts.poppins(
+                                textStyle: TextStyle(
+                                  fontSize: 16, // tablet
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            !isResend
+                                ? (isOTPExpire
+                                    ? TimerCountdown(
+                                        format:
+                                            CountDownTimerFormat.minutesSeconds,
+                                        spacerWidth: 5,
+                                        timeTextStyle: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Colors.black),
+                                        enableDescriptions: false,
+                                        colonsTextStyle: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Colors.black),
+                                        endTime: DateTime.now().add(
+                                          Duration(
+                                            // days: 0,
+                                            // days: 5,
+                                            // hours: 0,
+                                            minutes: 10,
+                                            seconds: 0,
+                                          ),
+                                        ),
+                                        onEnd: () {
+                                          setState(() {
+                                            isOTPExpire = false;
+                                          });
+
+                                          return;
+                                        },
+                                      )
+                                    : TextButton(
+                                        onPressed: () async {
+                                          setState(() {
+                                            isResend = true;
+                                          });
+                                          try {
+                                            var dataOTP =
+                                                await Provider.of<Auth>(context,
+                                                        listen: false)
+                                                    .sendOTP(
+                                                        txtContactNumber.text);
+                                            if (dataOTP['success']) {
+                                              setState(() {
+                                                data = dataOTP;
+                                                isOTPExpire = true;
+                                                isResend = false;
+                                                _otpcode.text = '';
+                                              });
+                                            } else {
+                                              setState(() {
+                                                _otpcode.text = '';
+                                                isResend = false;
+                                              });
+                                              AwesomeDialog(
+                                                dismissOnBackKeyPress: false,
+                                                dismissOnTouchOutside: false,
+                                                onDismissCallback:
+                                                    (BuildContext) {
+                                                  // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+                                                },
+                                                context: context,
+                                                animType: AnimType.scale,
+                                                dialogType: DialogType.error,
+                                                title: "Error",
+                                                desc: "Something went wrong",
+                                                btnOkOnPress: () {
+                                                  // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+                                                  // print(_selectedProvince);
+                                                },
+                                              ).show();
+                                            }
+
+                                            // setState(() {
+                                            //   _isLoading = false;
+                                            // });
+                                          } on HttpException catch (error) {
+                                            var message = "Error";
+                                            if (error
+                                                .toString()
+                                                .contains('User not found')) {
+                                              message = 'User not found';
+                                            }
+                                            _showErrorMessage(message);
+                                          } catch (error) {
+                                            var message =
+                                                "Something went wrong";
+                                            _showErrorMessage(message);
+                                          }
+                                        },
+                                        child: Text(
+                                          'Resend OTP',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.amberAccent),
+                                          ),
+                                        ),
+                                      ))
+                                : CircularProgressIndicator(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            buttons: [
+              DialogButton(
+                color: Color.fromARGB(255, 55, 57, 175),
+                onPressed: () async {
+                  // Navigator.of(context)
+                  //     .pushReplacementNamed(Dashboard.routeName);
+                  // updateMyPassword();
+                  print(_otpcode.text);
+                  print(data['otp']);
+                  setState(() {
+                    isOTPExpire = false;
+                  });
+                  if (_otpcode.text == data['data']['otp']) {
+                    print("here");
+                    _determinePosition();
+                  } else {
+                    setState(() {
+                      isOtpValid = true;
+                      Fluttertoast.showToast(
+                        msg: 'Invalid OTP Code',
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Color(0xff404747),
+                        textColor: Colors.white,
+                        fontSize: 13.0,
+                      );
+                    });
+                  }
+                },
+                child: Text(
+                  "OK",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              )
+            ]).show();
+      } else {
+        AwesomeDialog(
+          dismissOnBackKeyPress: false,
+          dismissOnTouchOutside: false,
+          onDismissCallback: (BuildContext) {
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+          },
+          context: context,
+          animType: AnimType.scale,
+          dialogType: DialogType.error,
+          title: "Error",
+          desc: "Something went wrong",
+          btnOkOnPress: () {
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+            // print(_selectedProvince);
+          },
+        ).show();
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+    } on HttpException catch (error) {
+      var message = "Error";
+      if (error.toString().contains('User not found')) {
+        message = 'User not found';
+      }
+      _showErrorMessage(message);
+    } catch (error) {
+      var message = "Something went wrong";
+      _showErrorMessage(message);
+    }
+  }
+
+  void _showErrorMessage(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Color(0xff404747),
+      textColor: Colors.white,
+      fontSize: 13.0,
+    );
+  }
+
+  Future<void> resendOTP() async {
+    try {
+      var dataOTP = await Provider.of<Auth>(context, listen: false)
+          .sendOTP(txtContactNumber.text);
+      if (dataOTP['success']) {
+        // setState(() {
+        //   data = dataOTP;
+        //   isOTPExpire = true;
+        //   print(data);
+        // });
+      } else {
+        AwesomeDialog(
+          dismissOnBackKeyPress: false,
+          dismissOnTouchOutside: false,
+          onDismissCallback: (BuildContext) {
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+          },
+          context: context,
+          animType: AnimType.scale,
+          dialogType: DialogType.error,
+          title: "Error",
+          desc: "Something went wrong",
+          btnOkOnPress: () {
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+            // print(_selectedProvince);
+          },
+        ).show();
+      }
+
+      // setState(() {
+      //   _isLoading = false;
+      // });
+    } on HttpException catch (error) {
+      var message = "Error";
+      if (error.toString().contains('User not found')) {
+        message = 'User not found';
+      }
+      _showErrorMessage(message);
+    } catch (error) {
+      var message = "Something went wrong";
+      _showErrorMessage(message);
+    }
+  }
+
   Future<void> _determinePosition() async {
     // bool serviceEnabled;
     // LocationPermission permission;
@@ -305,6 +644,7 @@ class _AccountRegisterState extends State<AccountRegister> {
         'middle_name': txtMiddleName.text,
         'age': txtAge.text,
         'last_name': txtLastName.text,
+        'date_of_birth': txtBirthday.text.toString(),
         'email': txtEmail.text,
         'address': txtBrgyAddress.text,
         'mobile_number': txtContactNumber.text,
@@ -528,7 +868,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                                     width: 10,
                                   ),
                                   Expanded(
-                                    child: customTextField(
+                                    child: customTextFieldDisable(
                                         TextInputType.number,
                                         'Age',
                                         txtAge,
@@ -586,6 +926,49 @@ class _AccountRegisterState extends State<AccountRegister> {
                             // SizedBox(
                             //   height: 15,
                             // ),
+                            CustomDateTime(
+                              title: "",
+                              controller: txtBirthday,
+                              onFieldSubmitted: (value) {
+                                setState(() {
+                                  // final f = new DateFormat('yyyy-MM-dd');
+                                  final f = new DateFormat('MMMM dd, yyyy');
+                                  txtBirthday.text = f.format(value).toString();
+                                  // print(value);
+                                  // return txtEnterDate.text;
+                                });
+                                // FocusScope.of(context)
+                                //     .requestFocus(ctcNumberFocus);
+                              },
+                              onChanged: (value) {
+                                if (value != null) {
+                                  DateTime now = DateTime.now();
+                                  Duration age = now.difference(value!);
+                                  int years = age.inDays ~/ 365;
+                                  setState(() {
+                                    txtAge.text = years.toString();
+                                  });
+                                }
+                              },
+                              onSaved: (val) {
+                                setState(() {
+                                  // final f = new DateFormat('yyyy-MM-dd');
+                                  final f = new DateFormat('MMMM dd, yyyy');
+                                  // txtBirthday.text = val.toString();
+                                  txtBirthday.text = f.format(val).toString();
+                                  // print("ONSAVE" +
+                                  //     txtBirthday.text);
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null && txtBirthday.text.isEmpty) {
+                                  // print(txtEnterDateFrom.text);
+                                  return 'Please enter date';
+                                }
+                                return null;
+                              },
+                              focusNode: lastNameFocus,
+                            ),
                             customTextField(
                                 TextInputType.text,
                                 'Email Address',
@@ -930,6 +1313,113 @@ class _AccountRegisterState extends State<AccountRegister> {
     );
   }
 
+  Container customTextFieldDisable(
+      TextInputType inputType,
+      String hintTextP,
+      TextEditingController control,
+      bool useMobileLayout,
+      String validator,
+      String? Function(String?)? validate,
+      String? Function(String?)? onChange) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Expanded(
+            child: TextFormField(
+              controller: control,
+              keyboardType: inputType,
+              obscureText: hintTextP != "" ? false : _hidePassword,
+              style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                  fontSize: useMobileLayout ? 16 : 18,
+                  color: Colors.black,
+                ),
+              ),
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                floatingLabelBehavior: FloatingLabelBehavior.auto,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: Colors.green,
+                    width: 1,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1,
+                  ),
+                ),
+                disabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: Colors.redAccent,
+                    width: 1,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1,
+                  ),
+                ),
+                enabled: false,
+                hintText: hintTextP,
+                hintStyle: GoogleFonts.poppins(
+                  textStyle: TextStyle(
+                    fontSize: useMobileLayout ? 14 : 16,
+                    color: Colors.grey,
+                  ),
+                ),
+                errorStyle: GoogleFonts.poppins(
+                  textStyle: TextStyle(
+                    fontSize: 12,
+                    color: Colors.redAccent[200],
+                  ),
+                ),
+                fillColor: Colors.white,
+                filled: true,
+                suffixIcon: hintTextP == ""
+                    ? IconButton(
+                        icon: _hidePassword
+                            ? const Icon(
+                                Icons.visibility_off,
+                                color: Colors.grey,
+                                // size: useMobileLayout ? 15 : 18,
+                                size: 20,
+                              )
+                            : const Icon(
+                                Icons.visibility,
+                                color: Colors.grey,
+                                // size: useMobileLayout ? 15 : 18,
+                                size: 20,
+                              ),
+                        onPressed: toggleVisibilityConfirm,
+                      )
+                    : null,
+              ),
+              validator: validate,
+              onChanged: onChange,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Container mypassword(String hintTextP, IconData preIcon,
       TextEditingController control, bool useMobileLayout) {
     return Container(
@@ -1220,10 +1710,11 @@ class _AccountRegisterState extends State<AccountRegister> {
               setState(() {
                 _isLoading = true;
               });
-
-              _determinePosition();
+              sendOTP(context);
+              // _determinePosition();
               // _getMacAddress();
             }
+            // sendOTP(context);
           }, // your tap handler moved here
           builder: (context, onTap) {
             return ElevatedButton(
