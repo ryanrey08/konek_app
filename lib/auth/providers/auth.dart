@@ -129,10 +129,61 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.remove('userData');
-    prefs.remove('swakPaymentRefNo');
+  Future<bool> logout() async {
+       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userInfo = json.decode(sharedPreferences.getString('userData')!)
+        as Map<String, dynamic>;
+    var token = userInfo['data']['token'];
+        var jsonResponse;
+    try {
+      final response = await http.post(
+        Uri.parse("${config.pre_url}/logout/" + token),
+        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'}
+      );
+      jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      if (jsonResponse['success']) {
+        jsonResponse = json.decode(response.body);
+          // sharedPreferences.remove('userData');
+          // sharedPreferences.remove('swakPaymentRefNo');
+          sharedPreferences.clear();
+        return true;
+      } else {
+        jsonResponse = json.decode(response.body);
+        return false;
+        // throw HttpException(jsonResponse['message']);
+      }
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+
+    Future<Map<String, dynamic>> checkAccount() async {
+       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userInfo = json.decode(sharedPreferences.getString('userData')!)
+        as Map<String, dynamic>;
+    var token = userInfo['data']['token'];
+        var jsonResponse;
+    try {
+      final response = await http.post(
+        Uri.parse("${config.pre_url}/check-if-active"),
+        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'}
+      );
+      jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      if (jsonResponse['success']) {
+          // sharedPreferences.remove('userData');
+          // sharedPreferences.remove('swakPaymentRefNo');
+        return jsonResponse;
+      } else {
+        return jsonResponse;
+        // throw HttpException(jsonResponse['message']);
+      }
+    } catch (error) {
+      print(error);
+      throw error;
+    }
   }
 
     Future<Map<String, dynamic>> sendOTP(String number) async {
@@ -159,9 +210,34 @@ class Auth with ChangeNotifier {
     }
   }
 
+    Future<Map<String, dynamic>> checkUserCreds(String number, String email) async {
+    int id = 0;
+    var jsonResponse;
+    print(number);
+    try {
+      final response = await http.post(
+        Uri.parse("${config.pre_url}/check-creds"),
+        body: {'mobile_number': number, 'email': email},
+      );
+      jsonResponse = json.decode(response.body);
+      print(response.body);
+      if (jsonResponse['success']) {
+        jsonResponse = json.decode(response.body);
+        return jsonResponse;
+      } else {
+        jsonResponse = json.decode(response.body);
+        return jsonResponse;
+        // throw HttpException(jsonResponse['message']);
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   Future<Map<String, dynamic>> checkUserExists(String number) async {
     int id = 0;
     var jsonResponse;
+    print(number);
     try {
       final response = await http.post(
         Uri.parse("${config.pre_url}/check-number"),

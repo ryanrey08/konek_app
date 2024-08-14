@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:konek_app/auth/providers/auth.dart';
+import 'package:konek_app/auth/screens/login.dart';
 import 'package:konek_app/content/dashboard.dart';
 import 'package:konek_app/content/provider/pos.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../config/httpexception.dart';
 
 import 'provider/voucher.dart';
@@ -27,7 +30,35 @@ class _TransactionState extends State<Transaction> {
   @override
   void initState() {
     super.initState();
+    refreshPage();
+  }
+
+  Future<void> refreshPage() async {
+    checkAccount();
     getVoucherData();
+  }
+
+  Future<void> checkAccount() async {
+    try {
+      var accountData =
+          await Provider.of<Auth>(context, listen: false).checkAccount();
+      if (accountData['data']['status'] == 'Inactive') {
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        sharedPreferences.clear();
+        Navigator.of(context).pushReplacementNamed(Login.routeName);
+      }
+    } on HttpException catch (error) {
+      // print(error);
+      showError(error.toString());
+    } catch (error) {
+      // showError(error.toString());
+      if (error.toString().contains('Connection failed')) {
+        // showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+    }
   }
 
   Future<void> getVoucherData() async {
@@ -85,11 +116,13 @@ class _TransactionState extends State<Transaction> {
     );
   }
 
-  getTimeText(time) {
-    var nowDate = DateTime.now();
-    var toDate = nowDate.add(Duration(days: 1));
+  getTimeText(time, duration) {
+    var nowDate = DateTime.parse(time);
+    var toDate = nowDate.add(Duration(days: int.parse(duration)));
     // int interval = toDate.difference(nowDate).inSeconds;
-    return DateFormat("yyyy-MM-dd hh:mm").format(DateTime.now()).toString() +
+    return DateFormat("yyyy-MM-dd hh:mm")
+            .format(DateTime.parse(time))
+            .toString() +
         " - " +
         DateFormat("yyyy-MM-dd hh:mm").format(toDate).toString();
   }
@@ -123,7 +156,7 @@ class _TransactionState extends State<Transaction> {
               color: Colors.white,
               backgroundColor: Colors.blue,
               strokeWidth: 4.0,
-              onRefresh: getVoucherData,
+              onRefresh: refreshPage,
               child: voucherData.length > 0
                   ? ListView.builder(
                       itemCount: voucherData.length,
@@ -151,7 +184,9 @@ class _TransactionState extends State<Transaction> {
                               // subtitle: Text(voucherData[index]['created_at'] + " - " + (voucherData[index]['expire_date'])),
                               subtitle: Text(
                                 getTimeText(
-                                    voucherData[index]['payment_request_at']),
+                                    voucherData[index]['payment_completion_at'],
+                                    voucherData[index]['subscription']
+                                        ['duration']),
                                 style: GoogleFonts.poppins(
                                   textStyle: TextStyle(
                                     color: Colors.black,
@@ -168,7 +203,7 @@ class _TransactionState extends State<Transaction> {
                     )
                   : Center(
                       child: SingleChildScrollView(
-                           physics: AlwaysScrollableScrollPhysics(),
+                          physics: AlwaysScrollableScrollPhysics(),
                           child: Column(children: <Widget>[
                             Container(
                               child: Text(

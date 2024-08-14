@@ -1,7 +1,10 @@
 // Packages and Libraries
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
+import 'package:konek_app/auth/providers/auth.dart';
+import 'package:konek_app/auth/screens/login.dart';
 import 'package:konek_app/config/httpexception.dart';
 import 'package:konek_app/config/notification.dart';
 import 'package:konek_app/content/provider/content.dart';
@@ -151,6 +154,7 @@ class _HomePageState extends State<HomePage> {
   ];
   List quickLinks = [];
   List ads = [];
+  bool hasNoInternet = false;
 
   @override
   void initState() {
@@ -219,6 +223,27 @@ class _HomePageState extends State<HomePage> {
     } catch (error) {
       // showError(error.toString());
       if (error.toString().contains('Connection failed')) {
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        var quickLinksData =
+            json.decode(sharedPreferences.getString('swakQuicklinks')!)
+                as List<dynamic>;
+        setState(() {
+          hasNoInternet = true;
+
+          var newQuicklinks = [];
+          var myQuickLinks = [];
+          for (var x = 0; x < quickLinksData.length; x++) {
+            myQuickLinks.add(quickLinksData[x]);
+            if (x % 2 == 1) {
+              newQuicklinks.add(myQuickLinks);
+              myQuickLinks = [];
+            } else if (x == (quickLinksData.length - 1)) {
+              newQuicklinks.add(myQuickLinks);
+            }
+          }
+          quickLinks = newQuicklinks;
+        });
       } else {
         showError('something went wrong');
       }
@@ -251,6 +276,14 @@ class _HomePageState extends State<HomePage> {
     } catch (error) {
       // showError(error.toString());
       if (error.toString().contains('Connection failed')) {
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        var adsData = json.decode(sharedPreferences.getString('swakAds')!)
+            as List<dynamic>;
+        setState(() {
+          hasNoInternet = true;
+          ads = adsData;
+        });
       } else {
         showError('something went wrong');
       }
@@ -419,6 +452,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       isLoading = false;
     });
+    await checkAccount();
     await getSubscription();
     await getQuickLinks();
     await getAds();
@@ -550,6 +584,29 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> checkAccount() async {
+    try {
+      var accountData =
+          await Provider.of<Auth>(context, listen: false).checkAccount();
+      if (accountData['data']['status'] == 'Inactive') {
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        sharedPreferences.clear();
+        Navigator.of(context).pushReplacementNamed(Login.routeName);
+      }
+    } on HttpException catch (error) {
+      // print(error);
+      showError(error.toString());
+    } catch (error) {
+      // showError(error.toString());
+      if (error.toString().contains('Connection failed')) {
+        // showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -664,54 +721,65 @@ class _HomePageState extends State<HomePage> {
                                 height: 20,
                               ),
                               SizedBox(
-                                width: double.infinity,
-                                child: ads.isNotEmpty
-                                    ? CarouselSlider(
-                                        options: CarouselOptions(
-                                            autoPlay: true,
-                                            aspectRatio: 2.0,
-                                            // enlargeCenterPage: true,
-                                            viewportFraction: 1.0,
-                                            height: 100,
-                                            enlargeStrategy:
-                                                CenterPageEnlargeStrategy
-                                                    .height,
-                                            scrollPhysics:
-                                                const NeverScrollableScrollPhysics()),
-                                        items: ads.map((i) {
-                                          return Builder(
-                                            builder: (BuildContext context) {
-                                              return Container(
-                                                width: MediaQuery.of(context)
-                                                    .size
-                                                    .width,
-                                                // margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                                decoration: BoxDecoration(
-                                                  image: DecorationImage(
-                                                      image: NetworkImage(
-                                                          i['image_url']),
-                                                      fit: BoxFit.fitHeight),
-                                                ),
-                                                // child: Text(i['description']),
-                                              );
-                                            },
-                                          );
-                                        }).toList(),
-                                      )
-                                    : Center(
-                                        child: Text(
-                                          "NO CURRENT ADS",
-                                          style: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              color: Colors.red,
-                                              fontSize:
-                                                  useMobileLayout ? 14 : 25,
-                                              fontWeight: FontWeight.w600,
+                                  width: double.infinity,
+                                  child: ads.isNotEmpty
+                                      ? CarouselSlider(
+                                          options: CarouselOptions(
+                                              autoPlay: true,
+                                              aspectRatio: 2.0,
+                                              // enlargeCenterPage: true,
+                                              viewportFraction: 1.0,
+                                              height: 100,
+                                              enlargeStrategy:
+                                                  CenterPageEnlargeStrategy
+                                                      .height,
+                                              scrollPhysics:
+                                                  const NeverScrollableScrollPhysics()),
+                                          items: ads.map((i) {
+                                            return Builder(
+                                              builder: (BuildContext context) {
+                                                return Container(
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  // margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                                  // decoration: BoxDecoration(
+                                                  //   image: DecorationImage(
+                                                  //       image: NetworkImage(
+                                                  //           i['image_url']),
+                                                  //       fit:
+                                                  //           BoxFit.fitHeight),
+                                                  // ),
+                                                  // child: Text(i['description']),
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: i['image_url'],
+                                                    placeholder: (context,
+                                                            url) =>
+                                                        Container(
+                                                            child:
+                                                                CircularProgressIndicator()),
+                                                    errorWidget:
+                                                        (context, url, error) =>
+                                                            Icon(Icons.error),
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          }).toList(),
+                                        )
+                                      : Center(
+                                          child: Text(
+                                            "NO CURRENT ADS",
+                                            style: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                color: Colors.red,
+                                                fontSize:
+                                                    useMobileLayout ? 14 : 25,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                              ),
+                                        )),
                               const SizedBox(
                                 height: 10,
                               ),
@@ -863,7 +931,7 @@ class _HomePageState extends State<HomePage> {
                                                                             subscriptions[x]['id'].toString(),
                                                                             subscriptions[x]['name'].toString());
                                                                       } else {
-                                                                        Navigator.pushReplacementNamed(
+                                                                        Navigator.pushNamed(
                                                                             context,
                                                                             POS.routeName,
                                                                             arguments: {
@@ -1095,22 +1163,37 @@ class _HomePageState extends State<HomePage> {
                                                               'tel:+${quickLinks[x][y]['link']}');
                                                         },
                                                         child: Container(
-                                                          width: 120.0,
-                                                          height: 70.0,
-                                                          alignment:
-                                                              Alignment.center,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            image: DecorationImage(
-                                                                image: NetworkImage(
-                                                                    quickLinks[x]
-                                                                            [y][
-                                                                        'image_url']),
-                                                                fit: BoxFit
-                                                                    .contain),
-                                                          ),
-                                                          // child: Text(quickLinks[x][y]['description']),
-                                                        ),
+                                                            width: 120.0,
+                                                            height: 70.0,
+                                                            alignment: Alignment
+                                                                .center,
+                                                            // decoration:
+                                                            //     BoxDecoration(
+                                                            //   image: DecorationImage(
+                                                            //       image: NetworkImage(
+                                                            //           quickLinks[x]
+                                                            //                   [y][
+                                                            //               'image_url']),
+                                                            //       fit: BoxFit
+                                                            //           .contain),
+                                                            // ),
+                                                            // child: Text(quickLinks[x][y]['description']),
+                                                            child:
+                                                                CachedNetworkImage(
+                                                              imageUrl: quickLinks[
+                                                                      x][y]
+                                                                  ['image_url'],
+                                                              placeholder: (context,
+                                                                      url) =>
+                                                                  Container(
+                                                                      child:
+                                                                          CircularProgressIndicator()),
+                                                              errorWidget: (context,
+                                                                      url,
+                                                                      error) =>
+                                                                  Icon(Icons
+                                                                      .error),
+                                                            )),
                                                       ),
                                                       const SizedBox(
                                                         height: 15,

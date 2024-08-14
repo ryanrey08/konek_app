@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:konek_app/auth/providers/auth.dart';
+import 'package:konek_app/auth/screens/login.dart';
 import 'package:konek_app/config/httpexception.dart';
 import 'package:konek_app/content/provider/content.dart';
 import 'package:konek_app/content/provider/pos.dart';
@@ -117,6 +119,31 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
       textColor: Colors.white,
       fontSize: 13.0,
     );
+  }
+
+    Future<void> checkAccount() async {
+    try {
+      var accountData =
+          await Provider.of<Auth>(context, listen: false).checkAccount();
+      if (accountData['data']['status'] == 'Inactive') {
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        sharedPreferences.clear();
+        Navigator.of(context).pushReplacementNamed(Login.routeName);
+      }else{
+        sendPaymentRequest();
+      }
+    } on HttpException catch (error) {
+      // print(error);
+      showError(error.toString());
+    } catch (error) {
+      // showError(error.toString());
+      if (error.toString().contains('Connection failed')) {
+        // showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+    }
   }
 
   sendPaymentRequest() async {
@@ -420,7 +447,7 @@ class _POSState extends State<POS> with SingleTickerProviderStateMixin {
                   onPressed: isLoadingRequest
                       ? null
                       : () {
-                          sendPaymentRequest();
+                          checkAccount();
                         },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,

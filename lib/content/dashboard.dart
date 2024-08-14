@@ -53,6 +53,8 @@ class _DashboardState extends State<Dashboard> {
 
   int currentPageIndex = 0;
 
+  bool isLoggingOut = false;
+
   @override
   void initState() {
     super.initState();
@@ -207,6 +209,36 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  void logOut() async {
+    setState(() {
+      isLoggingOut = true;
+    });
+    try {
+      var isLoggedOut =
+          await Provider.of<Auth>(context, listen: false).logout();
+      if (isLoggedOut) {
+        Navigator.of(context).pushReplacementNamed(Login.routeName);
+      } else {
+        setState(() {
+          isLoggingOut = false;
+        });
+      }
+    } on HttpException catch (error) {
+      // print(error);
+      showError(error.toString());
+    } catch (error) {
+      // showError(error.toString());
+      if (error.toString().contains('Connection failed')) {
+        // showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+    }
+    setState(() {
+      isLoggingOut = false;
+    });
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -246,7 +278,7 @@ class _DashboardState extends State<Dashboard> {
                           await StreamingSharedPreferences.instance;
                       preferences.setString('notifData', '');
                       Navigator.of(context)
-                          .pushReplacementNamed(NotificationList.routeName);
+                          .pushNamed(NotificationList.routeName);
                     },
                     child: !isLoading
                         ? PreferenceBuilder<String>(
@@ -465,7 +497,8 @@ class _DashboardState extends State<Dashboard> {
                                       width: 180,
                                       decoration: const BoxDecoration(
                                         // color: Colors.grey,
-                                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(30)),
                                         image: DecorationImage(
                                           scale: 5,
                                           image: AssetImage(
@@ -475,7 +508,9 @@ class _DashboardState extends State<Dashboard> {
                                         // borderRadius: BorderRadius.circular(50),
                                       ),
                                     ),
-                                    SizedBox(height: 5,),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
                                     Text(
                                       fullName.toString(),
                                       style: GoogleFonts.poppins(
@@ -506,8 +541,8 @@ class _DashboardState extends State<Dashboard> {
                                   useMobileLayout: useMobileLayout,
                                   iconData: Icons.account_box,
                                   onTapFunc: () {
-                                    Navigator.of(context).pushReplacementNamed(
-                                        MyProfile.routeName);
+                                    Navigator.of(context)
+                                        .pushNamed(MyProfile.routeName);
                                   },
                                   color: Colors.white,
                                 ),
@@ -560,30 +595,34 @@ class _DashboardState extends State<Dashboard> {
                                       horizontal: 10, vertical: 10),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
-                                    color: Colors.blue[200],
+                                    color: isLoggingOut
+                                        ? Colors.white
+                                        : Colors.blue[200],
                                   ),
-                                  child: DrawerOptions(
-                                    title: "Log Out",
-                                    useMobileLayout: useMobileLayout,
-                                    iconData: Icons.exit_to_app,
-                                    onTapFunc: () async {
-                                      // await Provider.of<Auth>(context,
-                                      //         listen: false).logout();
-                                      await Provider.of<Auth>(context,
-                                              listen: false)
-                                          .logout();
-                                      Navigator.of(context)
-                                          .pushNamedAndRemoveUntil(
-                                              Login.routeName,
-                                              (Route<dynamic> route) => false);
+                                  child: isLoggingOut
+                                      ? Center(
+                                          child: CircularProgressIndicator())
+                                      : DrawerOptions(
+                                          title: "Log Out",
+                                          useMobileLayout: useMobileLayout,
+                                          iconData: Icons.exit_to_app,
+                                          onTapFunc: () async {
+                                            // await Provider.of<Auth>(context,
+                                            //         listen: false)
+                                            //     .logout();
+                                            // Navigator.of(context)
+                                            //     .pushNamedAndRemoveUntil(
+                                            //         Login.routeName,
+                                            //         (Route<dynamic> route) => false);
 
-                                      Navigator.of(context)
-                                          .pushReplacementNamed(
-                                              Login.routeName);
-                                    },
-                                    color: Colors.white,
-                                    dense: false,
-                                  ),
+                                            // Navigator.of(context)
+                                            //     .pushReplacementNamed(
+                                            //         Login.routeName);
+                                            logOut();
+                                          },
+                                          color: Colors.white,
+                                          dense: false,
+                                        ),
                                 ),
 
                                 // SizedBox(

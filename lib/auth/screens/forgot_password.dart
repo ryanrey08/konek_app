@@ -511,7 +511,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 icon:
                     const Icon(Icons.keyboard_arrow_left, color: Colors.white),
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, Login.routeName);
+                  Navigator.pushNamed(context, Login.routeName);
                 } /*Navigator.of(context).pushReplacementNamed(TransactionPage.routeName)*/);
           }),
           automaticallyImplyLeading: false,

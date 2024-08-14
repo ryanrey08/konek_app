@@ -298,7 +298,7 @@ class POSProvider with ChangeNotifier {
           Uri.parse("${config.hit_pay}payment-logs/?phone=" + phoneNo),
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       // print(response.statusCode);
-      // print(json.decode(response.body));
+      print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
       notifyListeners();
       return jsonResponse;

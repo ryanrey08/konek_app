@@ -233,7 +233,7 @@ class _LoginState extends State<Login> {
                                               ),
                                               onTap: () {
                                                    Navigator.of(context)
-                                                      .pushReplacementNamed(
+                                                      .pushNamed(
                                                     ForgotPassword.routeName,
                                                   );
                                               },
@@ -267,7 +267,7 @@ class _LoginState extends State<Login> {
                                               child: TextButton(
                                                 onPressed: () {
                                                   Navigator.of(context)
-                                                      .pushReplacementNamed(
+                                                      .pushNamed(
                                                     AccountRegister.routeName,
                                                   );
                                                 },

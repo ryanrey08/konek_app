@@ -51,6 +51,8 @@ class Content with ChangeNotifier {
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       // print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
+      sharedPreferences.setString(
+          'swakQuicklinks', json.encode(jsonResponse["data"]));
       notifyListeners();
       return jsonResponse["data"];
     } catch (error) {
@@ -74,6 +76,7 @@ class Content with ChangeNotifier {
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
+      sharedPreferences.setString('swakAds', json.encode(jsonResponse["data"]));
       notifyListeners();
       return jsonResponse["data"];
     } catch (error) {

@@ -254,6 +254,41 @@ class _AccountRegisterState extends State<AccountRegister> {
     });
   }
 
+  Future<void> checkUserCreds(BuildContext context1) async {
+    var data;
+    try {
+      data = await Provider.of<Auth>(context, listen: false)
+          .checkUserCreds(txtContactNumber.text, txtEmail.text);
+      if (data['success']) {
+        sendOTP(context1);
+      } else {
+        if (data['data'].containsKey('mobile_number')) {
+          _showErrorMessage(data['data']['mobile_number'][0]);
+        } else {
+          _showErrorMessage(data['data']['email'][0]);
+        }
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } on HttpException catch (error) {
+      var message = "Error";
+      if (error.toString().contains('User not found')) {
+        message = 'User not found';
+      }
+      _showErrorMessage(message);
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (error) {
+      var message = "Something went wrong";
+      _showErrorMessage(message);
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   Future<void> sendOTP(BuildContext context1) async {
     try {
       data = await Provider.of<Auth>(context, listen: false)
@@ -1008,13 +1043,13 @@ class _AccountRegisterState extends State<AccountRegister> {
                               //     .hasMatch(value)) {
                               //   return 'Invalid Email Address';
                               // }
-                              if (!RegExp(r"^[\p{L} ,.'-]*$",
-                                      caseSensitive: false,
-                                      unicode: true,
-                                      dotAll: true)
-                                  .hasMatch(value)) {
-                                return 'Invalid Input';
-                              }
+                              // if (!RegExp(r"^[\p{L} ,.'-]*$",
+                              //         caseSensitive: false,
+                              //         unicode: true,
+                              //         dotAll: true)
+                              //     .hasMatch(value)) {
+                              //   return 'Invalid Input';
+                              // }
                               return null;
                             }, (value) {}),
                             customTextField(
@@ -1710,7 +1745,8 @@ class _AccountRegisterState extends State<AccountRegister> {
               setState(() {
                 _isLoading = true;
               });
-              sendOTP(context);
+              checkUserCreds(context);
+              // sendOTP(context);
               // _determinePosition();
               // _getMacAddress();
             }
