@@ -246,6 +246,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.1"
+  flutter_device_id:
+    dependency: "direct main"
+    description:
+      name: flutter_device_id
+      sha256: "1955b83abe6deb59aa1a3685a723422e26a3529c0df144f6af359848ac8defcb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   flutter_device_identifier:
     dependency: "direct main"
     description:

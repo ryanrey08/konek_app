@@ -28,6 +28,7 @@ import 'package:flutter/services.dart';
 import 'package:simnumber/siminfo.dart';
 import 'package:simnumber/sim_number.dart';
 import 'package:mobile_device_identifier/mobile_device_identifier.dart';
+import 'package:flutter_device_id/flutter_device_id.dart';
 // import 'package:loader_overlay/loader_overlay.dart';
 
 import 'dart:convert';
@@ -128,7 +129,7 @@ class _AccountRegisterState extends State<AccountRegister> {
 
   SimInfo simInfo = SimInfo([]);
 
-  String _deviceId = 'Unknown';
+  var _deviceId;
   final _mobileDeviceIdentifierPlugin = MobileDeviceIdentifier();
 
   var data;
@@ -141,7 +142,8 @@ class _AccountRegisterState extends State<AccountRegister> {
   void initState() {
     super.initState();
     txtBirthday.text = 'January 01, 1990';
-    initDeviceId();
+    // initDeviceId();
+    getMobileID();
   }
 
   @override
@@ -156,6 +158,16 @@ class _AccountRegisterState extends State<AccountRegister> {
         txtContactNumber.text = subsData;
       });
     }
+  }
+
+  void getMobileID() async {
+    final _flutterDeviceIdPlugin = FlutterDeviceId();
+
+    String? deviceId = await _flutterDeviceIdPlugin.getDeviceId() ?? '';
+
+    setState(() {
+      _deviceId = deviceId;
+    });
   }
 
   void showTermsAndConditions() {

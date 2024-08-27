@@ -3,6 +3,7 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_device_id/flutter_device_id.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:konek_app/config/httpexception.dart';
 import 'package:konek_app/features/widgets.dart';
@@ -45,9 +46,28 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   bool isCheckNumber = false;
 
+   var _deviceId;
+
+  @override
+  void initState() {
+    getMobileID();
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
+  }
+
+    void getMobileID() async {
+    final _flutterDeviceIdPlugin = FlutterDeviceId();
+
+    String? deviceId = await _flutterDeviceIdPlugin.getDeviceId() ?? '';
+
+    setState(() {
+      _deviceId = deviceId;
+    });
   }
 
   Future<void> _showDialog() async {
@@ -94,7 +114,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     var data;
     try {
       data = await Provider.of<Auth>(context, listen: false)
-          .checkUserExists(_numberContoller.text);
+          .checkUserExists(_numberContoller.text, _deviceId);
       if (data['success']) {
         // ignore: use_build_context_synchronously
         Alert(
@@ -439,6 +459,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       'mobile_number': _numberContoller.text,
       'new_password': txtNewPassword.text,
       'confirm_password': txtConfirmPassword.text,
+      'mac_address': _deviceId
     };
     try {
       bool isSaved = await Provider.of<Auth>(context, listen: false)

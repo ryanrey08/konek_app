@@ -234,14 +234,14 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> checkUserExists(String number) async {
+  Future<Map<String, dynamic>> checkUserExists(String number, String deviceId) async {
     int id = 0;
     var jsonResponse;
     print(number);
     try {
       final response = await http.post(
         Uri.parse("${config.pre_url}/check-number"),
-        body: {'mobile_number': number},
+        body: {'mobile_number': number, 'mac_address': deviceId},
       );
       jsonResponse = json.decode(response.body);
       print(response.body);
