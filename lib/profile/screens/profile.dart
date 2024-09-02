@@ -322,7 +322,8 @@ class _MyProfileState extends State<MyProfile> {
       'address': txtCompleteAddress.text,
       'province': _provsId,
       'municipality': _munId,
-      'barangay': _brgyId
+      'barangay': _brgyId,
+      'date_of_birth': txtBirthday.text.toString()
     };
 
     // print(userInfo);
