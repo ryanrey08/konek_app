@@ -32,7 +32,7 @@ class Content with ChangeNotifier {
       notifyListeners();
       return jsonResponse["data"];
     } catch (error) {
-      // print(error);
+      print(error);
       // print(responseCode);
       rethrow;
     }
@@ -51,6 +51,8 @@ class Content with ChangeNotifier {
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       // print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
+      sharedPreferences.setString(
+          'swakQuicklinks', json.encode(jsonResponse["data"]));
       notifyListeners();
       return jsonResponse["data"];
     } catch (error) {
@@ -68,11 +70,13 @@ class Content with ChangeNotifier {
     var responseCode;
     try {
       Uri uri = Uri.parse(config.pre_url_ads);
+      // Uri uri = Uri.parse('http://10.44.77.240:2060/ext_login?username=sjz6xa&password=sjz6xa&next_url=http://113.19.24.196:443/api/v1/quick-links-and-ads/ads&groupid=63770&validity=5&user_type=cloud_voucher');
       final finalUri = uri.replace(queryParameters: {'type': 'ads'});
       var response = await http.get(finalUri,
           headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
       print(json.decode(response.body));
       var jsonResponse = json.decode(response.body);
+      sharedPreferences.setString('swakAds', json.encode(jsonResponse["data"]));
       notifyListeners();
       return jsonResponse["data"];
     } catch (error) {

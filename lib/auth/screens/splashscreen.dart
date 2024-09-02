@@ -123,8 +123,8 @@ class _SplashScreenState extends State<SplashScreen> {
                       Container(
                         padding: EdgeInsets.only(left: 5, right: 5),
                         decoration: const BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          // color: Colors.grey,
+                          // borderRadius: BorderRadius.all(Radius.circular(30)),
                           // image: DecorationImage(
                           //   scale: 7.5,
                           //   image: AssetImage(

@@ -12,7 +12,8 @@ class FileRequirements extends StatelessWidget {
   final String title;
   final String copy;
 
-  const FileRequirements({super.key, 
+  const FileRequirements({
+    super.key,
     required this.points,
     required this.title,
     required this.copy,
@@ -49,16 +50,21 @@ class FileRequirements extends StatelessWidget {
 
 class CustomFormField extends StatelessWidget {
   final String label;
+  final TextInputType inputType;
   final TextEditingController controller;
-  final Function validator;
+  final Function(dynamic) validator;
+  final Function(dynamic) onChange;
   final Function(String) onFieldSubmitted;
   final String initialValue;
   final bool status;
 
   const CustomFormField(
-      {super.key, required this.label,
+      {super.key,
+      required this.label,
+      required this.inputType,
       required this.controller,
       required this.validator,
+      required this.onChange,
       required this.onFieldSubmitted,
       required this.initialValue,
       required this.status});
@@ -71,8 +77,10 @@ class CustomFormField extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: useMobileLayout ? 3 : 10),
       child: TextFormField(
         enabled: status,
-
-        style: GoogleFonts.poppins(fontSize: useMobileLayout ? 16 : 18, color: status ? Colors.black : Colors.grey),
+        keyboardType: inputType,
+        style: GoogleFonts.poppins(
+            fontSize: useMobileLayout ? 16 : 18,
+            color: status ? Colors.black : Colors.grey),
         // decoration: InputDecoration(
         //   border: OutlineInputBorder(),
         //   labelText: label,
@@ -83,35 +91,35 @@ class CustomFormField extends StatelessWidget {
           // OutlineInputBorder
           // UnderlineInputBorder
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
               color: Colors.grey.shade400,
               width: 1,
             ),
           ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
               color: Colors.grey.shade400,
               width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
               color: Colors.grey.shade400,
               width: 1,
             ),
           ),
           disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
               color: Colors.grey.shade400,
               width: 1,
             ),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: Colors.redAccent,
               width: 1,
@@ -139,7 +147,8 @@ class CustomFormField extends StatelessWidget {
         ),
         controller: controller,
         onFieldSubmitted: onFieldSubmitted,
-        validator: (_) => validator(),
+        validator: (value) => validator(value),
+        onChanged: onChange,
       ),
     );
   }
@@ -149,7 +158,8 @@ class StatementAccountListItem extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const StatementAccountListItem({super.key, required this.title, required this.subtitle});
+  const StatementAccountListItem(
+      {super.key, required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +182,8 @@ class StatementAccountListItem extends StatelessWidget {
 
 class DrawerOptions extends StatelessWidget {
   const DrawerOptions(
-      {super.key, required this.dense,
+      {super.key,
+      required this.dense,
       required this.title,
       required this.useMobileLayout,
       required this.iconData,
@@ -204,8 +215,8 @@ class DrawerOptions extends StatelessWidget {
           ),
           // style: SettingsStyle.listTileText(),
         ),
-        leading:
-            Icon(iconData, color: const Color.fromARGB(255, 55, 57, 175), size: 20),
+        leading: Icon(iconData,
+            color: const Color.fromARGB(255, 55, 57, 175), size: 20),
         trailing: const Icon(Icons.keyboard_arrow_right, size: 15),
         onTap: onTapFunc,
       ),
@@ -219,7 +230,10 @@ class DragContainer extends StatelessWidget {
   final String location;
 
   const DragContainer(
-      {super.key, required this.label1, required this.label2, required this.location});
+      {super.key,
+      required this.label1,
+      required this.label2,
+      required this.location});
 
   @override
   Widget build(BuildContext context) {
@@ -402,35 +416,41 @@ class _CustomDropDownState extends State<CustomDropDown> {
           // OutlineInputBorder
           // UnderlineInputBorder
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
               color: widget.value != null ? Colors.black : Colors.grey.shade400,
               width: 1,
             ),
           ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
-              color: widget.value != null ? Colors.grey.shade400 : Colors.grey.shade400,
+              color: widget.value != null
+                  ? Colors.grey.shade400
+                  : Colors.grey.shade400,
               width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
-              color: widget.value != null ? Colors.grey.shade400 : Colors.grey.shade400,
+              color: widget.value != null
+                  ? Colors.grey.shade400
+                  : Colors.grey.shade400,
               width: 1,
             ),
           ),
           disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
-              color: widget.value != null ? Colors.grey.shade400 : Colors.grey.shade400,
+              color: widget.value != null
+                  ? Colors.grey.shade400
+                  : Colors.grey.shade400,
               width: 1,
             ),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: Colors.redAccent,
               width: 1,
@@ -473,9 +493,9 @@ class CustomDateTime extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final Function onFieldSubmitted;
+  final Function(DateTime?) onChanged;
   final Function onSaved;
-  final Function validator;
-  final String labeltxtTitle;
+  final String? Function(Object?) validator;
 
   const CustomDateTime(
       {Key? key,
@@ -483,9 +503,9 @@ class CustomDateTime extends StatefulWidget {
       required this.controller,
       required this.focusNode,
       required this.onFieldSubmitted,
+      required this.onChanged,
       required this.onSaved,
-      required this.validator,
-      required this.labeltxtTitle})
+      required this.validator})
       : super(key: key);
 
   @override
@@ -496,17 +516,21 @@ class _CustomDateTimeState extends State<CustomDateTime> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      // color: Colors.white,
+      margin: EdgeInsets.only(bottom: 15),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10), color: Colors.white),
       child: Theme(
         data: ThemeData.from(
           colorScheme: ColorScheme.fromSwatch(
-            primarySwatch: Colors.green,
+            // primarySwatch: Colors.white,
             backgroundColor: Colors.white,
           ),
         ),
         child: DateTimeField(
           controller: widget.controller,
           style: GoogleFonts.poppins(
-            textStyle: const TextStyle(
+            textStyle: TextStyle(
               fontSize: 16,
               color: Colors.black,
             ),
@@ -519,58 +543,233 @@ class _CustomDateTimeState extends State<CustomDateTime> {
               context: context,
               firstDate: DateTime(1900),
               initialDate: currentValue ?? DateTime.now(),
-              // lastDate: DateTime.now(),
-
-              lastDate: DateTime(2050),
-              // initialDatePickerMode: DatePickerMode.year
+              lastDate: DateTime.now(),
             ).then((pickedDate) {
               if (pickedDate == null) {
                 return null;
               }
-              setState(() {
-                // final f = new DateFormat('yyyy-MM-dd');
-                final f = DateFormat('MMMM dd, yyyy');
-                widget.controller.text = f.format(pickedDate).toString();
-              });
+              // setState(() {
+              //   // final f = new DateFormat('yyyy-MM-dd');
+              //   final f = new DateFormat('MMMM dd, yyyy');
+              //   widget.controller.text = f.format(pickedDate).toString();
+              //   print("BIRTHDAY: " + pickedDate.toString());
+              // });
+              final f = new DateFormat('MMMM dd, yyyy');
+              widget.controller.text = f.format(pickedDate).toString();
+              print("BIRTHDAY: " + pickedDate.toString());
               return pickedDate;
             });
           },
           focusNode: widget.focusNode,
-          onFieldSubmitted: widget.onFieldSubmitted(),
+          onFieldSubmitted: (_) {
+            widget.onFieldSubmitted();
+          },
+          onChanged: widget.onChanged,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.symmetric(horizontal: 20),
+            floatingLabelBehavior: FloatingLabelBehavior.auto,
+            fillColor: Colors.white,
+            // OutlineInputBorder
+            // UnderlineInputBorder
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: widget.controller.text != ""
+                    ? Colors.white
+                    : Colors.grey.shade400,
+                width: 1,
+              ),
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: widget.controller.text != ""
+                    ? Colors.white
+                    : Colors.grey.shade400,
+                width: 1,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: widget.controller.text != ""
+                    ? Colors.white
+                    : Colors.grey.shade400,
+                width: 1,
+              ),
+            ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: widget.controller.text != ""
+                    ? Colors.white
+                    : Colors.grey.shade400,
+                width: 1,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Colors.redAccent,
+                width: 1,
+              ),
+            ),
+            errorStyle: GoogleFonts.poppins(
+              textStyle: TextStyle(
+                fontSize: 12,
+                color: Colors.redAccent[700],
+              ),
+            ),
+            labelText: widget.controller.text != "" ? widget.title : null,
+            labelStyle: widget.controller.text != ""
+                ? GoogleFonts.poppins(
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  )
+                : null,
+            hintText: "Birthday",
+            hintStyle: widget.controller.text == ""
+                ? GoogleFonts.poppins(
+                    textStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  )
+                : null,
+          ),
+          onSaved: (_) {
+            widget.onSaved();
+          },
+          validator: widget.validator,
+          // onChanged: (date) {
+          //   print(date);
+          // },
+        ),
+      ),
+    );
+  }
+}
+
+class CustomDateTimeProfile extends StatefulWidget {
+  final String title;
+  final bool status;
+  final String label;
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final Function onFieldSubmitted;
+  final Function(DateTime?) onChanged;
+  final Function onSaved;
+  final String? Function(Object?) validator;
+
+  const CustomDateTimeProfile(
+      {Key? key,
+      required this.title,
+      required this.status,
+      required this.label,
+      required this.controller,
+      required this.focusNode,
+      required this.onFieldSubmitted,
+      required this.onChanged,
+      required this.onSaved,
+      required this.validator})
+      : super(key: key);
+
+  @override
+  _CustomDateTimeProfileState createState() => _CustomDateTimeProfileState();
+}
+
+class _CustomDateTimeProfileState extends State<CustomDateTimeProfile> {
+  @override
+  Widget build(BuildContext context) {
+    final double shortestSide = MediaQuery.of(context).size.shortestSide;
+    final bool useMobileLayout = shortestSide < 900.0;
+    return Container(
+      // color: Colors.white,
+      margin: EdgeInsets.only(bottom: 15),
+      // decoration: BoxDecoration(
+      //     borderRadius: BorderRadius.circular(10), color: Colors.white),
+      child: Theme(
+        data: ThemeData.from(
+          colorScheme: ColorScheme.fromSwatch(
+            // primarySwatch: Colors.white,
+            // backgroundColor: Colors.white,
+          ),
+        ),
+        child: DateTimeField(
+          controller: widget.controller,
+          style: GoogleFonts.poppins(
+            textStyle: TextStyle(
+              fontSize: 16,
+              color: widget.status ? Colors.black : Colors.grey.shade500,
+            ),
+          ),
+          enabled: widget.status,
+          format: DateFormat("MMMM dd, yyyy"),
+          // format: DateFormat("yyyy-MM-dd"),
+          onShowPicker: (context, currentValue) {
+            return showDatePicker(
+              context: context,
+              firstDate: DateTime(1900),
+              initialDate: currentValue ?? DateTime.now(),
+              lastDate: DateTime.now(),
+            ).then((pickedDate) {
+              if (pickedDate == null) {
+                return null;
+              }
+              // setState(() {
+              //   // final f = new DateFormat('yyyy-MM-dd');
+              //   final f = new DateFormat('MMMM dd, yyyy');
+              //   widget.controller.text = f.format(pickedDate).toString();
+              //   print("BIRTHDAY: " + pickedDate.toString());
+              // });
+              final f = new DateFormat('MMMM dd, yyyy');
+              widget.controller.text = f.format(pickedDate).toString();
+              print("BIRTHDAY: " + pickedDate.toString());
+              return pickedDate;
+            });
+          },
+          focusNode: widget.focusNode,
+          onFieldSubmitted: (_) {
+            widget.onFieldSubmitted();
+          },
+          onChanged: widget.onChanged,
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 20),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
             // OutlineInputBorder
             // UnderlineInputBorder
             focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
                 color: Colors.grey.shade400,
                 width: 1,
               ),
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(50),
+              borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
                 color: Colors.grey.shade400,
                 width: 1,
               ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(50),
+              borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
                 color: Colors.grey.shade400,
                 width: 1,
               ),
             ),
             disabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(50),
+              borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
                 color: Colors.grey.shade400,
                 width: 1,
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(50),
+              borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(
                 color: Colors.redAccent,
                 width: 1,
@@ -582,10 +781,10 @@ class _CustomDateTimeState extends State<CustomDateTime> {
                 color: Colors.redAccent[700],
               ),
             ),
-            labelText: widget.labeltxtTitle,
+            labelText: widget.label != "" ? widget.label : null,
             labelStyle: GoogleFonts.poppins(
               textStyle: TextStyle(
-                fontSize: 16,
+                fontSize: useMobileLayout ? 16 : 18,
                 color: Colors.grey[400],
               ),
             ),
@@ -596,11 +795,13 @@ class _CustomDateTimeState extends State<CustomDateTime> {
               ),
             ),
           ),
-          onSaved: widget.onSaved(),
-          validator: widget.validator(),
-          onChanged: (date) {
-            // print(date);
+          onSaved: (_) {
+            widget.onSaved();
           },
+          validator: widget.validator,
+          // onChanged: (date) {
+          //   print(date);
+          // },
         ),
       ),
     );
@@ -742,7 +943,8 @@ class DropDownCustom extends StatelessWidget {
   final String title;
   final String copy;
 
-  const DropDownCustom({super.key, 
+  const DropDownCustom({
+    super.key,
     required this.points,
     required this.title,
     required this.copy,
@@ -779,7 +981,8 @@ class DropDownCustom extends StatelessWidget {
 
 class ProductionCostList extends StatelessWidget {
   const ProductionCostList(
-      {super.key, required this.dense,
+      {super.key,
+      required this.dense,
       required this.title,
       required this.useMobileLayout,
       required this.iconData,
@@ -915,7 +1118,8 @@ class ParticularDetails extends StatelessWidget {
   final Color color;
 
   const ParticularDetails(
-      {super.key, required this.particularName,
+      {super.key,
+      required this.particularName,
       required this.measurement,
       required this.quantity,
       required this.unit,

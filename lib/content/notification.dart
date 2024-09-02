@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:konek_app/auth/providers/auth.dart';
+import 'package:konek_app/auth/screens/login.dart';
 import 'package:konek_app/content/dashboard.dart';
 import 'package:konek_app/content/provider/pos.dart';
 import 'package:provider/provider.dart';
@@ -34,8 +36,13 @@ class _NotificationListState extends State<NotificationList> {
   @override
   void initState() {
     super.initState();
-    getVoucherData();
+    refreshPage();
     // getNotification();
+  }
+
+  Future<void> refreshPage()async{
+    checkAccount();
+     getVoucherData();
   }
 
   Future<void> getNotification() async {
@@ -77,8 +84,9 @@ class _NotificationListState extends State<NotificationList> {
             var nowDate = DateTime.parse(item['payment_completion_at']);
             var toDate = nowDate.add(
                 Duration(days: int.parse(item['subscription']['duration'])));
-            var diff = toDate.difference(nowDate).inSeconds;
-            if (diff <= 0) {
+            var diff = DateTime.parse(voucher['current_date']).difference(toDate).inSeconds;
+            print(diff);
+            if (diff > 0) {
               voucherData.add(item);
             }
           }
@@ -126,6 +134,29 @@ class _NotificationListState extends State<NotificationList> {
         DateFormat("yyyy-MM-dd hh:mm").format(toDate).toString();
   }
 
+    Future<void> checkAccount() async {
+    try {
+      var accountData =
+          await Provider.of<Auth>(context, listen: false).checkAccount();
+      if (accountData['data']['status'] == 'Inactive') {
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        sharedPreferences.clear();
+        Navigator.of(context).pushReplacementNamed(Login.routeName);
+      }
+    } on HttpException catch (error) {
+      // print(error);
+      showError(error.toString());
+    } catch (error) {
+      // showError(error.toString());
+      if (error.toString().contains('Connection failed')) {
+        // showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double shortestSide = MediaQuery.of(context).size.shortestSide;
@@ -157,7 +188,7 @@ class _NotificationListState extends State<NotificationList> {
                 color: Colors.white,
                 backgroundColor: Colors.blue,
                 strokeWidth: 4.0,
-                onRefresh: getVoucherData,
+                onRefresh: refreshPage,
                 child: voucherData.length > 0
                     ? ListView.builder(
                         itemCount: voucherData.length,

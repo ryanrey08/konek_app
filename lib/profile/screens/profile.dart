@@ -3,7 +3,7 @@ import 'dart:io';
 // import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 // import 'package:flutter/foundation.dart';
-// import 'package:intl/intl.dart';
+import 'package:intl/intl.dart';
 // import 'package:konek_app/Config/Config.dart';
 import 'package:konek_app/content/uploadpic.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -22,6 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:signature/signature.dart';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
+import '../../config/httpexception.dart';
 
 class MyProfile extends StatefulWidget {
   static const routeName = '/myprofile';
@@ -35,7 +36,6 @@ class _MyProfileState extends State<MyProfile> {
   int _currentStep = 0;
 
   bool editStatus = false;
-
 
   final _formKey1 = GlobalKey<FormState>();
   final _formKey2 = GlobalKey<FormState>();
@@ -267,14 +267,16 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
-
 //Personal Information
   final txtFirstName = TextEditingController();
   final txtMiddleName = TextEditingController();
+  final txtAge = TextEditingController();
   final txtLastName = TextEditingController();
+  final txtBirthday = TextEditingController();
   final txtCompleteAddress = TextEditingController();
   final txtPhoneNumber = TextEditingController();
   final txtSex = TextEditingController();
+  final txtOldPassword = TextEditingController();
   final txtNewPassword = TextEditingController();
   final txtConfirmPassword = TextEditingController();
   final txtEmailAddress = TextEditingController();
@@ -314,12 +316,14 @@ class _MyProfileState extends State<MyProfile> {
   void updateProfile() {
     var userInfo = {
       'm_name': txtMiddleName.text,
+      'age': txtAge.text,
       'first_name': txtFirstName.text,
       'last_name': txtLastName.text,
       'address': txtCompleteAddress.text,
       'province': _provsId,
       'municipality': _munId,
-      'barangay': _brgyId
+      'barangay': _brgyId,
+      'date_of_birth': txtBirthday.text.toString()
     };
 
     // print(userInfo);
@@ -359,7 +363,55 @@ class _MyProfileState extends State<MyProfile> {
       // print(error);
       showError(error.toString());
     } catch (error) {
-            if (error.toString().contains('Connection failed')) {
+      if (error.toString().contains('Connection failed')) {
+        showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+    }
+  }
+
+  void updateMyPassword() async {
+    var userInfo = {
+      'current_password': txtOldPassword.text,
+      'new_password': txtNewPassword.text,
+      'confirm_password': txtConfirmPassword.text,
+    };
+    try {
+      bool isSaved = await Provider.of<ProfileProvider>(context, listen: false)
+          .updatePassword(userInfo);
+      if (isSaved) {
+        setState(() {
+          isLoadingSend = false;
+        });
+        Navigator.of(context).pop();
+        AwesomeDialog(
+          dismissOnBackKeyPress: false,
+          dismissOnTouchOutside: false,
+          onDismissCallback: (BuildContext) {
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+          },
+          context: context,
+          animType: AnimType.scale,
+          dialogType: DialogType.success,
+          title: "Update Password",
+          desc: "Successfully Updated",
+          btnOkOnPress: () {
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+            // print(_selectedProvince);
+          },
+        ).show();
+
+        // setState(() {
+        //   _currentStep += 1;
+        // });
+      }
+    } on HttpException catch (error) {
+      // print(error);
+      showError(error.toString());
+    } catch (error) {
+      print(error);
+      if (error.toString().contains('Connection failed')) {
         showError('No Internet Connection');
       } else {
         showError('something went wrong');
@@ -381,8 +433,12 @@ class _MyProfileState extends State<MyProfile> {
         myProfile['first_name'] == null ? '' : myProfile['first_name'];
     txtMiddleName.text =
         myProfile['middle_name'] == null ? '' : myProfile['middle_name'];
+    txtAge.text = myProfile['age'] == null ? '' : myProfile['age'].toString();
     txtLastName.text =
         myProfile['last_name'] == null ? '' : myProfile['last_name'];
+    final f = new DateFormat('MMMM dd, yyyy');
+         txtBirthday.text =
+        myProfile['date_of_birth'] == null ? '' : f.format(DateTime.parse(myProfile['date_of_birth'])).toString();
     txtEmailAddress.text = myProfile['email'] == null ? '' : myProfile['email'];
     txtPhoneNumber.text =
         myProfile['mobile_no'] == null ? '' : myProfile['mobile_no'];
@@ -401,14 +457,14 @@ class _MyProfileState extends State<MyProfile> {
       setState(() {
         myProfile = prof['data'];
         getProfile();
-        // print(myProfile);
+        print(myProfile);
       });
     } on HttpException catch (error) {
       // print(error);
       showError(error.toString());
     } catch (error) {
       // showError(error.toString());
-            if (error.toString().contains('Connection failed')) {
+      if (error.toString().contains('Connection failed')) {
         showError('No Internet Connection');
       } else {
         showError('something went wrong');
@@ -489,7 +545,7 @@ class _MyProfileState extends State<MyProfile> {
       // print(error);
       showError(error.toString());
     } catch (error) {
-           if (error.toString().contains('Connection failed')) {
+      if (error.toString().contains('Connection failed')) {
         showError('No Internet Connection');
       } else {
         showError('something went wrong');
@@ -531,7 +587,7 @@ class _MyProfileState extends State<MyProfile> {
       // print(error);
       showError(error.toString());
     } catch (error) {
-            if (error.toString().contains('Connection failed')) {
+      if (error.toString().contains('Connection failed')) {
         showError('No Internet Connection');
       } else {
         showError('something went wrong');
@@ -703,6 +759,7 @@ class _MyProfileState extends State<MyProfile> {
                               ),
                               CustomFormField(
                                 status: editStatus,
+                                inputType: TextInputType.text,
                                 label: 'First Name',
                                 controller: txtFirstName,
                                 onFieldSubmitted: (_) {
@@ -715,25 +772,77 @@ class _MyProfileState extends State<MyProfile> {
                                   }
                                   return null;
                                 },
+                                onChange: (value) {},
                                 initialValue: '',
+                              ),
+                              const SizedBox(height: 4),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: CustomFormField(
+                                        status: editStatus,
+                                        inputType: TextInputType.text,
+                                        label: 'Middlename Initial (optional)',
+                                        controller: txtMiddleName,
+                                        validator: (value) {
+                                          return null;
+                                        },
+                                        onChange: (value) {
+                                          if (txtMiddleName.text.length > 2) {
+                                            setState(() {
+                                              txtMiddleName.text = value
+                                                  .toString()
+                                                  .substring(0, 2);
+                                            });
+                                          }
+                                        },
+                                        initialValue: '',
+                                        onFieldSubmitted: (_) {
+                                          FocusScope.of(context)
+                                              .requestFocus(lNameFocus);
+                                        },
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                      child: CustomFormField(
+                                        status: false,
+                                        inputType: TextInputType.number,
+                                        label: 'Age',
+                                        controller: txtAge,
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Please enter your age';
+                                          }
+                                          return null;
+                                        },
+                                        onChange: (value) {
+                                          if (value.toString().length > 2) {
+                                            setState(() {
+                                              txtAge.text = value
+                                                  .toString()
+                                                  .substring(0, 2);
+                                            });
+                                          }
+                                        },
+                                        initialValue: '',
+                                        onFieldSubmitted: (_) {
+                                          FocusScope.of(context)
+                                              .requestFocus(lNameFocus);
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                               const SizedBox(height: 4),
                               CustomFormField(
                                 status: editStatus,
-                                label: 'Middlename (optional)',
-                                controller: txtMiddleName,
-                                validator: (value) {
-                                  return null;
-                                },
-                                initialValue: '',
-                                onFieldSubmitted: (_) {
-                                  FocusScope.of(context)
-                                      .requestFocus(lNameFocus);
-                                },
-                              ),
-                              const SizedBox(height: 4),
-                              CustomFormField(
-                                status: editStatus,
+                                inputType: TextInputType.text,
                                 label: 'Lastname',
                                 controller: txtLastName,
                                 onFieldSubmitted: (_) {
@@ -742,15 +851,61 @@ class _MyProfileState extends State<MyProfile> {
                                 },
                                 validator: (value) {
                                   if (value.isEmpty) {
-                                    return 'Please enter your lasst name';
+                                    return 'Please enter your last name';
                                   }
                                   return null;
                                 },
+                                onChange: (value) {},
                                 initialValue: '',
                               ),
                               const SizedBox(height: 4),
+                               CustomDateTimeProfile(
+                              title: "",
+                              controller: txtBirthday,
+                              onFieldSubmitted: (value) {
+                                setState(() {
+                                  // final f = new DateFormat('yyyy-MM-dd');
+                                  final f = new DateFormat('MMMM dd, yyyy');
+                                  txtBirthday.text = f.format(value).toString();
+                                  // print(value);
+                                  // return txtEnterDate.text;
+                                });
+                                // FocusScope.of(context)
+                                //     .requestFocus(ctcNumberFocus);
+                              },
+                              onChanged: (value) {
+                                if (value != null) {
+                                  DateTime now = DateTime.now();
+                                  Duration age = now.difference(value!);
+                                  int years = age.inDays ~/ 365;
+                                  setState(() {
+                                    txtAge.text = years.toString();
+                                  });
+                                }
+                              },
+                              onSaved: (val) {
+                                setState(() {
+                                  // final f = new DateFormat('yyyy-MM-dd');
+                                  final f = new DateFormat('MMMM dd, yyyy');
+                                  // txtBirthday.text = val.toString();
+                                  txtBirthday.text = f.format(val).toString();
+                                  // print("ONSAVE" +
+                                  //     txtBirthday.text);
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null && txtBirthday.text.isEmpty) {
+                                  // print(txtEnterDateFrom.text);
+                                  return 'Please enter date';
+                                }
+                                return null;
+                              },
+                              focusNode: phoneFocus, status: editStatus, label: '',
+                            ),
+                              // const SizedBox(height: 4),
                               CustomFormField(
                                 status: editStatus,
+                                inputType: TextInputType.emailAddress,
                                 label: 'Email Address',
                                 controller: txtEmailAddress,
                                 onFieldSubmitted: (_) {
@@ -759,15 +914,23 @@ class _MyProfileState extends State<MyProfile> {
                                 },
                                 validator: (value) {
                                   if (value.isEmpty) {
-                                    return 'Please enter your TIN No.';
+                                    return 'Please enter your Email Address.';
                                   }
+                                  if (!RegExp(
+                                          r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$')
+                                      .hasMatch(value)) {
+                                    return 'Invalid Email Address';
+                                  }
+
                                   return null;
                                 },
+                                onChange: (value) {},
                                 initialValue: '',
                               ),
                               const SizedBox(height: 4),
                               CustomFormField(
                                 status: editStatus,
+                                inputType: TextInputType.number,
                                 label: 'Mobile Number',
                                 controller: txtPhoneNumber,
                                 onFieldSubmitted: (_) {
@@ -778,13 +941,19 @@ class _MyProfileState extends State<MyProfile> {
                                   if (value.isEmpty) {
                                     return 'Please enter your mobile number';
                                   }
+
+                                  if (value.toString().length != 11) {
+                                    return 'Invalid Number';
+                                  }
                                   return null;
                                 },
+                                onChange: (value) {},
                                 initialValue: '',
                               ),
                               const SizedBox(height: 4),
                               CustomFormField(
                                 status: editStatus,
+                                inputType: TextInputType.text,
                                 label: 'Address',
                                 controller: txtCompleteAddress,
                                 onFieldSubmitted: (_) {
@@ -797,6 +966,7 @@ class _MyProfileState extends State<MyProfile> {
                                   }
                                   return null;
                                 },
+                                onChange: (value) {},
                                 initialValue: '',
                               ),
                               const SizedBox(height: 4),
@@ -1003,6 +1173,395 @@ class _MyProfileState extends State<MyProfile> {
                   width: double.infinity,
                   child: Row(
                     children: <Widget>[
+                      Expanded(
+                        child: ElevatedButton(
+                          child: Text(
+                            "CHANGE PASSWORD",
+                            style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            //_formKey1.currentState!.validate();
+                            Alert(
+                                context: context,
+                                title: "",
+                                content: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 15),
+                                  child: Column(
+                                    children: <Widget>[
+                                      // Text(
+                                      //   'The OTP password was sent to the following recipient:',
+                                      //   textAlign: TextAlign.center,
+                                      //   style: GoogleFonts.poppins(
+                                      //     color: Colors.black,
+                                      //     fontSize: 16,
+                                      //     fontWeight: FontWeight.w500,
+                                      //   ),
+                                      // ),
+                                      // SizedBox(
+                                      //   height: 10,
+                                      // ),
+                                      Container(
+                                        margin: EdgeInsets.only(bottom: 5),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: TextFormField(
+                                                controller: txtOldPassword,
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                decoration: InputDecoration(
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                          horizontal: 20),
+                                                  floatingLabelBehavior:
+                                                      FloatingLabelBehavior
+                                                          .auto,
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50),
+                                                    borderSide: BorderSide(
+                                                      color: Colors.green,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Colors.grey.shade400,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  disabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Colors.grey.shade400,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  errorBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color: Colors.redAccent,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Colors.grey.shade400,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  enabled: true,
+                                                  hintText:
+                                                      'Enter Old Password',
+                                                  hintStyle:
+                                                      GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                  errorStyle:
+                                                      GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                      fontSize: 12,
+                                                      color:
+                                                          Colors.redAccent[700],
+                                                    ),
+                                                  ),
+                                                  fillColor: Colors.grey[200],
+                                                  filled: true,
+                                                ),
+                                                validator: (value) {
+                                                  if (value == null) {
+                                                    return 'Please enter old password';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(bottom: 5),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: TextFormField(
+                                                controller: txtNewPassword,
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                decoration: InputDecoration(
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                          horizontal: 20),
+                                                  floatingLabelBehavior:
+                                                      FloatingLabelBehavior
+                                                          .auto,
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color: Colors.green,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Colors.grey.shade400,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  disabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Colors.grey.shade400,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  errorBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color: Colors.redAccent,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Colors.grey.shade400,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  enabled: true,
+                                                  hintText:
+                                                      'Enter New Password',
+                                                  hintStyle:
+                                                      GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                  errorStyle:
+                                                      GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                      fontSize: 12,
+                                                      color:
+                                                          Colors.redAccent[700],
+                                                    ),
+                                                  ),
+                                                  fillColor: Colors.grey[200],
+                                                  filled: true,
+                                                ),
+                                                validator: (value) {
+                                                  if (value == null) {
+                                                    return 'Please enter the password';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(bottom: 5),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: TextFormField(
+                                                controller: txtConfirmPassword,
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                decoration: InputDecoration(
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                          horizontal: 20),
+                                                  floatingLabelBehavior:
+                                                      FloatingLabelBehavior
+                                                          .auto,
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50),
+                                                    borderSide: BorderSide(
+                                                      color: Colors.green,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Colors.grey.shade400,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  disabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Colors.grey.shade400,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  errorBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color: Colors.redAccent,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Colors.grey.shade400,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  enabled: true,
+                                                  hintText:
+                                                      'Enter Confirm Password',
+                                                  hintStyle:
+                                                      GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                  errorStyle:
+                                                      GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                      fontSize: 12,
+                                                      color:
+                                                          Colors.redAccent[700],
+                                                    ),
+                                                  ),
+                                                  fillColor: Colors.grey[200],
+                                                  filled: true,
+                                                ),
+                                                validator: (value) {
+                                                  if (value == null) {
+                                                    return 'Please enter confirm password';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                buttons: [
+                                  DialogButton(
+                                    color: Color.fromARGB(255, 55, 57, 175),
+                                    onPressed: () async {
+                                      // Navigator.of(context)
+                                      //     .pushReplacementNamed(Dashboard.routeName);
+                                      updateMyPassword();
+                                    },
+                                    child: Text(
+                                      "Change Password",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 16),
+                                    ),
+                                  )
+                                ]).show();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary:
+                                Color.fromARGB(255, 55, 57, 175), // background
+                            onPrimary: Colors.white, // foreground
+                            //                color: Colors.yellow,
+                            // textColor: Colors.black,
+                            // splashColor: Colors.yellowAccent[800],
+                          ),
+                          // color: Colors.green,
+                          // textColor: Colors.black,
+                          // splashColor: Colors.yellowAccent[800],
+                        ),
+                      ),
                       const SizedBox(
                         width: 5,
                       ),
@@ -1041,8 +1600,11 @@ class _MyProfileState extends State<MyProfile> {
                           : Expanded(
                               child: ElevatedButton(
                                 onPressed: () {
-                                  // _formKey1.currentState.validate();
-                                  proceed();
+                                  if (!_formKey1.currentState!.validate()) {
+                                    return;
+                                  } else {
+                                    proceed();
+                                  }
                                 },
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.white,

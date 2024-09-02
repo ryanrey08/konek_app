@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:konek_app/auth/screens/forgot_password.dart';
 //import 'package:konek_app/auth/providers/auth.dart';
 import 'package:konek_app/auth/screens/register.dart';
 // import 'package:konek_app/config/httpexception.dart';
@@ -12,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tap_debouncer/tap_debouncer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:mobile_device_identifier/mobile_device_identifier.dart';
 import '/config/HttpException.dart';
 import '../providers/auth.dart';
 
@@ -33,10 +36,32 @@ class _LoginState extends State<Login> {
   final txtPasswordController = TextEditingController();
   double appBarHeight = AppBar().preferredSize.height;
 
+    String _deviceId = 'Unknown';
+  final _mobileDeviceIdentifierPlugin = MobileDeviceIdentifier();
+  
+
   @override
   void initState() {
+    initDeviceId();
     // TODO: implement initState
     super.initState();
+  }
+
+    Future<void> initDeviceId() async {
+    String deviceId;
+    try {
+      deviceId = await _mobileDeviceIdentifierPlugin.getDeviceId() ??
+          'Unknown platform version';
+    } on PlatformException {
+      deviceId = 'Failed to get platform version.';
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _deviceId = deviceId;
+
+      // print(_deviceId);
+    });
   }
 
   @override
@@ -102,8 +127,8 @@ class _LoginState extends State<Login> {
                       margin: EdgeInsets.zero,
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30)),
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10)),
                       ),
                       child: Container(
                         height: MediaQuery.of(context).size.height / 2 + 100,
@@ -126,42 +151,44 @@ class _LoginState extends State<Login> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
                                       // SizedBox(height: 20),
-                                      Container(
-                                        alignment: Alignment.topCenter,
-                                        child: Text(
-                                          "SIGN IN",
-                                          textAlign: TextAlign.left,
-                                          style: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize:
-                                                  useMobileLayout ? 18 : 30,
-                                            ),
-                                          ),
-                                        ),
+                                      // Container(
+                                      //   alignment: Alignment.topCenter,
+                                      //   child: Text(
+                                      //     "SIGN IN",
+                                      //     textAlign: TextAlign.left,
+                                      //     style: GoogleFonts.poppins(
+                                      //       textStyle: TextStyle(
+                                      //         color: Colors.white,
+                                      //         fontWeight: FontWeight.w500,
+                                      //         fontSize:
+                                      //             useMobileLayout ? 18 : 30,
+                                      //       ),
+                                      //     ),
+                                      //   ),
+                                      // ),
+                                      SizedBox(
+                                        height: 5,
                                       ),
-                                      SizedBox(height: 5,),
                                       SizedBox(
                                           width: 120,
                                           height: 80,
                                           child: Container(
                                             decoration: const BoxDecoration(
-                                              color: Colors.grey,
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(30)),
-                                              image: DecorationImage(
-                                                scale: 7.5,
-                                                image: AssetImage(
-                                                    'assets/images/move_mandaue_swak.png'),
-                                              ),
+                                                // color: Colors.grey,
+                                                // borderRadius: BorderRadius.all(
+                                                //     Radius.circular(30)),
+                                                // image: DecorationImage(
+                                                //   scale: 7.5,
+                                                //   image: AssetImage(
+                                                //       'assets/images/move_mandaue_swak.png'),
+                                                // ),
+                                                ),
+                                            child: const Image(
+                                              // image: NetworkImage(
+                                              //     'assets/images/novulutions.png'),
+                                              image: AssetImage(
+                                                  'assets/images/move_mandaue_swak.png'),
                                             ),
-                                            // child: const Image(
-                                            //   // image: NetworkImage(
-                                            //   //     'assets/images/novulutions.png'),
-                                            //   image: AssetImage(
-                                            //       'assets/images/move_mandaue_swak.png'),
-                                            // ),
                                           )),
                                       const SizedBox(
                                         height: 15,
@@ -174,43 +201,46 @@ class _LoginState extends State<Login> {
                                       const SizedBox(
                                         height: 10,
                                       ),
-                                      // loginFields("", Icons.lock,
-                                      //     txtPasswordController, useMobileLayout),
-                                      // SizedBox(
-                                      //   height: 10,
-                                      // ),
-                                      // Column(
-                                      //   mainAxisAlignment: MainAxisAlignment.end,
-                                      //   crossAxisAlignment:
-                                      //       CrossAxisAlignment.end,
-                                      //   children: <Widget>[
-                                      //     Container(
-                                      //       child: GestureDetector(
-                                      //         child: Text(
-                                      //           'Forgot password?',
-                                      //           style: GoogleFonts.poppins(
-                                      //             textStyle: TextStyle(
-                                      //                 fontSize: 15,
-                                      //                 // decoration: TextDecoration.underline,
-                                      //                 color: Colors.grey),
-                                      //           ),
-                                      //         ),
-                                      //         onTap: () {
-                                      //           // Navigator.push(
-                                      //           //   context,
-                                      //           //   MaterialPageRoute(
-                                      //           //       builder: (context) => ForgotPassword()),
-                                      //           // );\
-                                      //         },
-                                      //       ),
-                                      //     ),
-                                      //   ],
-                                      // ),
+                                      loginFields(
+                                          "",
+                                          Icons.lock,
+                                          txtPasswordController,
+                                          useMobileLayout),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
                                       const SizedBox(
                                         height: 10,
                                       ),
                                       loginButton(useMobileLayout),
-                                      const SizedBox(height: 5),
+                                      const SizedBox(height: 20),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: <Widget>[
+                                          Container(
+                                            child: GestureDetector(
+                                              child: Text(
+                                                'Forgot password?',
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                      fontSize: 15,
+                                                      // decoration: TextDecoration.underline,
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                              onTap: () {
+                                                   Navigator.of(context)
+                                                      .pushNamed(
+                                                    ForgotPassword.routeName,
+                                                  );
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                       Container(
                                         alignment: Alignment.center,
                                         width: useMobileLayout ? null : 500,
@@ -237,7 +267,7 @@ class _LoginState extends State<Login> {
                                               child: TextButton(
                                                 onPressed: () {
                                                   Navigator.of(context)
-                                                      .pushReplacementNamed(
+                                                      .pushNamed(
                                                     AccountRegister.routeName,
                                                   );
                                                 },
@@ -326,35 +356,35 @@ class _LoginState extends State<Login> {
                 // focusedErrorBorder: _textFormBorder(),
                 // focusedBorder: _textFormBorder(),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Color.fromARGB(255, 55, 57, 175),
                     width: 1,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: CupertinoColors.systemGrey,
                     width: 1,
                   ),
                 ),
                 disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: CupertinoColors.systemGrey,
                     width: 1,
                   ),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.redAccent,
                     width: 1,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
@@ -414,35 +444,35 @@ class _LoginState extends State<Login> {
           contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           floatingLabelBehavior: FloatingLabelBehavior.auto,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: Colors.green,
               width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: CupertinoColors.systemGrey,
               width: 1,
             ),
           ),
           disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: CupertinoColors.systemGrey,
               width: 1,
             ),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: Colors.redAccent,
               width: 1,
             ),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
               color: CupertinoColors.systemGrey,
               width: 1,
@@ -524,7 +554,7 @@ class _LoginState extends State<Login> {
               style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50.0),
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                   textStyle: const TextStyle(
                     color: Colors.green,
@@ -576,7 +606,7 @@ class _LoginState extends State<Login> {
     try {
       //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
       await Provider.of<Auth>(context, listen: false)
-          .login(txtUsernameController.text, txtPasswordController.text);
+          .login(txtUsernameController.text, txtPasswordController.text, _deviceId);
       // SharedPreferences prefs = await SharedPreferences.getInstance();
       SharedPreferences prefs = await SharedPreferences.getInstance();
       if (prefs.containsKey('userData')) {

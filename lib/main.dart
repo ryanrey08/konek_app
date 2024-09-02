@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:konek_app/auth/screens/forgot_password.dart';
 import 'package:konek_app/config/checkconnection.dart';
 import 'package:konek_app/config/notification.dart';
 import 'package:konek_app/content/notification.dart';
@@ -20,7 +23,16 @@ import './content/dashboard.dart';
 import 'auth/screens/splashscreen.dart';
 import 'content/pos.dart';
 
+ class MyHttpOverrides extends HttpOverrides{
+  @override
+  HttpClient createHttpClient(SecurityContext? context){
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
+  }
+}
+
 void main() async {
+  HttpOverrides.global = MyHttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationController.initializeLocalNotifications();
   await NotificationController.initializeIsolateReceivePort();
@@ -176,6 +188,7 @@ class _MyAppPageState extends State<MyApp> {
               Dashboard.routeName: (context) => const Dashboard(),
               //Login
               Login.routeName: (context) => const Login(),
+              ForgotPassword.routeName: (context) => const ForgotPassword(),
               // ignore: equal_keys_in_map
               //Registration
               AccountRegister.routeName: (context) => AccountRegister(),

@@ -1,3 +1,6 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
 import 'package:konek_app/auth/providers/auth.dart';
 import 'package:konek_app/auth/screens/login.dart';
 //import 'package:konek_app/Screen/RegisterSuccesScreen.dart';
@@ -5,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:konek_app/auth/screens/terms_and_conditions.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tap_debouncer/tap_debouncer.dart';
@@ -21,6 +25,7 @@ import 'package:string_validator/string_validator.dart';
 import 'package:flutter_device_identifier/flutter_device_identifier.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_device_identifier/mobile_device_identifier.dart';
+import 'package:flutter_device_id/flutter_device_id.dart';
 // import 'package:loader_overlay/loader_overlay.dart';
 
 import 'dart:convert';
@@ -39,7 +44,7 @@ import '/auth/providers/auth.dart';
 import '/config/HttpException.dart';
 import 'Splashscreen.dart';
 
-const String CAPTCHA_SITE_KEY = "6LcSiSQdAAAAAOyoKM6G5CeLAPE-P5ApqwNMUQaV";
+const String CAPTCHA_SITE_KEY = "6LeVSg4qAAAAAHK97rol9rhvDkGwQdSdpJDqJrQm";
 
 class AccountRegister extends StatefulWidget {
   static const routeName = '/register';
@@ -58,12 +63,15 @@ class _AccountRegisterState extends State<AccountRegister> {
 
   final txtFirstName = TextEditingController();
   final txtMiddleName = TextEditingController();
+  final txtAge = TextEditingController();
   final txtLastName = TextEditingController();
+  final txtBirthday = TextEditingController();
   final txtEmail = TextEditingController();
-  // final txtBirthday = TextEditingController();
+  final txtBrgyAddress = TextEditingController();
   final txtContactNumber = TextEditingController();
   final txtPassword = TextEditingController();
   final txtConfirmPassword = TextEditingController();
+  TextEditingController _otpcode = TextEditingController();
 
   final fNameFocus = FocusNode();
   final mNameFocus = FocusNode();
@@ -93,7 +101,6 @@ class _AccountRegisterState extends State<AccountRegister> {
   var maskTextInputFormatter = MaskTextInputFormatter(
       mask: "##########", filter: {"#": RegExp(r'[0-9]')});
 
-
   var userInfo = User(
     last_name: "",
     first_name: "",
@@ -106,6 +113,8 @@ class _AccountRegisterState extends State<AccountRegister> {
     status: '',
   );
 
+  // var data;
+
   bool isCheckedLoad = false;
   bool isChecked = false;
 
@@ -116,15 +125,21 @@ class _AccountRegisterState extends State<AccountRegister> {
   final String _serialNumber = "--";
 
 
-  String _deviceId = 'Unknown';
+  var _deviceId;
   final _mobileDeviceIdentifierPlugin = MobileDeviceIdentifier();
+
+  var data;
+  bool isOtpValid = false;
+  var otpTimer;
+  bool isOTPExpire = false;
+  bool isResend = false;
 
   @override
   void initState() {
     super.initState();
-
-
-    initDeviceId();
+    txtBirthday.text = 'January 01, 1990';
+    // initDeviceId();
+    getMobileID();
   }
 
   @override
@@ -139,6 +154,29 @@ class _AccountRegisterState extends State<AccountRegister> {
         txtContactNumber.text = subsData;
       });
     }
+  }
+
+  void getMobileID() async {
+    final _flutterDeviceIdPlugin = FlutterDeviceId();
+
+    String? deviceId = await _flutterDeviceIdPlugin.getDeviceId() ?? '';
+
+    setState(() {
+      _deviceId = deviceId;
+    });
+  }
+
+  void showTermsAndConditions() {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        useSafeArea: true,
+        builder: (context) => Center(
+              child: Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: MediaQuery.of(context).size.height - 150,
+                  child: TermsAndConditions()),
+            ));
   }
 
   Future<void> initDeviceId() async {
@@ -184,7 +222,7 @@ class _AccountRegisterState extends State<AccountRegister> {
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> _openReCaptcha() async {
     Grecaptcha()
-        .verifyWithRecaptcha('6LcSiSQdAAAAAOyoKM6G5CeLAPE-P5ApqwNMUQaV')
+        .verifyWithRecaptcha('6LeVSg4qAAAAAHK97rol9rhvDkGwQdSdpJDqJrQm')
         .then((result) {
       // print(result);
       if (result != '') {
@@ -207,76 +245,442 @@ class _AccountRegisterState extends State<AccountRegister> {
     });
   }
 
-  Future<void> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
+  Future<void> checkUserCreds(BuildContext context1) async {
+    var data;
+    try {
+      data = await Provider.of<Auth>(context, listen: false)
+          .checkUserCreds(txtContactNumber.text, txtEmail.text);
+      if (data['success']) {
+        sendOTP(context1);
+      } else {
+        if (data['data'].containsKey('mobile_number')) {
+          _showErrorMessage(data['data']['mobile_number'][0]);
+        } else {
+          _showErrorMessage(data['data']['email'][0]);
+        }
+        setState(() {
+          _isLoading = false;
+        });
       }
+    } on HttpException catch (error) {
+      var message = "Error";
+      if (error.toString().contains('User not found')) {
+        message = 'User not found';
+      }
+      _showErrorMessage(message);
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (error) {
+      var message = "Something went wrong";
+      _showErrorMessage(message);
+      setState(() {
+        _isLoading = false;
+      });
     }
+  }
 
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      showDialog<String>(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text('Cannot Acess Location'),
-          content: const Text('Location permissions are denied'),
-          actions: <Widget>[
-            // TextButton(
-            //   onPressed: () => Navigator.pop(context, 'Cancel'),
-            //   child: const Text('Cancel'),
-            // ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, 'OK'),
-              child: const Text('OK'),
+  Future<void> sendOTP(BuildContext context1) async {
+    try {
+      data = await Provider.of<Auth>(context, listen: false)
+          .sendOTP(txtContactNumber.text);
+      // setState(() {
+      //   data = dataOTP;
+      // });
+      if (data['success']) {
+        setState(() {
+          isOTPExpire = true;
+          _isLoading = false;
+        });
+        // ignore: use_build_context_synchronously
+        Alert(
+            context: context,
+            onWillPopActive: true,
+            title:
+                "Verify Your Mobile Number \n Please enter the One-Time Password (OTP) sent to your mobile number " +
+                    txtContactNumber.text +
+                    ". This OTP is valid for 10 minutes.",
+            style: AlertStyle(
+                titleStyle:
+                    GoogleFonts.poppins(fontSize: 14, color: Colors.black)),
+            content: StatefulBuilder(
+              builder: (BuildContext context1, StateSetter setState) {
+                return Container(
+                  margin: EdgeInsets.only(top: 10),
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        // margin: EdgeInsets.only(bottom: 5),
+                        height: 200,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Expanded(
+                              child: TextFormField(
+                                  controller: _otpcode,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                  ),
+                                  decoration: InputDecoration(
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    helperText: "Enter OTP Code",
+                                    helperStyle: TextStyle(
+                                      color: Colors.transparent,
+                                      fontSize: 10,
+                                    ),
+                                    fillColor: Colors.white,
+                                    filled: true,
+                                    hintText: '- - - - - -',
+                                    hintStyle: TextStyle(
+                                        color: Colors.grey, fontSize: 50),
+                                    errorText:
+                                        isOtpValid ? 'Invalid Code' : null,
+                                    errorStyle: TextStyle(fontSize: 12),
+                                  ),
+                                  autocorrect: false,
+                                  // inputFormatters: [maskTextInputFormatter],
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    print(value.length);
+                                    if (value.length >= 6) {
+                                      setState(() {
+                                        value = value.substring(0, 6);
+                                        _otpcode.text = value;
+                                      });
+                                    }
+                                  }),
+                            ),
+                            Text(
+                              "Didn't receive the OTP?",
+                              style: GoogleFonts.poppins(
+                                textStyle: TextStyle(
+                                  fontSize: 16, // tablet
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            !isResend
+                                ? (isOTPExpire
+                                    ? TimerCountdown(
+                                        format:
+                                            CountDownTimerFormat.minutesSeconds,
+                                        spacerWidth: 5,
+                                        timeTextStyle: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Colors.black),
+                                        enableDescriptions: false,
+                                        colonsTextStyle: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Colors.black),
+                                        endTime: DateTime.now().add(
+                                          Duration(
+                                            // days: 0,
+                                            // days: 5,
+                                            // hours: 0,
+                                            minutes: 10,
+                                            seconds: 0,
+                                          ),
+                                        ),
+                                        onEnd: () {
+                                          setState(() {
+                                            isOTPExpire = false;
+                                          });
+
+                                          return;
+                                        },
+                                      )
+                                    : TextButton(
+                                        onPressed: () async {
+                                          setState(() {
+                                            isResend = true;
+                                          });
+                                          try {
+                                            var dataOTP =
+                                                await Provider.of<Auth>(context,
+                                                        listen: false)
+                                                    .sendOTP(
+                                                        txtContactNumber.text);
+                                            if (dataOTP['success']) {
+                                              setState(() {
+                                                data = dataOTP;
+                                                isOTPExpire = true;
+                                                isResend = false;
+                                                _otpcode.text = '';
+                                              });
+                                            } else {
+                                              setState(() {
+                                                _otpcode.text = '';
+                                                isResend = false;
+                                              });
+                                              AwesomeDialog(
+                                                dismissOnBackKeyPress: false,
+                                                dismissOnTouchOutside: false,
+                                                onDismissCallback:
+                                                    (BuildContext) {
+                                                  // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+                                                },
+                                                context: context,
+                                                animType: AnimType.scale,
+                                                dialogType: DialogType.error,
+                                                title: "Error",
+                                                desc: "Something went wrong",
+                                                btnOkOnPress: () {
+                                                  // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+                                                  // print(_selectedProvince);
+                                                },
+                                              ).show();
+                                            }
+
+                                            // setState(() {
+                                            //   _isLoading = false;
+                                            // });
+                                          } on HttpException catch (error) {
+                                            var message = "Error";
+                                            if (error
+                                                .toString()
+                                                .contains('User not found')) {
+                                              message = 'User not found';
+                                            }
+                                            _showErrorMessage(message);
+                                          } catch (error) {
+                                            var message =
+                                                "Something went wrong";
+                                            _showErrorMessage(message);
+                                          }
+                                        },
+                                        child: Text(
+                                          'Resend OTP',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.amberAccent),
+                                          ),
+                                        ),
+                                      ))
+                                : CircularProgressIndicator(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
-          ],
-        ),
-      );
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+            buttons: [
+              DialogButton(
+                color: Color.fromARGB(255, 55, 57, 175),
+                onPressed: () async {
+                  // Navigator.of(context)
+                  //     .pushReplacementNamed(Dashboard.routeName);
+                  // updateMyPassword();
+                  print(_otpcode.text);
+                  print(data['otp']);
+                  setState(() {
+                    isOTPExpire = false;
+                  });
+                  if (_otpcode.text == data['data']['otp']) {
+                    print("here");
+                    _determinePosition();
+                  } else {
+                    setState(() {
+                      isOtpValid = true;
+                      Fluttertoast.showToast(
+                        msg: 'Invalid OTP Code',
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Color(0xff404747),
+                        textColor: Colors.white,
+                        fontSize: 13.0,
+                      );
+                    });
+                  }
+                },
+                child: Text(
+                  "OK",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              )
+            ]).show();
+      } else {
+        AwesomeDialog(
+          dismissOnBackKeyPress: false,
+          dismissOnTouchOutside: false,
+          onDismissCallback: (BuildContext) {
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+          },
+          context: context,
+          animType: AnimType.scale,
+          dialogType: DialogType.error,
+          title: "Error",
+          desc: "Something went wrong",
+          btnOkOnPress: () {
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+            // print(_selectedProvince);
+          },
+        ).show();
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+    } on HttpException catch (error) {
+      var message = "Error";
+      if (error.toString().contains('User not found')) {
+        message = 'User not found';
+      }
+      _showErrorMessage(message);
+    } catch (error) {
+      var message = "Something went wrong";
+      _showErrorMessage(message);
     }
+  }
+
+  void _showErrorMessage(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Color(0xff404747),
+      textColor: Colors.white,
+      fontSize: 13.0,
+    );
+  }
+
+  Future<void> resendOTP() async {
+    try {
+      var dataOTP = await Provider.of<Auth>(context, listen: false)
+          .sendOTP(txtContactNumber.text);
+      if (dataOTP['success']) {
+        // setState(() {
+        //   data = dataOTP;
+        //   isOTPExpire = true;
+        //   print(data);
+        // });
+      } else {
+        AwesomeDialog(
+          dismissOnBackKeyPress: false,
+          dismissOnTouchOutside: false,
+          onDismissCallback: (BuildContext) {
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+          },
+          context: context,
+          animType: AnimType.scale,
+          dialogType: DialogType.error,
+          title: "Error",
+          desc: "Something went wrong",
+          btnOkOnPress: () {
+            // Navigator.pushReplacementNamed(context, Dashboard.routeName);
+            // print(_selectedProvince);
+          },
+        ).show();
+      }
+
+      // setState(() {
+      //   _isLoading = false;
+      // });
+    } on HttpException catch (error) {
+      var message = "Error";
+      if (error.toString().contains('User not found')) {
+        message = 'User not found';
+      }
+      _showErrorMessage(message);
+    } catch (error) {
+      var message = "Something went wrong";
+      _showErrorMessage(message);
+    }
+  }
+
+  Future<void> _determinePosition() async {
+    // bool serviceEnabled;
+    // LocationPermission permission;
+
+    // // Test if location services are enabled.
+    // serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    // if (!serviceEnabled) {
+    //   // Location services are not enabled don't continue
+    //   // accessing the position and request users of the
+    //   // App to enable the location services.
+    //   return Future.error('Location services are disabled.');
+    // }
+
+    // permission = await Geolocator.checkPermission();
+    // if (permission == LocationPermission.denied) {
+    //   permission = await Geolocator.requestPermission();
+    //   if (permission == LocationPermission.denied) {
+    //     // Permissions are denied, next time you could try
+    //     // requesting permissions again (this is also where
+    //     // Android's shouldShowRequestPermissionRationale
+    //     // returned true. According to Android guidelines
+    //     // your App should show an explanatory UI now.
+    //     return Future.error('Location permissions are denied');
+    //   }
+    // }
+
+    // if (permission == LocationPermission.deniedForever) {
+    //   // Permissions are denied forever, handle appropriately.
+    //   showDialog<String>(
+    //     context: context,
+    //     builder: (BuildContext context) => AlertDialog(
+    //       title: const Text('Cannot Acess Location'),
+    //       content: const Text('Location permissions are denied'),
+    //       actions: <Widget>[
+    //         // TextButton(
+    //         //   onPressed: () => Navigator.pop(context, 'Cancel'),
+    //         //   child: const Text('Cancel'),
+    //         // ),
+    //         TextButton(
+    //           onPressed: () => Navigator.pop(context, 'OK'),
+    //           child: const Text('OK'),
+    //         ),
+    //       ],
+    //     ),
+    //   );
+    //   return Future.error(
+    //       'Location permissions are permanently denied, we cannot request permissions.');
+    // }
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     //return await Geolocator.getCurrentPosition();
     String? errorMessage;
     try {
-      Position position = await Geolocator.getCurrentPosition();
+      // Position position = await Geolocator.getCurrentPosition();
       // print(position.latitude.toString());
       // print(position.longitude.toString());
 
       Map<String, dynamic> user = {
         'first_name': txtFirstName.text,
         'middle_name': txtMiddleName.text,
+        'age': txtAge.text,
         'last_name': txtLastName.text,
+        'date_of_birth': txtBirthday.text.toString(),
         'email': txtEmail.text,
+        'address': txtBrgyAddress.text,
         'mobile_number': txtContactNumber.text,
         'password': txtPassword.text,
         'confirm_password': txtConfirmPassword.text,
-        'location': json.encode({
-          'longitude': position.longitude.toString(),
-          'latitude': position.latitude.toString()
-        }),
+        // 'location': json.encode({
+        //   'longitude': position.longitude.toString(),
+        //   'latitude': position.latitude.toString()
+        // }),
+        'location': 'n/a',
         'mac_address': _deviceId
       };
 
@@ -330,6 +734,7 @@ class _AccountRegisterState extends State<AccountRegister> {
     txtMiddleName.dispose();
     txtContactNumber.dispose();
     txtEmail.dispose();
+    txtBrgyAddress.dispose();
     txtPassword.dispose();
     txtConfirmPassword.dispose();
     super.dispose();
@@ -347,7 +752,7 @@ class _AccountRegisterState extends State<AccountRegister> {
     bool hideConfirmPassword = true;
 
     final format = DateFormat("MM/dd/yyyy");
-    HCaptcha.init(siteKey: '6LcSiSQdAAAAAOyoKM6G5CeLAPE-P5ApqwNMUQaV');
+    HCaptcha.init(siteKey: '6LeVSg4qAAAAAHK97rol9rhvDkGwQdSdpJDqJrQm');
 
     //getToken();
 
@@ -399,7 +804,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                               // height: 250,
 
                               decoration: const BoxDecoration(
-                                color: Colors.grey,
+                                // color: Colors.grey,
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(30)),
                                 image: DecorationImage(
@@ -429,50 +834,100 @@ class _AccountRegisterState extends State<AccountRegister> {
                               height: 15,
                             ),
                             customTextField(
-                              TextInputType.text,
-                              'First Name',
-                              txtFirstName,
-                              useMobileLayout,
-                              'Please enter your First Name',
-                              (value) {
-                                if (value!.isEmpty) {
-                                  return 'Please enter your First Name';
-                                }
-
-                                if (!RegExp(r"^[\p{L} ,.'-]*$",
-                                        caseSensitive: false,
-                                        unicode: true,
-                                        dotAll: true)
-                                    .hasMatch(value)) {
-                                  return 'Invalid Input';
-                                }
-
-                                return null;
-                              },
-                            ),
-                            customTextField(
                                 TextInputType.text,
-                                'Middle Name',
-                                txtMiddleName,
+                                'First Name',
+                                txtFirstName,
                                 useMobileLayout,
-                                'Please enter your Middle Name', (value) {
-                              return null;
-                            }
-                                //     (value) {
-                                //   if (value!.isEmpty) {
-                                //     return 'Please enter your Middle Name';
-                                //   }
+                                'Please enter your First Name', (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter your First Name';
+                              }
 
-                                //   if (!RegExp(r"^[\p{L} ,.'-]*$",
-                                //           caseSensitive: false,
-                                //           unicode: true,
-                                //           dotAll: true)
-                                //       .hasMatch(value)) {
-                                //     return 'Invalid Input';
-                                //   }
-                                //   return null;
-                                // }
-                                ),
+                              if (!RegExp(r"^[\p{L} ,.'-]*$",
+                                      caseSensitive: false,
+                                      unicode: true,
+                                      dotAll: true)
+                                  .hasMatch(value)) {
+                                return 'Invalid Input';
+                              }
+
+                              return null;
+                            }, (value) {}),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: customTextField(
+                                        TextInputType.text,
+                                        'Middle Initial',
+                                        txtMiddleName,
+                                        useMobileLayout,
+                                        'Please enter your Middle Name',
+                                        (value) {
+                                      return null;
+                                    }, (value) {
+                                      if (value.toString().length > 2) {
+                                        setState(() {
+                                          txtMiddleName.text =
+                                              value.toString().substring(0, 2);
+                                        });
+                                      }
+                                    }
+                                        //     (value) {
+                                        //   if (value!.isEmpty) {
+                                        //     return 'Please enter your Middle Name';
+                                        //   }
+
+                                        //   if (!RegExp(r"^[\p{L} ,.'-]*$",
+                                        //           caseSensitive: false,
+                                        //           unicode: true,
+                                        //           dotAll: true)
+                                        //       .hasMatch(value)) {
+                                        //     return 'Invalid Input';
+                                        //   }
+                                        //   return null;
+                                        // }
+                                        ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: customTextFieldDisable(
+                                        TextInputType.number,
+                                        'Age',
+                                        txtAge,
+                                        useMobileLayout,
+                                        'Please enter your Age',
+                                        //     (value) {
+                                        //   return null;
+                                        // }
+                                        (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Please enter your Age';
+                                      }
+
+                                      // if (!RegExp(r"^[\p{L} ,.'-]*$",
+                                      //         caseSensitive: false,
+                                      //         unicode: true,
+                                      //         dotAll: true)
+                                      //     .hasMatch(value)) {
+                                      //   return 'Invalid Input';
+                                      // }
+                                      return null;
+                                    }, (value) {
+                                      if (value.toString().length > 2) {
+                                        setState(() {
+                                          txtAge.text =
+                                              value.toString().substring(0, 2);
+                                        });
+                                      }
+                                    }),
+                                  ),
+                                ],
+                              ),
+                            ),
                             //                           customTextField('Middle Name', txtMiddleName,
                             //                               useMobileLayout, 'Please enter your Middle Name'),
                             customTextField(
@@ -493,13 +948,56 @@ class _AccountRegisterState extends State<AccountRegister> {
                                 return 'Invalid Input';
                               }
                               return null;
-                            }),
+                            }, (value) {}),
                             // SizedBox(
                             //   height: 15,
                             // ),
+                            CustomDateTime(
+                              title: "",
+                              controller: txtBirthday,
+                              onFieldSubmitted: (value) {
+                                setState(() {
+                                  // final f = new DateFormat('yyyy-MM-dd');
+                                  final f = new DateFormat('MMMM dd, yyyy');
+                                  txtBirthday.text = f.format(value).toString();
+                                  // print(value);
+                                  // return txtEnterDate.text;
+                                });
+                                // FocusScope.of(context)
+                                //     .requestFocus(ctcNumberFocus);
+                              },
+                              onChanged: (value) {
+                                if (value != null) {
+                                  DateTime now = DateTime.now();
+                                  Duration age = now.difference(value!);
+                                  int years = age.inDays ~/ 365;
+                                  setState(() {
+                                    txtAge.text = years.toString();
+                                  });
+                                }
+                              },
+                              onSaved: (val) {
+                                setState(() {
+                                  // final f = new DateFormat('yyyy-MM-dd');
+                                  final f = new DateFormat('MMMM dd, yyyy');
+                                  // txtBirthday.text = val.toString();
+                                  txtBirthday.text = f.format(val).toString();
+                                  // print("ONSAVE" +
+                                  //     txtBirthday.text);
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null && txtBirthday.text.isEmpty) {
+                                  // print(txtEnterDateFrom.text);
+                                  return 'Please enter date';
+                                }
+                                return null;
+                              },
+                              focusNode: lastNameFocus,
+                            ),
                             customTextField(
-                                TextInputType.emailAddress,
-                                'Email',
+                                TextInputType.text,
+                                'Email Address',
                                 txtEmail,
                                 useMobileLayout,
                                 'Please enter your Email', (value) {
@@ -512,8 +1010,39 @@ class _AccountRegisterState extends State<AccountRegister> {
                                   .hasMatch(value)) {
                                 return 'Invalid Email Address';
                               }
+                              // if (!RegExp(r"^[\p{L} ,.'-]*$",
+                              //         caseSensitive: false,
+                              //         unicode: true,
+                              //         dotAll: true)
+                              //     .hasMatch(value)) {
+                              //   return 'Invalid Input';
+                              // }
                               return null;
-                            }),
+                            }, (value) {}),
+                            customTextField(
+                                TextInputType.text,
+                                'Brgy Address',
+                                txtBrgyAddress,
+                                useMobileLayout,
+                                'Please enter your Email', (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter your Brgy Address';
+                              }
+
+                              // if (!RegExp(
+                              //         r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$')
+                              //     .hasMatch(value)) {
+                              //   return 'Invalid Email Address';
+                              // }
+                              // if (!RegExp(r"^[\p{L} ,.'-]*$",
+                              //         caseSensitive: false,
+                              //         unicode: true,
+                              //         dotAll: true)
+                              //     .hasMatch(value)) {
+                              //   return 'Invalid Input';
+                              // }
+                              return null;
+                            }, (value) {}),
                             customTextField(
                                 TextInputType.number,
                                 'Mobile Number (09XXXXXXXXX)',
@@ -529,11 +1058,11 @@ class _AccountRegisterState extends State<AccountRegister> {
                                 return 'Invalid Number';
                               }
                               return null;
-                            }),
-                            // mypassword('', Icons.password, txtPassword,
-                            //     useMobileLayout),
-                            // confirmpassword("", Icons.password,
-                            //     txtConfirmPassword, useMobileLayout),
+                            }, (value) {}),
+                            mypassword('', Icons.password, txtPassword,
+                                useMobileLayout),
+                            confirmpassword("", Icons.password,
+                                txtConfirmPassword, useMobileLayout),
                             Container(
                                 child: Row(
                               children: [
@@ -548,8 +1077,23 @@ class _AccountRegisterState extends State<AccountRegister> {
                                   },
                                 ),
                                 Expanded(
-                                    child: Text(
-                                  "I agree the Terms and Conditions and Privacy Policy",
+                                    child: Text.rich(
+                                  TextSpan(
+                                      text: "I agree the ",
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                            text:
+                                                "Terms and Conditions and Privacy Policy",
+                                            style: GoogleFonts.poppins(
+                                                color: Colors.white,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                decorationColor: Colors.yellow),
+                                            recognizer: TapGestureRecognizer()
+                                              ..onTap = () {
+                                                showTermsAndConditions();
+                                              })
+                                      ]),
                                   style:
                                       GoogleFonts.poppins(color: Colors.white),
                                 ))
@@ -569,48 +1113,48 @@ class _AccountRegisterState extends State<AccountRegister> {
                                     : Container())
                                 : Container(),
 
-                            Card(
-                              elevation: 5,
-                              child: SizedBox(
-                                height: 100,
-                                child: Row(
-                                  children: <Widget>[
-                                    Checkbox(
-                                        value: isNotARobot,
-                                        onChanged: (bool? value) {
-                                          _openReCaptcha();
-                                        }),
-                                    const Expanded(
-                                      child: Text("I'm not a robot"),
-                                    ),
-                                    const SizedBox(
-                                      width: 5,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.centerRight,
-                                      child: Image.asset(
-                                        'assets/images/captcha.jpg',
-                                        width: 80,
-                                        height: 80,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            isCheckedLoad
-                                ? (!isNotARobot
-                                    ? Text(
-                                        "Please check not a robot",
-                                        style: GoogleFonts.poppins(
-                                          textStyle: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.redAccent[200],
-                                          ),
-                                        ),
-                                      )
-                                    : Container())
-                                : Container(),
+                            // Card(
+                            //   elevation: 5,
+                            //   child: SizedBox(
+                            //     height: 100,
+                            //     child: Row(
+                            //       children: <Widget>[
+                            //         Checkbox(
+                            //             value: isNotARobot,
+                            //             onChanged: (bool? value) {
+                            //               _openReCaptcha();
+                            //             }),
+                            //         const Expanded(
+                            //           child: Text("I'm not a robot"),
+                            //         ),
+                            //         const SizedBox(
+                            //           width: 5,
+                            //         ),
+                            //         Container(
+                            //           alignment: Alignment.centerRight,
+                            //           child: Image.asset(
+                            //             'assets/images/captcha.jpg',
+                            //             width: 80,
+                            //             height: 80,
+                            //           ),
+                            //         ),
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
+                            // isCheckedLoad
+                            //     ? (!isNotARobot
+                            //         ? Text(
+                            //             "Please check not a robot",
+                            //             style: GoogleFonts.poppins(
+                            //               textStyle: TextStyle(
+                            //                 fontSize: 12,
+                            //                 color: Colors.redAccent[200],
+                            //               ),
+                            //             ),
+                            //           )
+                            //         : Container())
+                            //     : Container(),
                             const SizedBox(
                               height: 10,
                             ),
@@ -694,7 +1238,8 @@ class _AccountRegisterState extends State<AccountRegister> {
       TextEditingController control,
       bool useMobileLayout,
       String validator,
-      String? Function(String?)? validate) {
+      String? Function(String?)? validate,
+      String? Function(String?)? onChange) {
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       child: Row(
@@ -716,35 +1261,35 @@ class _AccountRegisterState extends State<AccountRegister> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.green,
                     width: 1,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
                   ),
                 ),
                 disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
                   ),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.redAccent,
                     width: 1,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
@@ -786,8 +1331,114 @@ class _AccountRegisterState extends State<AccountRegister> {
                     : null,
               ),
               validator: validate,
-              onChanged: (value) {
-              },
+              onChanged: onChange,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container customTextFieldDisable(
+      TextInputType inputType,
+      String hintTextP,
+      TextEditingController control,
+      bool useMobileLayout,
+      String validator,
+      String? Function(String?)? validate,
+      String? Function(String?)? onChange) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Expanded(
+            child: TextFormField(
+              controller: control,
+              keyboardType: inputType,
+              obscureText: hintTextP != "" ? false : _hidePassword,
+              style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                  fontSize: useMobileLayout ? 16 : 18,
+                  color: Colors.black,
+                ),
+              ),
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                floatingLabelBehavior: FloatingLabelBehavior.auto,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: Colors.green,
+                    width: 1,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1,
+                  ),
+                ),
+                disabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: Colors.redAccent,
+                    width: 1,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1,
+                  ),
+                ),
+                enabled: false,
+                hintText: hintTextP,
+                hintStyle: GoogleFonts.poppins(
+                  textStyle: TextStyle(
+                    fontSize: useMobileLayout ? 14 : 16,
+                    color: Colors.grey,
+                  ),
+                ),
+                errorStyle: GoogleFonts.poppins(
+                  textStyle: TextStyle(
+                    fontSize: 12,
+                    color: Colors.redAccent[200],
+                  ),
+                ),
+                fillColor: Colors.white,
+                filled: true,
+                suffixIcon: hintTextP == ""
+                    ? IconButton(
+                        icon: _hidePassword
+                            ? const Icon(
+                                Icons.visibility_off,
+                                color: Colors.grey,
+                                // size: useMobileLayout ? 15 : 18,
+                                size: 20,
+                              )
+                            : const Icon(
+                                Icons.visibility,
+                                color: Colors.grey,
+                                // size: useMobileLayout ? 15 : 18,
+                                size: 20,
+                              ),
+                        onPressed: toggleVisibilityConfirm,
+                      )
+                    : null,
+              ),
+              validator: validate,
+              onChanged: onChange,
             ),
           ),
         ],
@@ -818,35 +1469,35 @@ class _AccountRegisterState extends State<AccountRegister> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.green,
                     width: 1,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
                   ),
                 ),
                 disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
                   ),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.redAccent,
                     width: 1,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
@@ -941,35 +1592,35 @@ class _AccountRegisterState extends State<AccountRegister> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.green,
                     width: 1,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
                   ),
                 ),
                 disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
                   ),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(
                     color: Colors.redAccent,
                     width: 1,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
                     width: 1,
@@ -1085,11 +1736,12 @@ class _AccountRegisterState extends State<AccountRegister> {
               setState(() {
                 _isLoading = true;
               });
-
-              _determinePosition();
+              checkUserCreds(context);
+              // sendOTP(context);
+              // _determinePosition();
               // _getMacAddress();
-
             }
+            // sendOTP(context);
           }, // your tap handler moved here
           builder: (context, onTap) {
             return ElevatedButton(
@@ -1097,7 +1749,7 @@ class _AccountRegisterState extends State<AccountRegister> {
                 foregroundColor: Colors.white,
                 backgroundColor: Color.fromARGB(255, 255, 255, 0), // foreground
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50.0),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
               ),
 

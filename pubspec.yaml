@@ -70,6 +70,8 @@ dependencies:
   permission_handler: ^11.3.1
   awesome_notifications: ^0.8.2
   flutter_timer_countdown: ^1.0.7
+  cached_network_image: ^3.3.1
+  flutter_device_id: ^1.0.1
 
 dev_dependencies:
   flutter_test:

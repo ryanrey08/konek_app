@@ -1,7 +1,10 @@
 // Packages and Libraries
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
+import 'package:konek_app/auth/providers/auth.dart';
+import 'package:konek_app/auth/screens/login.dart';
 import 'package:konek_app/config/httpexception.dart';
 import 'package:konek_app/config/notification.dart';
 import 'package:konek_app/content/provider/content.dart';
@@ -13,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 // import 'package:flutter_slidable/flutter_slidable.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 //Widget
@@ -150,6 +154,7 @@ class _HomePageState extends State<HomePage> {
   ];
   List quickLinks = [];
   List ads = [];
+  bool hasNoInternet = false;
 
   @override
   void initState() {
@@ -218,6 +223,27 @@ class _HomePageState extends State<HomePage> {
     } catch (error) {
       // showError(error.toString());
       if (error.toString().contains('Connection failed')) {
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        var quickLinksData =
+            json.decode(sharedPreferences.getString('swakQuicklinks')!)
+                as List<dynamic>;
+        setState(() {
+          hasNoInternet = true;
+
+          var newQuicklinks = [];
+          var myQuickLinks = [];
+          for (var x = 0; x < quickLinksData.length; x++) {
+            myQuickLinks.add(quickLinksData[x]);
+            if (x % 2 == 1) {
+              newQuicklinks.add(myQuickLinks);
+              myQuickLinks = [];
+            } else if (x == (quickLinksData.length - 1)) {
+              newQuicklinks.add(myQuickLinks);
+            }
+          }
+          quickLinks = newQuicklinks;
+        });
       } else {
         showError('something went wrong');
       }
@@ -229,6 +255,19 @@ class _HomePageState extends State<HomePage> {
       var adsData = await Provider.of<Content>(context, listen: false).getAds();
       setState(() {
         ads = adsData;
+        // showDialog(
+        //     context: context,
+        //     barrierDismissible: true,
+        //     useSafeArea: true,
+        //     builder: (context) => Center(
+        //       child: Container(
+        //           width: MediaQuery.of(context).size.width - 40,
+        //           height: MediaQuery.of(context).size.height - 150,
+        //           child: WebView(
+        //             initialUrl: 'http://10.44.77.240:2060/ext_login?username=sjz6xa&password=sjz6xa&next_url=https://www.youtube.com&groupid=63770&validity=5&user_type=cloud_voucher',
+        //           )),
+        //     ));
+
         //isLoading = false;
         // print(ads);
       });
@@ -237,6 +276,14 @@ class _HomePageState extends State<HomePage> {
     } catch (error) {
       // showError(error.toString());
       if (error.toString().contains('Connection failed')) {
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        var adsData = json.decode(sharedPreferences.getString('swakAds')!)
+            as List<dynamic>;
+        setState(() {
+          hasNoInternet = true;
+          ads = adsData;
+        });
       } else {
         showError('something went wrong');
       }
@@ -344,7 +391,6 @@ class _HomePageState extends State<HomePage> {
   //   // });
   // }
 
-
   void enterVoucherCode() {
     late AwesomeDialog dialog;
     dialog = AwesomeDialog(
@@ -406,6 +452,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       isLoading = false;
     });
+    await checkAccount();
     await getSubscription();
     await getQuickLinks();
     await getAds();
@@ -449,7 +496,7 @@ class _HomePageState extends State<HomePage> {
     return remainingInSeconds > 86400 ? true : false;
   }
 
-    computeRemainingSeconds(currentDate, sDate, duration, duration_unit) {
+  computeRemainingSeconds(currentDate, sDate, duration, duration_unit) {
     var nowDate = DateTime.parse(currentDate);
     var startDate = DateTime.parse(sDate);
     var expDate;
@@ -463,6 +510,101 @@ class _HomePageState extends State<HomePage> {
     print(remainingInSeconds);
 
     return remainingInSeconds;
+  }
+
+  confirmFree(String id, String name) {
+    AwesomeDialog(
+            dismissOnBackKeyPress: false,
+            dismissOnTouchOutside: false,
+            onDismissCallback: (_) {
+              //Navigator.of(context).pop();
+            },
+            context: context,
+            animType: AnimType.scale,
+            dialogType: DialogType.warning,
+            title: "Confirm",
+            desc: "Are you sure you want to claim " + name + "?",
+            btnOkOnPress: () {
+              claimFree(id);
+            },
+            btnCancelOnPress: () {
+              // Navigator.of(context).pop();
+            })
+        .show();
+  }
+
+  void claimFree(String id) async {
+    setState(() {
+      isLoading = false;
+    });
+    try {
+      var subscriptionsData =
+          await Provider.of<POSProvider>(context, listen: false)
+              .getMyFreePromo(id);
+
+      // await UrlLauncher.launch("http://10.44.77.240:2060/ext_login?username=sjz6xa&password=sjz6xa&next_url=$requestPaymentDataUrl&groupid=63770&validity=5&user_type=cloud_voucher");
+      // await UrlLauncher.launch(requestPaymentDataUrl);
+      await UrlLauncher.launch(subscriptionsData['url']);
+
+      var vouchData;
+
+      try {
+        //await Provider.of<Auth>(context, listen: false).login(txtUsernameController.text, txtPasswordController.text);
+        vouchData = await Provider.of<POSProvider>(context, listen: false)
+            .getMyPaymentStatus();
+        // SharedPreferences prefs = await SharedPreferences.getInstance();
+        // if (vouchData['status'] == 'completed') {
+        //   prefs.setString('swakPaymentRefNo', json.encode(vouchData));
+        //   // prefs.setString('swakUrl', vouchData['url']);
+        // }
+      } on HttpException catch (error) {
+        // print(error);
+        showError(error.toString());
+      } catch (error) {
+        showError(error.toString());
+      }
+
+      Future.delayed(const Duration(milliseconds: 3000), () {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const Dashboard()),
+          (Route<dynamic> route) => false,
+        );
+        // Navigator.pushReplacementNamed(context, Dashboard.routeName,
+        //     arguments: vouchData['url']);
+      });
+    } on HttpException catch (error) {
+      showError(error.toString());
+    } catch (error) {
+      showError('something went wrong');
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+  }
+
+  Future<void> checkAccount() async {
+    try {
+      var accountData =
+          await Provider.of<Auth>(context, listen: false).checkAccount();
+      if (accountData['data']['status'] == 'Inactive') {
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        sharedPreferences.clear();
+        Navigator.of(context).pushReplacementNamed(Login.routeName);
+      }
+    } on HttpException catch (error) {
+      // print(error);
+      showError(error.toString());
+    } catch (error) {
+      // showError(error.toString());
+      if (error.toString().contains('Connection failed')) {
+        // showError('No Internet Connection');
+      } else {
+        showError('something went wrong');
+      }
+    }
   }
 
   @override
@@ -506,20 +648,174 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: <Widget>[
               Container(
-                width: useMobileLayout ? 300 : 350,
-                height: useMobileLayout ? 130 : 180,
-                margin: EdgeInsets.only(top: 15),
-                decoration: const BoxDecoration(
-                   color: Colors.grey,
-                   borderRadius: BorderRadius.all(Radius.circular(30)),
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/move_mandaue_swak.png'),
-                  ),
+                width: double.infinity,
+                // height: useMobileLayout ? 130 : 180,
+                // margin: EdgeInsets.only(top: 15),
+                // decoration: const BoxDecoration(
+                //   //  color: Colors.grey,
+                //   //  borderRadius: BorderRadius.all(Radius.circular(30)),
+                //   image: DecorationImage(
+                //     image: AssetImage('assets/images/move_mandaue_swak.png'),
+                //   ),
+                // ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  // color: Colors.white,
                 ),
-                child: const Column(children: [
-                  SizedBox(
-                    height: 45,
-                  ),
+                child: Column(children: [
+                  // SizedBox(
+                  //   height: 45,
+                  // ),
+                  isLoading
+                      ? Card(
+                          elevation: 4,
+                          color: const Color.fromARGB(255, 55, 57, 175),
+                          margin: EdgeInsets.all(16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: SizedBox(
+                            // height:  150,
+                            width: double.infinity,
+                            //width: useMobileLayout ? 600 : 700,
+
+                            //height: useMobileLayout ? 90 : 150,
+                            // decoration: BoxDecoration(
+                            //   borderRadius: BorderRadius.circular(10),
+                            //   color: Colors.white,
+                            // ),
+                            // padding:
+                            //     EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                            child: Column(children: [
+                              // Container(
+                              //   height: 100,
+                              //   decoration: BoxDecoration(
+                              //     // color: Colors.grey[200],
+
+                              //     image: DecorationImage(
+                              //       image:
+                              //           const AssetImage('assets/images/move_mandaue.jpg'),
+                              //       fit: BoxFit.cover,
+                              //       // colorFilter: ColorFilter.mode(
+                              //       //   Colors.black.withOpacity(0.2),
+                              //       //   BlendMode.dstATop,
+                              //       // ),
+                              //     ),
+                              //   ),
+                              // ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Container(
+                                height: 100,
+                                decoration: const BoxDecoration(
+                                  //  color: Colors.grey,
+                                  //  borderRadius: BorderRadius.all(Radius.circular(30)),
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                        'assets/images/move_mandaue_swak.png'),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              SizedBox(
+                                  width: double.infinity,
+                                  child: ads.isNotEmpty
+                                      ? CarouselSlider(
+                                          options: CarouselOptions(
+                                              autoPlay: true,
+                                              aspectRatio: 2.0,
+                                              // enlargeCenterPage: true,
+                                              viewportFraction: 1.0,
+                                              height: 100,
+                                              enlargeStrategy:
+                                                  CenterPageEnlargeStrategy
+                                                      .height,
+                                              scrollPhysics:
+                                                  const NeverScrollableScrollPhysics()),
+                                          items: ads.map((i) {
+                                            return Builder(
+                                              builder: (BuildContext context) {
+                                                return Container(
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  // margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                                  // decoration: BoxDecoration(
+                                                  //   image: DecorationImage(
+                                                  //       image: NetworkImage(
+                                                  //           i['image_url']),
+                                                  //       fit:
+                                                  //           BoxFit.fitHeight),
+                                                  // ),
+                                                  // child: Text(i['description']),
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: i['image_url'],
+                                                    placeholder: (context,
+                                                            url) =>
+                                                        Container(
+                                                            child:
+                                                                CircularProgressIndicator()),
+                                                    errorWidget:
+                                                        (context, url, error) =>
+                                                            Icon(Icons.error),
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          }).toList(),
+                                        )
+                                      : Center(
+                                          child: Text(
+                                            "NO CURRENT ADS",
+                                            style: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                color: Colors.red,
+                                                fontSize:
+                                                    useMobileLayout ? 14 : 25,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        )),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              // Container(
+                              //   width: double.infinity,
+                              //   child: CarouselSlider(
+                              //     options: CarouselOptions(
+                              //       autoPlay: true,
+                              //       aspectRatio: 2.0,
+                              //       // enlargeCenterPage: true,
+                              //       viewportFraction: 1.0,
+                              //       height: 100,
+                              //       enlargeStrategy:
+                              //           CenterPageEnlargeStrategy.height,
+                              //     ),
+                              //     items: imgLists.map((i) {
+                              //       return Builder(
+                              //         builder: (BuildContext context) {
+                              //           return Container(
+                              //             width: MediaQuery.of(context).size.width,
+                              //             // margin: EdgeInsets.symmetric(horizontal: 5.0),
+                              //             decoration: BoxDecoration(
+                              //               image: DecorationImage(
+                              //                   image: AssetImage(i['image']),
+                              //                   fit: BoxFit.fitWidth),
+                              //             ),
+                              //           );
+                              //         },
+                              //       );
+                              //     }).toList(),
+                              //   ),
+                              // )
+                            ]),
+                          ),
+                        )
+                      : Container()
                   // Expanded(
                   //   child: Text(
                   //     "WELCOME",
@@ -541,301 +837,6 @@ class _HomePageState extends State<HomePage> {
                 child: isLoading
                     ? Column(
                         children: <Widget>[
-                          PreferenceBuilder<String>(
-                              preference: globalVoucherData,
-                              builder: (context, vouchData) {
-                                var newVoucherData = json.decode(vouchData);
-                                return Container(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Card(
-                                    elevation: 4,
-                                    color: Colors.white.withOpacity(0.8),
-                                    margin: const EdgeInsets.all(8),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Container(
-                                      // height:  150,
-                                      //width: double.infinity,
-                                      width: useMobileLayout ? null : 700,
-                                      //width: 500,
-                                      height: useMobileLayout ? 150 : 190,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: const Color.fromARGB(
-                                              255, 55, 57, 175)),
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 5, horizontal: 15),
-                                      child: Row(
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                const SizedBox(height: 10),
-                                                Expanded(
-                                                  child: Text(
-                                                    'MY ACCOUNT',
-                                                    textAlign: TextAlign.center,
-                                                    style: GoogleFonts.poppins(
-                                                      textStyle: TextStyle(
-                                                        fontSize:
-                                                            useMobileLayout
-                                                                ? 12
-                                                                : 18,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                isLoading ? Expanded(
-                                                  child: newVoucherData["status"] == 'completed' ? (isRemainingHours(
-                                                          newVoucherData[
-                                                                  "current_date"]
-                                                              .toString(),
-                                                          newVoucherData[
-                                                                  "payment_request_at"]
-                                                              .toString(),
-                                                          newVoucherData[
-                                                                  "duration"]
-                                                              .toString(),
-                                                          newVoucherData[
-                                                                  "duration_unit"]
-                                                              .toString())
-                                                      ? Text(
-                                                          "${(computeRemaining(newVoucherData["current_date"].toString(), newVoucherData["payment_request_at"].toString(), newVoucherData["duration"].toString(), newVoucherData["duration_unit"].toString()))} ${newVoucherData["duration_unit"].toString() == 'days' ? 'Day/s' : 'Hour/s'}",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: GoogleFonts
-                                                              .poppins(
-                                                            textStyle:
-                                                                TextStyle(
-                                                              fontSize:
-                                                                  useMobileLayout
-                                                                      ? 16
-                                                                      : 28,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                          ),
-                                                        )
-                                                      : TimerCountdown(
-                                                          format: CountDownTimerFormat
-                                                              .hoursMinutesSeconds,
-                                                          spacerWidth: 5,
-                                                          timeTextStyle:
-                                                              GoogleFonts.poppins(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize:
-                                                                      useMobileLayout
-                                                                          ? 16
-                                                                          : 28,
-                                                                  color: Colors
-                                                                      .white),
-                                                          enableDescriptions:
-                                                              false,
-                                                          colonsTextStyle:
-                                                              GoogleFonts.poppins(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize:
-                                                                      useMobileLayout
-                                                                          ? 16
-                                                                          : 28,
-                                                                  color: Colors
-                                                                      .white),
-                                                          endTime:
-                                                              DateTime.now()
-                                                                  .add(
-                                                            Duration(
-                                                              days: 0,
-                                                              // days: 5,
-                                                              hours: 0,
-                                                              minutes: 0,
-                                                              seconds: computeRemainingSeconds(newVoucherData["current_date"].toString(), newVoucherData["payment_request_at"].toString(), newVoucherData["duration"].toString(), newVoucherData["duration_unit"].toString()),
-                                                            ),
-                                                          ),
-                                                          onEnd: () {
-                                                            print(
-                                                                "Timer finished");
-                                                          },
-                                                        )) : Text(
-                                                          "0 Day/s",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: GoogleFonts
-                                                              .poppins(
-                                                            textStyle:
-                                                                TextStyle(
-                                                              fontSize:
-                                                                  useMobileLayout
-                                                                      ? 16
-                                                                      : 28,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                ) : Container(),
-                                                Expanded(
-                                                  child: AutoSizeText(
-                                                      'Remaining',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                        textStyle: TextStyle(
-                                                          fontSize:
-                                                              useMobileLayout
-                                                                  ? 16
-                                                                  : 28,
-                                                          fontWeight:
-                                                              FontWeight.w800,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                      minFontSize: 12,
-                                                      maxLines: 1,
-                                                      overflow: TextOverflow
-                                                          .ellipsis),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          // Expanded(
-                                          //   child: Column(
-                                          //     mainAxisAlignment:
-                                          //         MainAxisAlignment.start,
-                                          //     crossAxisAlignment:
-                                          //         CrossAxisAlignment.start,
-                                          //     children: <Widget>[
-                                          //       SizedBox(height: 10),
-                                          //       SizedBox(
-                                          //         height: 40,
-                                          //       ),
-                                          //       Expanded(
-                                          //         child: Text(
-                                          //           (isLoading
-                                          //               ? "13.26 GB"
-                                          //               : ""),
-                                          //           textAlign: TextAlign.center,
-                                          //           style: GoogleFonts.poppins(
-                                          //             textStyle: TextStyle(
-                                          //               fontSize:
-                                          //                   useMobileLayout
-                                          //                       ? 16
-                                          //                       : 28,
-                                          //               fontWeight:
-                                          //                   FontWeight.w800,
-                                          //               color: Colors.white,
-                                          //             ),
-                                          //           ),
-                                          //         ),
-                                          //       ),
-                                          //       Expanded(
-                                          //         child: Text(
-                                          //           'Data Spent',
-                                          //           textAlign: TextAlign.center,
-                                          //           style: GoogleFonts.poppins(
-                                          //             textStyle: TextStyle(
-                                          //               fontSize:
-                                          //                   useMobileLayout
-                                          //                       ? 16
-                                          //                       : 28,
-                                          //               fontWeight:
-                                          //                   FontWeight.w800,
-                                          //               color: Colors.white,
-                                          //             ),
-                                          //           ),
-                                          //         ),
-                                          //       ),
-                                          //     ],
-                                          //   ),
-                                          // ),
-                                          Container(
-                                            alignment: Alignment.centerLeft,
-                                            child: Column(children: [
-                                              const SizedBox(
-                                                height: 40,
-                                              ),
-                                              Icon(
-                                                Icons.wifi,
-                                                size: useMobileLayout ? 55 : 65,
-                                                color: isLoading
-                                                    ? (newVoucherData[
-                                                                'status'] ==
-                                                            'completed'
-                                                        ? Colors.greenAccent
-                                                        : Colors.redAccent)
-                                                    : Colors.greenAccent,
-                                              ),
-                                              Container(
-                                                child: Row(children: [
-                                                  AutoSizeText("Status: ",
-                                                      style: GoogleFonts.poppins(
-                                                          fontSize:
-                                                              useMobileLayout
-                                                                  ? 16
-                                                                  : 28,
-                                                          color: Colors.white),
-                                                      minFontSize: 12,
-                                                      maxLines: 1,
-                                                      overflow: TextOverflow
-                                                          .ellipsis),
-                                                  AutoSizeText(
-                                                      isLoading
-                                                          ? (newVoucherData[
-                                                                      'status'] ==
-                                                                  'completed'
-                                                              ? "Online"
-                                                              : "Offline")
-                                                          : 'Offline',
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                        fontSize:
-                                                            useMobileLayout
-                                                                ? 16
-                                                                : 28,
-                                                        color: isLoading
-                                                            ? (newVoucherData[
-                                                                        'status'] ==
-                                                                    'completed'
-                                                                ? Colors
-                                                                    .greenAccent
-                                                                : Colors
-                                                                    .redAccent)
-                                                            : Colors
-                                                                .greenAccent,
-                                                      ),
-                                                      minFontSize: 12,
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis)
-                                                ]),
-                                              ),
-                                            ]),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
                           PreferenceBuilder<String>(
                               preference: globalVoucherData,
                               builder: (context, vouchData) {
@@ -911,7 +912,7 @@ class _HomePageState extends State<HomePage> {
                                                                       shape:
                                                                           RoundedRectangleBorder(
                                                                         borderRadius:
-                                                                            BorderRadius.circular(50.0),
+                                                                            BorderRadius.circular(10.0),
                                                                       ),
                                                                       backgroundColor: const Color
                                                                           .fromARGB(
@@ -922,13 +923,21 @@ class _HomePageState extends State<HomePage> {
                                                                     ),
                                                                     onPressed:
                                                                         () {
-                                                                      Navigator.pushReplacementNamed(
-                                                                          context,
-                                                                          POS.routeName,
-                                                                          arguments: {
-                                                                            'subscription':
-                                                                                subscriptions[x]
-                                                                          });
+                                                                      if (subscriptions[x]
+                                                                              [
+                                                                              'is_free'] ==
+                                                                          true) {
+                                                                        confirmFree(
+                                                                            subscriptions[x]['id'].toString(),
+                                                                            subscriptions[x]['name'].toString());
+                                                                      } else {
+                                                                        Navigator.pushNamed(
+                                                                            context,
+                                                                            POS.routeName,
+                                                                            arguments: {
+                                                                              'subscription': subscriptions[x]
+                                                                            });
+                                                                      }
                                                                     },
                                                                     child: Text(
                                                                       //useMobileLayout ? "+ APPLY" : "+ APPLY LOAN",
@@ -1093,14 +1102,14 @@ class _HomePageState extends State<HomePage> {
                           //   ),
                           // ),
                           Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(15),
                             alignment: Alignment.center,
                             //        decoration: BoxDecoration(
                             //   borderRadius: BorderRadius.circular(10),
                             //   color: Colors.white,
                             // ),
                             child: Card(
-                              // elevation: 4,
+                              elevation: 4,
                               color: Colors.white,
                               //margin: EdgeInsets.all(8),
                               // shape: RoundedRectangleBorder(
@@ -1154,22 +1163,37 @@ class _HomePageState extends State<HomePage> {
                                                               'tel:+${quickLinks[x][y]['link']}');
                                                         },
                                                         child: Container(
-                                                          width: 120.0,
-                                                          height: 70.0,
-                                                          alignment:
-                                                              Alignment.center,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            image: DecorationImage(
-                                                                image: NetworkImage(
-                                                                    quickLinks[x]
-                                                                            [y][
-                                                                        'image_url']),
-                                                                fit: BoxFit
-                                                                    .contain),
-                                                          ),
-                                                          // child: Text(quickLinks[x][y]['description']),
-                                                        ),
+                                                            width: 120.0,
+                                                            height: 70.0,
+                                                            alignment: Alignment
+                                                                .center,
+                                                            // decoration:
+                                                            //     BoxDecoration(
+                                                            //   image: DecorationImage(
+                                                            //       image: NetworkImage(
+                                                            //           quickLinks[x]
+                                                            //                   [y][
+                                                            //               'image_url']),
+                                                            //       fit: BoxFit
+                                                            //           .contain),
+                                                            // ),
+                                                            // child: Text(quickLinks[x][y]['description']),
+                                                            child:
+                                                                CachedNetworkImage(
+                                                              imageUrl: quickLinks[
+                                                                      x][y]
+                                                                  ['image_url'],
+                                                              placeholder: (context,
+                                                                      url) =>
+                                                                  Container(
+                                                                      child:
+                                                                          CircularProgressIndicator()),
+                                                              errorWidget: (context,
+                                                                      url,
+                                                                      error) =>
+                                                                  Icon(Icons
+                                                                      .error),
+                                                            )),
                                                       ),
                                                       const SizedBox(
                                                         height: 15,
@@ -1207,125 +1231,312 @@ class _HomePageState extends State<HomePage> {
                       )),
               ),
               isLoading
-                  ? Card(
-                      elevation: 4,
-                      color: Colors.white.withOpacity(0.8),
-                      //margin: EdgeInsets.all(8),
-                      shape: const RoundedRectangleBorder(
-                          // borderRadius: BorderRadius.circular(10),
-                          ),
-                      child: SizedBox(
-                        // height:  150,
-                        width: double.infinity,
-                        //width: useMobileLayout ? 600 : 700,
-
-                        //height: useMobileLayout ? 90 : 150,
-                        // decoration: BoxDecoration(
-                        //   borderRadius: BorderRadius.circular(10),
-                        //   color: Colors.white,
-                        // ),
-                        // padding:
-                        //     EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                        child: Column(children: [
-                          // Container(
-                          //   height: 100,
-                          //   decoration: BoxDecoration(
-                          //     // color: Colors.grey[200],
-
-                          //     image: DecorationImage(
-                          //       image:
-                          //           const AssetImage('assets/images/move_mandaue.jpg'),
-                          //       fit: BoxFit.cover,
-                          //       // colorFilter: ColorFilter.mode(
-                          //       //   Colors.black.withOpacity(0.2),
-                          //       //   BlendMode.dstATop,
-                          //       // ),
-                          //     ),
-                          //   ),
-                          // ),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ads.isNotEmpty
-                                ? CarouselSlider(
-                                    options: CarouselOptions(
-                                        autoPlay: true,
-                                        aspectRatio: 2.0,
-                                        // enlargeCenterPage: true,
-                                        viewportFraction: 1.0,
-                                        height: 100,
-                                        enlargeStrategy:
-                                            CenterPageEnlargeStrategy.height,
-                                        scrollPhysics:
-                                            const NeverScrollableScrollPhysics()),
-                                    items: ads.map((i) {
-                                      return Builder(
-                                        builder: (BuildContext context) {
-                                          return Container(
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            // margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                            decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                                  image: NetworkImage(
-                                                      i['image_url']),
-                                                  fit: BoxFit.fitWidth),
+                  ? PreferenceBuilder<String>(
+                      preference: globalVoucherData,
+                      builder: (context, vouchData) {
+                        var newVoucherData = json.decode(vouchData);
+                        return Container(
+                          padding: const EdgeInsets.all(10),
+                          child: Card(
+                            elevation: 4,
+                            // color: Colors.white.withOpacity(0.8),
+                            color: const Color.fromARGB(255, 55, 57, 175),
+                            margin: const EdgeInsets.all(8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  // height:  150,
+                                  //width: double.infinity,
+                                  width: useMobileLayout ? 500 : 700,
+                                  //width: 500,
+                                  height: useMobileLayout ? 150 : 190,
+                                  decoration: BoxDecoration(
+                                      // borderRadius:
+                                      //     BorderRadius.circular(10),
+                                      // color: const Color.fromARGB(
+                                      //     255, 55, 57, 175)
+                                      ),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 5, horizontal: 15),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            const SizedBox(height: 10),
+                                            Expanded(
+                                              child: Text(
+                                                'MY ACCOUNT',
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    fontSize: useMobileLayout
+                                                        ? 12
+                                                        : 18,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                            // child: Text(i['description']),
-                                          );
-                                        },
-                                      );
-                                    }).toList(),
-                                  )
-                                : Center(
-                                    child: Text(
-                                      "NO CURRENT ADS",
-                                      style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
-                                          color: Colors.red,
-                                          fontSize: useMobileLayout ? 14 : 25,
-                                          fontWeight: FontWeight.w600,
+                                            isLoading
+                                                ? Expanded(
+                                                    child: newVoucherData[
+                                                                "status"] ==
+                                                            'completed'
+                                                        ? (isRemainingHours(
+                                                                newVoucherData[
+                                                                        "current_date"]
+                                                                    .toString(),
+                                                                newVoucherData[
+                                                                        "payment_request_at"]
+                                                                    .toString(),
+                                                                newVoucherData[
+                                                                        "duration"]
+                                                                    .toString(),
+                                                                newVoucherData[
+                                                                        "duration_unit"]
+                                                                    .toString())
+                                                            ? Text(
+                                                                "${(computeRemaining(newVoucherData["current_date"].toString(), newVoucherData["payment_request_at"].toString(), newVoucherData["duration"].toString(), newVoucherData["duration_unit"].toString()))} ${newVoucherData["duration_unit"].toString() == 'days' ? 'Day/s' : 'Hour/s'}",
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .poppins(
+                                                                  textStyle:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        useMobileLayout
+                                                                            ? 16
+                                                                            : 28,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w800,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            : TimerCountdown(
+                                                                format: CountDownTimerFormat
+                                                                    .hoursMinutesSeconds,
+                                                                spacerWidth: 5,
+                                                                timeTextStyle: GoogleFonts.poppins(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        useMobileLayout
+                                                                            ? 16
+                                                                            : 28,
+                                                                    color: Colors
+                                                                        .white),
+                                                                enableDescriptions:
+                                                                    false,
+                                                                colonsTextStyle: GoogleFonts.poppins(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        useMobileLayout
+                                                                            ? 16
+                                                                            : 28,
+                                                                    color: Colors
+                                                                        .white),
+                                                                endTime: DateTime
+                                                                        .now()
+                                                                    .add(
+                                                                  Duration(
+                                                                    days: 0,
+                                                                    // days: 5,
+                                                                    hours: 0,
+                                                                    minutes: 0,
+                                                                    seconds: computeRemainingSeconds(
+                                                                        newVoucherData["current_date"]
+                                                                            .toString(),
+                                                                        newVoucherData["payment_request_at"]
+                                                                            .toString(),
+                                                                        newVoucherData["duration"]
+                                                                            .toString(),
+                                                                        newVoucherData["duration_unit"]
+                                                                            .toString()),
+                                                                  ),
+                                                                ),
+                                                                onEnd: () {
+                                                                  print(
+                                                                      "Timer finished");
+                                                                },
+                                                              ))
+                                                        : Text(
+                                                            "0 Day/s",
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: GoogleFonts
+                                                                .poppins(
+                                                              textStyle:
+                                                                  TextStyle(
+                                                                fontSize:
+                                                                    useMobileLayout
+                                                                        ? 16
+                                                                        : 28,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w800,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                  )
+                                                : Container(),
+                                            Expanded(
+                                              child: AutoSizeText('Remaining',
+                                                  textAlign: TextAlign.center,
+                                                  style: GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                      fontSize: useMobileLayout
+                                                          ? 16
+                                                          : 28,
+                                                      fontWeight:
+                                                          FontWeight.w800,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                  minFontSize: 12,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ),
+                                      // Expanded(
+                                      //   child: Column(
+                                      //     mainAxisAlignment:
+                                      //         MainAxisAlignment.start,
+                                      //     crossAxisAlignment:
+                                      //         CrossAxisAlignment.start,
+                                      //     children: <Widget>[
+                                      //       SizedBox(height: 10),
+                                      //       SizedBox(
+                                      //         height: 40,
+                                      //       ),
+                                      //       Expanded(
+                                      //         child: Text(
+                                      //           (isLoading
+                                      //               ? "13.26 GB"
+                                      //               : ""),
+                                      //           textAlign: TextAlign.center,
+                                      //           style: GoogleFonts.poppins(
+                                      //             textStyle: TextStyle(
+                                      //               fontSize:
+                                      //                   useMobileLayout
+                                      //                       ? 16
+                                      //                       : 28,
+                                      //               fontWeight:
+                                      //                   FontWeight.w800,
+                                      //               color: Colors.white,
+                                      //             ),
+                                      //           ),
+                                      //         ),
+                                      //       ),
+                                      //       Expanded(
+                                      //         child: Text(
+                                      //           'Data Spent',
+                                      //           textAlign: TextAlign.center,
+                                      //           style: GoogleFonts.poppins(
+                                      //             textStyle: TextStyle(
+                                      //               fontSize:
+                                      //                   useMobileLayout
+                                      //                       ? 16
+                                      //                       : 28,
+                                      //               fontWeight:
+                                      //                   FontWeight.w800,
+                                      //               color: Colors.white,
+                                      //             ),
+                                      //           ),
+                                      //         ),
+                                      //       ),
+                                      //     ],
+                                      //   ),
+                                      // ),
+                                      Container(
+                                        alignment: Alignment.centerLeft,
+                                        child: Column(children: [
+                                          const SizedBox(
+                                            height: 40,
+                                          ),
+                                          Icon(
+                                            Icons.wifi,
+                                            size: useMobileLayout ? 55 : 65,
+                                            color: isLoading
+                                                ? (newVoucherData['status'] ==
+                                                        'completed'
+                                                    ? Colors.greenAccent
+                                                    : Colors.redAccent)
+                                                : Colors.greenAccent,
+                                          ),
+                                          Container(
+                                            child: Row(children: [
+                                              AutoSizeText("Status: ",
+                                                  style: GoogleFonts.poppins(
+                                                      fontSize: useMobileLayout
+                                                          ? 16
+                                                          : 28,
+                                                      color: Colors.white),
+                                                  minFontSize: 12,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis),
+                                              AutoSizeText(
+                                                  isLoading
+                                                      ? (newVoucherData[
+                                                                  'status'] ==
+                                                              'completed'
+                                                          ? "Online"
+                                                          : "Offline")
+                                                      : 'Offline',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: useMobileLayout
+                                                        ? 16
+                                                        : 28,
+                                                    color: isLoading
+                                                        ? (newVoucherData[
+                                                                    'status'] ==
+                                                                'completed'
+                                                            ? Colors.greenAccent
+                                                            : Colors.redAccent)
+                                                        : Colors.greenAccent,
+                                                  ),
+                                                  minFontSize: 12,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis)
+                                            ]),
+                                          ),
+                                        ]),
+                                      )
+                                    ],
                                   ),
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          // Container(
-                          //   width: double.infinity,
-                          //   child: CarouselSlider(
-                          //     options: CarouselOptions(
-                          //       autoPlay: true,
-                          //       aspectRatio: 2.0,
-                          //       // enlargeCenterPage: true,
-                          //       viewportFraction: 1.0,
-                          //       height: 100,
-                          //       enlargeStrategy:
-                          //           CenterPageEnlargeStrategy.height,
-                          //     ),
-                          //     items: imgLists.map((i) {
-                          //       return Builder(
-                          //         builder: (BuildContext context) {
-                          //           return Container(
-                          //             width: MediaQuery.of(context).size.width,
-                          //             // margin: EdgeInsets.symmetric(horizontal: 5.0),
-                          //             decoration: BoxDecoration(
-                          //               image: DecorationImage(
-                          //                   image: AssetImage(i['image']),
-                          //                   fit: BoxFit.fitWidth),
-                          //             ),
-                          //           );
-                          //         },
-                          //       );
-                          //     }).toList(),
-                          //   ),
-                          // )
-                        ]),
-                      ),
-                    )
-                  : Container()
+                        );
+                      })
+                  : Container(),
             ],
           ),
         ),

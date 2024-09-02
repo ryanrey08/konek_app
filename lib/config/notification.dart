@@ -22,7 +22,7 @@ class NotificationController {
   static Future<void> initializeLocalNotifications() async {
     await AwesomeNotifications().initialize(
         // null,
-        'resource://drawable/swak_img',
+        'resource://drawable/move_mandaue_swak',
         [
           NotificationChannel(
               channelKey: 'alerts',
@@ -363,7 +363,7 @@ Future<void> myNotifyScheduleInHours({
       backgroundColor: Colors.transparent,
       largeIcon: 'asset://assets/images/swak-img.png',
       // icon: 'asset://assets/images/novulutions.png',
-      icon: 'resource://drawable/swak_img',
+      icon: 'resource://drawable/move_mandaue_swak',
       // customSound: 'resource://raw/notif',
       payload: {'actPag': 'myAct', 'actType': 'food', 'username': username},
     ),
